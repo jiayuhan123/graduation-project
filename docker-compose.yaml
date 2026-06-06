@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # =========================================================================
+  # 1. MySQL (业务数据库) - 升级为最新的 8.4 LTS 长期支持版 (8.0系列已于2026年4月停更)
+  # =========================================================================
+  mysql:
+    image: mysql:8.4
+    container_name: micro-mysql
+    restart: always
+    mem_limit: 256m
+    environment:
+      MYSQL_ROOT_PASSWORD: "111111"
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/db:/var/lib/mysql
+    command: 
+      --mysql-native-password=ON
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --performance_schema=OFF
+      --innodb_buffer_pool_size=64M
+      --innodb_log_buffer_size=8M
+      --max_connections=50
+    networks:
+      - micro-net
+
+  # =========================================================================
+  # 2. Redis 缓存 - 升级为最新的 8.0 极速版 (或 7.4 稳定版)
+  # =========================================================================
+  redis:
+    image: redis:8.0
+    container_name: micro-redis
+    restart: always
+    mem_limit: 128m
+    command: >
+      redis-server 
+      --requirepass 111111 
+      --appendonly yes 
+      --maxmemory 96mb 
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - micro-net
+
+  # =========================================================================
+  # 3. Nacos 注册 & 配置中心 - 升级为 2026 年最新一代 3.2.2 版本 (支持 AI、命名空间体验优化)
+  # =========================================================================
+  nacos:
+    image: nacos/nacos-server:v3.2.2
+    container_name: micro-nacos
+    restart: always
+    mem_limit: 512m
+    environment:
+      MODE: standalone
+      JVM_XMS: 256m
+      JVM_XMX: 256m
+      JVM_XMN: 128m
+      NACOS_AUTH_IDENTITY_KEY: nacos_identity_project
+      NACOS_AUTH_IDENTITY_VALUE: nacos_identity_value_111111
+      NACOS_AUTH_TOKEN: SecretKey012345678901234567890123456789012345678901234567890123456789
+      TZ: Asia/Shanghai
+    ports:
+      - "8848:8848"  # API 端口
+      - "8847:8080"  # 3.x 独立控制台端口
+      - "9848:9848"
+      - "9849:9849"
+    volumes:
+      - ./data/nacos/logs:/home/nacos/logs
+      - ./data/nacos/data:/home/nacos/data
+    networks:
+      - micro-net
+
+  # =========================================================================
+  # 4. RabbitMQ 队列 - 升级为最新的 4.0-management 版本
+  # =========================================================================
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: micro-rabbitmq
+    restart: always
+    mem_limit: 350m
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: "111111"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - micro-net
+
+  # =========================================================================
+  # 5. MinIO 对象存储 - 保持最新的 latest 镜像构建
+  # =========================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: micro-minio
+    restart: always
+    mem_limit: 256m
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: admin111111
+      GOMAXPROCS: 2
+      TZ: Asia/Shanghai
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data/minio/data:/data
+      - ./data/minio/config:/root/.minio
+    command: server /data --console-address ":9001"
+    networks:
+      - micro-net
+
+networks:
+  micro-net:
+    driver: bridge
