@@ -1,0 +1,67 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: notify-service
+  
+  # 数据库连接配置 (本地测试，暂不配置在 Nacos 中)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://122.51.234.113:3306/notify_db?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 111111
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # Nacos 服务发现配置与配置中心关闭 (本地测试，暂不加载 Nacos 配置)
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 122.51.234.113:8848
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+
+  # RabbitMQ 配置 (消费端，对接你的 micro-rabbitmq)
+  rabbitmq:
+    host: 122.51.234.113
+    port: 5672
+    username: root
+    password: "111111"
+    listener:
+      simple:
+        acknowledge-mode: manual # 开启手动确认 (ACK)，防止消息丢失，提升可靠性
+        prefetch: 1 # 每次拉取一条消息处理
+
+  # 邮件发送配置 (SMTP 服务器配置，本地测试模板)
+  mail:
+    host: smtp.qq.com # 示例：QQ 邮箱服务器为 smtp.qq.com，网易为 smtp.163.com
+    port: 465 # SSL 端口通常为 465 或 994
+    username: xxx@qq.com # 发送方的邮箱账号，需要在此配置
+    password: xxx # 邮箱第三方授权码（非邮箱登录密码），需要在邮箱后台开启 SMTP 服务后获取
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true # 开启认证
+          ssl:
+            enable: true # 开启 SSL 加密安全传输
+          starttls:
+            enable: true
+            required: true
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 开启驼峰命名转换
+  global-config:
+    db-config:
+      logic-delete-field: deleted # 逻辑删除字段名
+      logic-delete-value: 1       # 逻辑删除值
+      logic-not-delete-value: 0   # 逻辑未删除值
