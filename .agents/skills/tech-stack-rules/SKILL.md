@@ -16,6 +16,7 @@ description: >-
 - **Spring Cloud**: `2025.1.1`
 - **Spring Cloud Alibaba (含 Nacos)**: `2025.1.0.0`
 - **MyBatis-Plus**: `3.5.15` (专属支持 Spring Boot 4 的 `mybatis-plus-spring-boot4-starter`)
+- **数据库**: `PostgreSQL 18` (全面替代 MySQL)
 - **Sa-Token**: `1.39.0`
 
 ---
@@ -47,6 +48,10 @@ description: >-
 ### 5. Sa-Token 鉴权规范
 - 本项目抛弃了繁重的 Spring Security/Shiro，统一使用 Sa-Token 进行权限和会话管理。
 - 路由拦截或 AOP 鉴权请使用 `StpUtil` 提供的 API，并配合全局异常处理器捕获 `SaTokenException` 的子类进行统一 JSON 响应。
+
+### 6. 基础设施与部署规范 (Docker)
+- 服务器端安装的是新版 Docker，集成了 Compose 插件。
+- 在提供任何容器编排相关的命令时，**必须使用 `docker compose`**（有空格），**严禁使用已被淘汰的旧版 `docker-compose`**（带横杠）。
 
 ---
 

@@ -31,7 +31,7 @@ description: >-
   - `3.5.15` (主微服务使用 `mybatis-plus-spring-boot4-starter`)
   - `3.5.12` (部分通用模块兼容使用 `mybatis-plus-spring-boot3-starter`)
 - **MinIO SDK**: `8.5.12`
-- **MySQL Connector/J**: 由 Spring Boot `4.0.6` 的 BOM 自动管控。
+- **PostgreSQL Driver**: `org.postgresql:postgresql` (版本由 Spring Boot 4.0.6 的 BOM 自动管控)
 
 ### 4. 权限、安全与网关组件
 - **Sa-Token 核心**: `1.39.0` (`sa-token-spring-boot3-starter`)

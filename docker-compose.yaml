@@ -2,30 +2,25 @@ version: '3.8'
 
 services:
   # =========================================================================
-  # 1. MySQL (业务数据库) - 升级为最新的 8.4 LTS 长期支持版 (8.0系列已于2026年4月停更)
+  # 1. PostgreSQL (业务数据库) - 升级为最新的 18 系列
   # =========================================================================
-  mysql:
-    image: mysql:8.4
-    container_name: micro-mysql
+  postgres:
+    image: postgres:18
+    container_name: micro-postgres
     restart: always
     mem_limit: 256m
     environment:
-      MYSQL_ROOT_PASSWORD: "111111"
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "111111"
+      POSTGRES_DB: user_db
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - ./data/mysql/db:/var/lib/mysql
-    command: 
-      --mysql-native-password=ON
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --performance_schema=OFF
-      --innodb_buffer_pool_size=64M
-      --innodb_log_buffer_size=8M
-      --max_connections=50
+      - ./data/postgres:/var/lib/postgresql
     networks:
       - micro-net
+
 
   # =========================================================================
   # 2. Redis 缓存 - 升级为最新的 8.0 极速版 (或 7.4 稳定版)
@@ -96,25 +91,27 @@ services:
       - micro-net
 
   # =========================================================================
-  # 5. MinIO 对象存储 - 保持最新的 latest 镜像构建
+  # 5. Jenkins - 自动化构建部署 (极致压缩版)
   # =========================================================================
-  minio:
-    image: minio/minio:latest
-    container_name: micro-minio
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: micro-jenkins
     restart: always
-    mem_limit: 256m
+    # 容器总限制压缩到 800m
+    mem_limit: 800m
+    user: root 
     environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: admin111111
-      GOMAXPROCS: 2
-      TZ: Asia/Shanghai
+      # 进一步压缩 Jenkins 自身的 JVM 堆内存为 256M
+      - JAVA_OPTS=-Xms128m -Xmx256m -XX:MaxMetaspaceSize=128m
+      - TZ=Asia/Shanghai
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "8080:8080"
+      - "50000:50000"
     volumes:
-      - ./data/minio/data:/data
-      - ./data/minio/config:/root/.minio
-    command: server /data --console-address ":9001"
+      - ./data/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      # (可选) 如果你以后想把宿主机的 Maven 仓库挂进去，可以加下面这行，加速构建
+      # - ./data/maven/repo:/root/.m2/repository
     networks:
       - micro-net
 

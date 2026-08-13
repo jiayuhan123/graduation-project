@@ -3,17 +3,6 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for notify-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.0.6/spring-boot-configuration-processor-4.0.6.jar" />
-        </processorPath>
-        <module name="notify-service" />
-        <module name="file-service" />
-      </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -30,7 +19,25 @@
         <module name="gateway" />
         <module name="user-service" />
       </profile>
+      <profile name="Annotation profile for notify-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.0.6/spring-boot-configuration-processor-4.0.6.jar" />
+        </processorPath>
+        <module name="notify-service" />
+        <module name="file-service" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="common" target="21" />
+      <module name="file-service" target="21" />
+      <module name="gateway" target="21" />
+      <module name="notify-service" target="21" />
+      <module name="user-service" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

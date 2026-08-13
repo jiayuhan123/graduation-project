@@ -1,0 +1,16 @@
+{
+  "name": "client-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Graduation project mini program portal",
+  "dependencies": {
+    "uview-plus": "^3.3.36",
+    "dayjs": "^1.11.10",
+    "clipboard": "^2.0.11"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.14",
+    "typescript": "~5.8.3",
+    "vue": "^3.4.21"
+  }
+}
