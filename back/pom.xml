@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.6</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>xyz.jiayuhan</groupId>
+    <artifactId>memorial-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>memorial-parent</name>
+    <description>面向特定社区的文明祭扫系统 - 后端父工程（聚合 + 版本统一管理）</description>
+
+    <modules>
+        <module>common</module>
+        <module>gateway</module>
+        <module>user-service</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Spring 生态版本（Boot 由上方 parent 管控） -->
+        <spring-cloud.version>2025.1.1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2025.1.0.0</spring-cloud-alibaba.version>
+
+        <!-- 第三方组件版本 -->
+        <sa-token.version>1.39.0</sa-token.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <knife4j.version>4.5.0</knife4j.version>
+        <lombok.version>1.18.30</lombok.version>
+        <spring-security.version>7.0.2</spring-security.version>
+
+        <!-- 内部模块版本 -->
+        <revision>0.0.1-SNAPSHOT</revision>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- ==================== 框架 BOM ==================== -->
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud Alibaba BOM（Nacos 等） -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ==================== 内部公共模块 ==================== -->
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- ==================== 第三方组件 ==================== -->
+            <!-- Sa-Token 权限认证（Servlet 版） -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <!-- Sa-Token 权限认证（Gateway 响应式版） -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <!-- Sa-Token 整合 Redis（Jackson 序列化） -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <!-- MyBatis-Plus（Spring Boot 4 专用 Starter） -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- Knife4j 网关聚合接口文档 -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            <!-- Lombok（覆盖 Boot 管控版本） -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <!-- Spring Security Crypto（仅用 BCrypt 密码哈希，不引入 Spring Security 全家桶；与 Boot 4 配套的 Security 7.x） -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${spring-security.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- 可执行模块统一打包配置：排除 Lombok -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <!-- 编译插件：统一注册 Lombok 注解处理器 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

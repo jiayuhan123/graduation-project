@@ -1,0 +1,64 @@
+server:
+  port: 10000
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 122.51.234.113:8848
+      config:
+        import-check:
+          enabled: false # 关闭 Nacos 强制配置导入检查
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/user/**
+  data:
+    redis:
+      host: 122.51.234.113
+      port: 6379
+      password: 111111 # 根据架构文档，Redis密码是 111111
+      database: 0
+
+# Sa-Token 配置
+sa-token:
+  token-name: satoken
+  timeout: 604800
+  active-timeout: 86400
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# 鉴权白名单配置 (本地配置兜底)
+security:
+  whitelist:
+    - /api/user/login
+    - /api/user/register
+    - /actuator/health
+    - /actuator/info
+    - /doc.html
+    - /webjars/**
+    - /v3/api-docs/**
+    - /swagger-resources/**
+
+# Knife4j 聚合配置
+knife4j:
+  gateway:
+    enabled: true
+    # 指定服务发现的模式为 nacos 
+    strategy: discover
+    discover:
+      enabled: true
+      # 指定不聚合网关本身
+      excluded-services:
+        - gateway
