@@ -11,12 +11,12 @@
     </parent>
 
     <groupId>xyz.jiayuhan</groupId>
-    <artifactId>memorial-parent</artifactId>
+    <artifactId>graduation-project-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>memorial-parent</name>
-    <description>面向特定社区的文明祭扫系统 - 后端父工程（聚合 + 版本统一管理）</description>
+    <name>graduation-project-parent</name>
+    <description>毕业设计微服务基础框架 - 后端父工程（聚合与版本统一管理）</description>
 
     <modules>
         <module>common</module>

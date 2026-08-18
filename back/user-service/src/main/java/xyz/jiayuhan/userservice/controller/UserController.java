@@ -14,7 +14,7 @@ import xyz.jiayuhan.userservice.model.vo.RegisterVO;
 import xyz.jiayuhan.userservice.service.UserService;
 
 /**
- * 居民用户接口
+ * 用户账号接口
  */
 @RestController
 @RequestMapping("/api/user")
@@ -24,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * 居民登录
+     * 用户登录
      */
     @PostMapping("/login")
     public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     /**
-     * 居民注册
+     * 用户注册
      */
     @PostMapping("/register")
     public Result<RegisterVO> register(@Valid @RequestBody RegisterDTO registerDTO) {

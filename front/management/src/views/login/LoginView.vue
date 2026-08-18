@@ -45,8 +45,8 @@ async function handleSubmit() {
 <template>
   <div class="login-page">
     <el-card class="login-card" shadow="always">
-      <h2 class="login-title">文明祭扫管理后台</h2>
-      <p class="login-subtitle">社区管理员登录</p>
+      <h2 class="login-title">项目管理后台</h2>
+      <p class="login-subtitle">管理员登录</p>
 
       <el-form ref="formRef" :model="form" :rules="rules" size="large" @keyup.enter="handleSubmit">
         <el-form-item prop="username">

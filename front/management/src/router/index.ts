@@ -29,7 +29,7 @@ const router = createRouter({
 /** 全局路由守卫：登录态校验 + 页面标题 */
 router.beforeEach((to) => {
   const userStore = useUserStore()
-  document.title = `${(to.meta.title as string) ?? ''} - 文明祭扫管理后台`
+  document.title = `${(to.meta.title as string) ?? ''} - 项目管理后台`
 
   if (to.meta.requiresAuth !== false && !userStore.isLoggedIn) {
     return { name: 'login', query: { redirect: to.fullPath } }

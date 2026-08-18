@@ -16,7 +16,7 @@ function handleLogout() {
   <el-container class="layout">
     <!-- 顶部导航栏 -->
     <el-header class="layout-header">
-      <div class="header-title">文明祭扫管理后台</div>
+      <div class="header-title">项目管理后台</div>
       <el-dropdown @command="handleLogout">
         <span class="user-info">
           <el-avatar :size="28">

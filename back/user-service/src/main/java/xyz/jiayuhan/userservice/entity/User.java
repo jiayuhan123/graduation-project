@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 居民用户实体类（对应 t_user 表）
+ * 用户实体类（对应 t_user 表）
  */
 @Data
 @TableName("t_user")

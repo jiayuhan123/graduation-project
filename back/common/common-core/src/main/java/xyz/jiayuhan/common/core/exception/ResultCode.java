@@ -10,7 +10,7 @@ import lombok.Getter;
  * - 200：操作成功
  * - 4xx：客户端错误（参数、权限、资源等）
  * - 5xx：服务器端错误
- * - 1xxx：用户与社区模块业务错误（10xx 居民账号、11xx 社区、12xx 纪念档案、13xx 祭扫预约）
+ * - 1xxx：用户模块业务错误
  * - 2xxx：文件模块业务错误
  * </p>
  */
@@ -31,29 +31,12 @@ public enum ResultCode {
     INTERNAL_SERVER_ERROR(500, "服务器内部错误"),
     SERVICE_UNAVAILABLE(503, "服务暂不可用"),
 
-    // =================== 居民账号（10xx） ===================
+    // =================== 用户账号（1xxx） ===================
     USERNAME_OR_PASSWORD_ERROR(1001, "用户名或密码错误"),
     USERNAME_EXISTS(1002, "用户名已存在"),
     PHONE_EXISTS(1003, "手机号已被注册"),
     USER_DISABLED(1004, "账号已被禁用，请联系管理员"),
     OLD_PASSWORD_ERROR(1005, "旧密码不正确"),
-
-    // =================== 社区（11xx） ===================
-    COMMUNITY_NOT_FOUND(1101, "社区不存在或已停用"),
-    ALREADY_JOINED_COMMUNITY(1102, "居民已加入该社区"),
-    NOT_COMMUNITY_MEMBER(1103, "不属于该社区成员"),
-
-    // =================== 纪念档案（12xx） ===================
-    DECEASED_NOT_FOUND(1201, "纪念档案不存在"),
-    DECEASED_STATUS_NOT_ALLOWED(1202, "纪念档案状态不允许操作"),
-    DECEASED_NO_PERMISSION(1203, "无权限操作该档案"),
-    SENSITIVE_WORD_FOUND(1204, "内容含敏感词"),
-
-    // =================== 祭扫预约（13xx） ===================
-    SLOT_IS_FULL(1301, "预约时段已满额"),
-    APPOINTMENT_EXISTS(1302, "该时段已存在预约"),
-    APPOINTMENT_STATUS_NOT_ALLOWED(1303, "预约状态不允许该操作"),
-    APPOINTMENT_TIME_PASSED(1304, "预约时间已过，无法取消"),
 
     // =================== 文件模块（2xxx） ===================
     FILE_NOT_FOUND(2000, "文件不存在"),

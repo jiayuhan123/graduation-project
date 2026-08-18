@@ -3,6 +3,20 @@ bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
+target/
+dist/
+node_modules/
+
+# IDE and local environment
+.idea/
+.vscode/
+*.iml
+.env
+.env.local
+
+# Logs and generated files
+*.log
+coverage/
 
 # Other files and folders
 .settings/

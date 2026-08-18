@@ -20,7 +20,7 @@ import xyz.jiayuhan.userservice.service.UserService;
 import java.time.LocalDateTime;
 
 /**
- * 居民用户服务实现
+ * 用户账号服务实现
  */
 @Slf4j
 @Service
@@ -28,16 +28,16 @@ import java.time.LocalDateTime;
 public class UserServiceImpl implements UserService {
 
     /**
-     * 登录成功后默认角色（社区模块上线后改为取自 t_community_member）
+     * 基础框架的默认登录角色，后续可按新业务替换为持久化角色。
      */
-    private static final String DEFAULT_ROLE = "resident";
+    private static final String DEFAULT_ROLE = "user";
 
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public LoginVO login(LoginDTO loginDTO) {
-        // 1. 按用户名或手机号查询居民账号
+        // 1. 按用户名或手机号查询用户账号
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, loginDTO.username())
                 .or()
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
         user.setStatus(1);
         userMapper.insert(user);
 
-        log.info("居民注册成功：userId={}, username={}", user.getId(), user.getUsername());
+        log.info("用户注册成功：userId={}, username={}", user.getId(), user.getUsername());
         return new RegisterVO(user.getId(), user.getUsername());
     }
 }

@@ -5,14 +5,14 @@
 
     <parent>
         <groupId>xyz.jiayuhan</groupId>
-        <artifactId>memorial-parent</artifactId>
+        <artifactId>graduation-project-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>user-service</artifactId>
 
     <name>user-service</name>
-    <description>用户服务：居民账号、社区成员关系管理</description>
+    <description>用户服务：账号注册、登录与身份认证</description>
 
     <dependencies>
         <!-- 监控端点 -->
