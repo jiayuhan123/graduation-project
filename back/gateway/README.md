@@ -27,7 +27,7 @@
 1. `AuthGlobalFilter` 检查请求路径是否命中 `security.whitelist`。
 2. 非白名单请求从 `satoken` 请求头读取令牌。
 3. 网关通过 Sa-Token 查询 Redis，获得登录用户 ID。
-4. 校验通过后，网关向下游请求写入 `X-User-ID`。
+4. 网关先删除客户端传入的 `X-User-ID`，校验通过后再写入可信用户 ID。
 5. 缺少或失效令牌时，返回 HTTP `200` 和业务码 `401`。
 
 当前白名单包括登录、注册、健康检查和接口文档相关路径，实际清单以 [`application.yml`](./src/main/resources/application.yml) 为准。
@@ -101,11 +101,11 @@ GET http://localhost:10000/actuator/health
 | `security.whitelist` | 无需登录即可访问的路径 |
 | `knife4j.gateway` | 接口文档聚合策略 |
 
-当前配置文件包含固定的远程基础设施信息。部署前应改用环境变量或 Nacos 配置中心，并轮换已经进入配置文件的凭据。
+配置文件使用 `NACOS_SERVER_ADDR`、`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD` 和 `REDIS_DATABASE` 环境变量，并可由 Nacos 配置覆盖。生产环境不得沿用本地默认密码。
 
 ## 安全边界与已知限制
 
-- 下游服务应只允许来自网关或可信内网的流量，避免外部伪造 `X-User-ID`。
+- 网关会过滤客户端伪造的 `X-User-ID`；下游服务仍应只允许来自网关或可信内网的流量。
 - 当前跨域范围过宽，生产环境需要设置明确的允许域名。
-- 全局过滤器中存在阻塞式 Sa-Token/Redis 调用，并包装在 Reactor 流程中；高并发前应进行压测并评估响应式线程占用。
+- Sa-Token/Redis 阻塞校验已调度到 Reactor bounded-elastic 线程池；生产前仍需按目标并发量压测。
 - 错误响应会包含部分异常消息，生产环境应避免向客户端暴露内部实现或基础设施细节。

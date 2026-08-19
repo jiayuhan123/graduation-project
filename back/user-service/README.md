@@ -1,273 +1,167 @@
-# User Service 用户服务
+# User Service 通用用户服务
 
-`user-service` 负责用户账号注册、登录、密码校验、账号状态检查和 Sa-Token 会话创建，是当前后端的用户身份数据源。
+`user-service` 是与毕业设计具体选题无关的账号与权限基础服务，提供注册登录、会话管理、个人资料、密码修改、用户管理和 RBAC。业务选题确定后，新业务服务只引用用户 ID 并按权限码授权，不把领域数据继续堆入本服务。
 
-## 服务信息
+## 已实现能力
 
-| 项目 | 当前值 |
-| --- | --- |
-| Maven 模块 | `xyz.jiayuhan:user-service` |
+- 用户名、手机号或邮箱登录，BCrypt 哈希校验；
+- Sa-Token + Redis 可撤销会话，登录、退出和会话查询；
+- 注册用户自动分配内置 `user` 角色；
+- 当前用户资料查询/修改和安全改密；
+- 管理员分页查询、创建、修改、禁用、软删除用户；
+- 管理员分配角色、重置密码，敏感操作后强制目标账号下线；
+- 数据库存储的 RBAC 角色/权限，并接入 Sa-Token 注解鉴权；
+- Redis 登录失败计数，默认 15 分钟内失败 5 次后暂时锁定；
+- Flyway 自动建表与升级、MyBatis-Plus 分页/乐观锁/逻辑删除；
+- OpenAPI 3 文档和基础自动化测试。
+
+## 技术与端点
+
+| 项目 | 值 |
+|---|---|
 | 应用名 | `user-service` |
 | 默认端口 | `8001` |
-| Web 技术栈 | Spring MVC |
-| 数据库 | PostgreSQL，数据库名当前为 `user_db` |
-| ORM | MyBatis-Plus |
-| 会话 | Sa-Token + Redis |
-| 服务注册 | Nacos |
-| 启动类 | `xyz.jiayuhan.userservice.UserServiceApplication` |
+| Java / Spring Boot | Java 21 / Spring Boot 4.0.6 |
+| 数据库 | PostgreSQL 18 + MyBatis-Plus 3.5.15 + Flyway |
+| 会话 | Sa-Token 1.39.0 + Redis |
+| 文档 | `/swagger-ui.html`、`/v3/api-docs` |
+| 健康检查 | `/actuator/health` |
 
-## 已实现功能
-
-- 使用用户名或手机号登录；
-- 使用 BCrypt 校验和存储密码；
-- 校验用户名、手机号唯一性；
-- 校验账号是否被禁用；
-- 登录成功后创建 Sa-Token 会话并写入 Redis；
-- 通过 `common-web` 统一处理参数校验和业务异常。
-
-RabbitMQ 与 OpenFeign 依赖已经预留，但当前源码尚未发布消息，也没有定义 Feign 客户端。
-
-## 登录认证与用户信息流程
-
-下图同时展示当前已经实现的登录、网关鉴权和用户身份透传链路，以及建议补充的“获取当前用户信息”链路。虚线部分表示尚未实现的能力。
-
-```mermaid
-flowchart TD
-    C["客户端"]
-
-    subgraph LOGIN["一、登录认证（当前已实现）"]
-        L1["POST /api/user/login<br/>用户名或手机号 + 密码"]
-        G1["Gateway :10000"]
-        W1{"是否命中白名单"}
-        R1["根据 Nacos 路由到<br/>user-service :8001"]
-        U1["UserController.login"]
-        U2["查询 PostgreSQL<br/>t_user"]
-        U3{"账号及密码是否正确"}
-        U4{"账号状态是否正常"}
-        U5["StpUtil.login(userId)"]
-        RD1["Redis<br/>保存 Token 与登录会话"]
-        LOK["返回 LoginVO<br/>token、userId、username<br/>固定角色 user、过期时间"]
-        LE1["Result 1001<br/>用户名或密码错误"]
-        LE2["Result 1004<br/>账号已禁用"]
-    end
-
-    C --> L1 --> G1 --> W1
-    W1 -->|"登录接口在白名单"| R1 --> U1 --> U2 --> U3
-    U3 -->|"否"| LE1 --> C
-    U3 -->|"是"| U4
-    U4 -->|"否"| LE2 --> C
-    U4 -->|"是"| U5 --> RD1
-    U5 --> LOK --> C
-
-    subgraph AUTH["二、访问受保护接口（鉴权已实现）"]
-        A1["请求业务接口<br/>Header: satoken = Token"]
-        G2["Gateway AuthGlobalFilter"]
-        A2{"是否携带 Token"}
-        A3["从 Redis 查询登录 ID<br/>getLoginIdByToken"]
-        A4{"Token 是否有效"}
-        AE["HTTP 200 + Result 401<br/>请先登录／登录已过期"]
-        H1["网关注入请求头<br/>X-User-ID = userId"]
-        ROUTE["Nacos 服务发现<br/>LoadBalancer 路由"]
-        BS["Servlet 业务服务"]
-        INT["common-web<br/>UserInfoInterceptor"]
-        CTX["UserContext<br/>保存当前线程 userId"]
-        LOGIC["Controller / Service<br/>通过 UserContext.getUserId() 获取身份"]
-        CLEAN["请求完成<br/>清理 ThreadLocal"]
-        RESULT["统一 Result 响应"]
-    end
-
-    C --> A1 --> G2 --> A2
-    A2 -->|"否"| AE --> C
-    A2 -->|"是"| A3
-    RD1 -.->|"共享会话数据"| A3
-    A3 --> A4
-    A4 -->|"无效"| AE
-    A4 -->|"有效"| H1 --> ROUTE --> BS --> INT --> CTX --> LOGIC
-    LOGIC --> RESULT --> CLEAN --> C
-
-    subgraph PROFILE["三、获取当前用户信息（建议新增）"]
-        M1["GET /api/user/me<br/>Header: satoken = Token"]
-        M2["复用网关鉴权流程"]
-        M3["user-service 获取<br/>UserContext.userId"]
-        M4["按用户 ID 查询 t_user"]
-        M5["返回 UserProfileVO<br/>userId、username、realName<br/>phone、avatar、status"]
-    end
-
-    C -.->|"当前尚未实现"| M1
-    M1 -.-> M2
-    M2 -.-> H1
-    LOGIC -.->|"目标为 user-service 时"| M3
-    M3 -.-> M4
-    M4 -.-> U2
-    M4 -.-> M5
-    M5 -.-> C
-```
-
-该方案遵循以下边界：网关只负责校验会话并透传可信用户 ID；业务服务通过 `UserContext` 获取身份；完整用户资料由 `user-service` 按需查询，不能在服务之间传递密码字段。
-
-## API
-
-经网关访问时，基础地址为：
-
-```text
-http://localhost:10000/api/user
-```
-
-### 用户注册
+外部调用统一经过 Gateway `:10000`。登录成功后，客户端使用响应中的 `tokenName` 作为请求头名称，默认形式为：
 
 ```http
-POST /api/user/register
-Content-Type: application/json
+satoken: <token>
 ```
 
-请求体：
+## API 一览
 
-```json
-{
-  "username": "demo_user",
-  "password": "123456",
-  "realName": "示例用户",
-  "phone": "13800138000"
-}
-```
+### 公开接口
 
-校验规则：
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/api/user/register` | 注册，保持原前端请求结构兼容 |
+| POST | `/api/user/login` | 用户名、手机号或邮箱登录 |
 
-| 字段 | 必填 | 规则 |
-| --- | --- | --- |
-| `username` | 是 | 3～20 位，仅字母、数字、下划线 |
-| `password` | 是 | 6～20 位 |
-| `realName` | 否 | 最多 50 个字符 |
-| `phone` | 是 | `1` 开头的 11 位数字 |
+### 登录用户接口
 
-成功响应：
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/api/user/logout` | 退出当前会话 |
+| GET | `/api/user/session` | 查询当前会话、角色和权限 |
+| GET | `/api/user/me` | 查询当前用户资料 |
+| PUT | `/api/user/me` | 修改可编辑资料 |
+| PUT | `/api/user/me/password` | 修改密码并使该账号全部会话失效 |
 
-```json
-{
-  "code": 200,
-  "message": "注册成功",
-  "data": {
-    "id": 123456789012345678,
-    "username": "demo_user"
-  }
-}
-```
+### 管理接口
 
-可能的业务错误：
+| 方法 | 路径 | 权限 |
+|---|---|---|
+| GET | `/api/user/admin/users` | `system:user:list` |
+| GET | `/api/user/admin/users/{id}` | `system:user:query` |
+| POST | `/api/user/admin/users` | `system:user:create` |
+| PUT | `/api/user/admin/users/{id}` | `system:user:update` |
+| PUT | `/api/user/admin/users/{id}/status` | `system:user:status` |
+| PUT | `/api/user/admin/users/{id}/roles` | `system:user:role` |
+| PUT | `/api/user/admin/users/{id}/password` | `system:user:password-reset` |
+| DELETE | `/api/user/admin/users/{id}` | `system:user:delete` |
+| GET/POST | `/api/user/admin/roles` | `system:role:list/create` |
+| PUT/DELETE | `/api/user/admin/roles/{id}` | `system:role:update/delete` |
+| PUT | `/api/user/admin/roles/{id}/status` | `system:role:update` |
+| PUT | `/api/user/admin/roles/{id}/permissions` | `system:role:permission` |
+| GET | `/api/user/admin/permissions` | `system:permission:list` |
 
-| 业务码 | 含义 |
-| ---: | --- |
-| `400` | 请求参数校验失败 |
-| `1002` | 用户名已存在 |
-| `1003` | 手机号已被注册 |
+请求、响应和完整示例见 [用户服务接口文档](../../项目文档/5-接口文档/用户服务接口.md)。
 
-### 用户登录
+## 兼容性约定
 
-```http
-POST /api/user/login
-Content-Type: application/json
-```
+原有客户端不需要修改即可继续使用：
 
-请求体中的 `username` 可以是用户名或手机号：
+- 登录仍为 `POST /api/user/login`，请求字段仍为 `username`、`password`；
+- 注册仍为 `POST /api/user/register`，原字段 `username`、`password`、`realName`、`phone` 均保留；
+- 登录响应继续返回 `token`、`tokenName`、`userId`、`username`、`role`、`expireAt`；
+- 新增的 `roles`、`permissions`、`timeout` 字段可由旧客户端忽略。
 
-```json
-{
-  "username": "demo_user",
-  "password": "123456"
-}
-```
+注册新增可选字段 `nickname`、`email`，手机号也允许为空，以适应尚未确定的新业务。
 
-成功响应：
+## 数据模型与迁移
 
-```json
-{
-  "code": 200,
-  "message": "登录成功",
-  "data": {
-    "token": "生成的令牌",
-    "tokenName": "satoken",
-    "userId": 123456789012345678,
-    "username": "demo_user",
-    "role": "user",
-    "expireAt": "2026-08-25T12:00:00"
-  }
-}
-```
+启动时 Flyway 自动执行 `src/main/resources/db/migration`。首次启动会创建：
 
-后续受保护请求需携带：
+| 表 | 用途 |
+|---|---|
+| `t_user` | 账号、资料、状态、登录审计与逻辑删除 |
+| `sys_role` | 角色字典 |
+| `sys_permission` | 权限字典 |
+| `sys_user_role` | 用户角色关联 |
+| `sys_role_permission` | 角色权限关联 |
+| `flyway_schema_history` | Flyway 迁移历史 |
 
-```http
-satoken: <登录响应中的 token>
-```
+迁移脚本会保留早期 `t_user` 数据并补充缺失字段。用户名和邮箱统一按小写保存；用户名、手机号、邮箱使用“未删除记录”唯一索引。内置角色：
 
-可能的业务错误：
+- `user`：注册账号默认角色；
+- `admin`：拥有当前全部系统管理权限。
 
-| 业务码 | 含义 |
-| ---: | --- |
-| `400` | 用户名或密码为空 |
-| `1001` | 用户名或密码错误 |
-| `1004` | 账号已禁用 |
+不要手工修改已经在环境中执行过的迁移文件。后续变更应新增 `V2__...sql`。
 
-## 数据模型
+## 创建初始管理员
 
-实体 `User` 映射 PostgreSQL 表 `t_user`：
-
-| 列 | Java 类型 | 说明 |
-| --- | --- | --- |
-| `id` | `Long` | 主键，由 MyBatis-Plus 雪花算法生成 |
-| `username` | `String` | 登录用户名，应有唯一约束 |
-| `password` | `String` | BCrypt 哈希，不存储明文 |
-| `real_name` | `String` | 真实姓名 |
-| `phone` | `String` | 手机号，应有唯一约束 |
-| `avatar` | `String` | 头像地址，注册时默认为空字符串 |
-| `status` | `Integer` | `1` 正常，`0` 禁用 |
-| `created_at` | `LocalDateTime` | 注册时间 |
-| `updated_at` | `LocalDateTime` | 最后更新时间 |
-
-仓库当前没有数据库迁移脚本。部署者需要提前创建 `t_user`，并为用户名和手机号添加数据库唯一约束；时间字段应由数据库默认值、触发器或后续的 MyBatis-Plus 自动填充策略负责写入。
-
-## 运行依赖
-
-- JDK 21；
-- PostgreSQL 及 `t_user` 表；
-- Redis，用于 Sa-Token 会话持久化；
-- Nacos，用于服务注册；
-- `common-core`、`common-web`、`common-redis` 公共模块。
-
-## 启动
-
-在 `back` 目录执行：
+仓库不保存默认管理员密码。首次部署时临时设置：
 
 ```powershell
-.\mvnw.cmd install -DskipTests
-.\mvnw.cmd -pl user-service spring-boot:run
+$env:BOOTSTRAP_ADMIN_ENABLED="true"
+$env:BOOTSTRAP_ADMIN_USERNAME="admin"
+$env:BOOTSTRAP_ADMIN_PASSWORD="请替换为强密码"
+./mvnw.cmd -pl user-service spring-boot:run
 ```
 
-也可以直接运行 `UserServiceApplication`。启动后可检查：
+初始化器会创建账号或把已有同名账号分配为 `admin`。完成后关闭 `BOOTSTRAP_ADMIN_ENABLED`；重复开启不会重置已有密码。
 
-```text
-GET http://localhost:8001/actuator/health
+## 配置
+
+本地默认连接 `localhost` 上由根目录 Compose 提供的服务，生产环境必须覆盖敏感项：
+
+| 环境变量 | 默认值 | 说明 |
+|---|---|---|
+| `SERVER_PORT` | `8001` | 服务端口 |
+| `NACOS_SERVER_ADDR` | `localhost:8848` | Nacos 地址 |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/user_db` | JDBC URL |
+| `DB_USERNAME` | `root` | 数据库账号 |
+| `DB_PASSWORD` | `111111` | 仅本地默认密码 |
+| `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` | Redis |
+| `REDIS_PASSWORD` | `111111` | 仅本地默认密码 |
+| `SA_TOKEN_TIMEOUT` | `604800` | 会话最长有效期，秒 |
+| `SA_TOKEN_ACTIVE_TIMEOUT` | `86400` | 无操作有效期，秒 |
+| `BCRYPT_STRENGTH` | `12` | BCrypt cost |
+| `LOGIN_MAX_ATTEMPTS` | `5` | 锁定前失败次数 |
+| `LOGIN_LOCK_DURATION` | `15m` | 登录失败计数有效期 |
+
+`application.yml` 使用 `spring.config.import=optional:nacos:user-service.yaml`，因此环境变量、本地配置和 Nacos 配置可以按 Spring 优先级覆盖。
+
+## 本地运行与验证
+
+在项目根目录启动基础中间件：
+
+```powershell
+docker compose up -d postgres redis nacos
 ```
 
-正常情况下，服务还会以 `user-service` 名称注册到 Nacos。
+然后在 `back` 目录执行：
 
-## 关键配置
+```powershell
+./mvnw.cmd -pl user-service -am test
+./mvnw.cmd -pl user-service spring-boot:run
+```
 
-| 配置前缀 | 作用 |
-| --- | --- |
-| `server.port` | 服务监听端口 |
-| `spring.cloud.nacos.discovery` | Nacos 注册与发现 |
-| `spring.datasource` | PostgreSQL 连接 |
-| `spring.data.redis` | Redis 连接 |
-| `mybatis-plus` | 下划线映射和 SQL 日志 |
-| `sa-token` | Token 名称、有效期、活跃超时和并发策略 |
+Docker 未启动时仍可执行单元测试；应用集成启动需要 PostgreSQL、Redis 和 Nacos。
 
-当前配置文件包含固定的远程基础设施地址和凭据。部署前应迁移到环境变量或 Nacos 配置中心，并轮换已经进入配置文件的凭据。生产环境还应关闭 MyBatis-Plus 标准输出 SQL 日志，避免泄露敏感数据。
+## 安全边界
 
-## 业务与安全约定
+- 网关会删除客户端伪造的 `X-User-ID`，校验 Token 后再重建；
+- 用户服务自身通过 Sa-Token 注解再次校验登录和权限，不能只依赖网关；
+- 密码只保存 BCrypt 哈希，不进入响应、缓存 Key 或业务日志；
+- 登录失败对“不存在账号”和“密码错误”返回相同错误；
+- 禁用、删除、改密、角色调整和管理员重置密码都会让相关会话失效；
+- 管理员不能禁用、删除、重置自身密码或修改自身角色，避免误锁；
+- `admin`、`user` 内置角色不能禁用、删除或重分配权限。
 
-- 登录失败统一返回“用户名或密码错误”，避免泄露账号是否存在。
-- 密码仅使用 BCrypt 哈希落库，日志和响应中不得输出密码。
-- 网关注入的 `X-User-ID` 由 `common-web` 提取；服务不应直接暴露到公网。
-- 当前角色固定返回 `user`，尚未接入持久化角色或权限模型。
-- 注册接口先查询再插入，数据库唯一约束仍是并发注册场景下的最终一致性保障。
+忘记密码流程没有伪造一个不安全的“直接重置”接口。选题确定并接入邮件或短信供应商后，应增加一次性验证码、有效期、次数限制和审计，再开放自助找回。

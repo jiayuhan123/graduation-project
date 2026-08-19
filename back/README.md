@@ -8,7 +8,7 @@
 | --- | --- | ---: | --- | --- |
 | `common` | 公共组件聚合 | - | 统一响应、Web 基础能力和 Redis 自动配置 | [查看文档](./common/README.md) |
 | `gateway` | 可运行服务 | `10000` | 路由、鉴权、跨域、异常处理和接口文档聚合 | [查看文档](./gateway/README.md) |
-| `user-service` | 可运行服务 | `8001` | 用户注册、登录、账号状态校验和会话创建 | [查看文档](./user-service/README.md) |
+| `user-service` | 可运行服务 | `8001` | 通用认证、账户、用户管理和 RBAC | [查看文档](./user-service/README.md) |
 
 `common` 下的组件不是独立服务，不能单独启动；`gateway` 和 `user-service` 才是当前可运行的 Spring Boot 应用。
 
@@ -71,7 +71,7 @@ cd back
 ## 启动顺序
 
 1. 准备 Nacos 和 Redis。
-2. 为 `user-service` 准备 PostgreSQL 数据库及 `t_user` 表。
+2. 为 `user-service` 准备空的 PostgreSQL 数据库；Flyway 自动创建和升级用户/RBAC 表。
 3. 启动 `user-service`，确认它已注册到 Nacos。
 4. 启动 `gateway`。
 5. 通过 `http://localhost:10000` 统一访问后端接口。
@@ -113,10 +113,11 @@ cd back
 - 网关完成登录校验后，将用户 ID 写入 `X-User-ID` 请求头。
 - Servlet 业务服务通过 `common-web` 的 `UserContext` 获取当前用户 ID。
 - 业务服务不应信任绕过网关、由外部直接传入的 `X-User-ID`。
+- 用户服务的管理接口还会在服务内通过 Sa-Token 权限码再次授权。
 
 ### 配置安全
 
-当前部分 `application.yml` 含有固定的基础设施地址和凭据，仅适合作为现阶段开发配置。部署前应迁移到环境变量或 Nacos 配置中心，并确保配置文件中不再保存生产凭据。
+`application.yml` 只保留 localhost 开发默认值。生产环境必须通过环境变量或 Nacos 覆盖数据库、Redis 和初始管理员等敏感配置。
 
 ## 文档维护约定
 

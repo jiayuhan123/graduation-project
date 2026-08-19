@@ -4,13 +4,15 @@ server:
 spring:
   application:
     name: gateway
+  config:
+    import: optional:nacos:${spring.application.name}.yaml
   cloud:
     nacos:
+      server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
       discovery:
-        server-addr: 122.51.234.113:8848
+        server-addr: ${spring.cloud.nacos.server-addr}
       config:
-        import-check:
-          enabled: false # 关闭 Nacos 强制配置导入检查
+        server-addr: ${spring.cloud.nacos.server-addr}
     gateway:
       server:
         webflux:
@@ -24,10 +26,10 @@ spring:
                 - Path=/api/user/**
   data:
     redis:
-      host: 122.51.234.113
-      port: 6379
-      password: 111111 # 根据架构文档，Redis密码是 111111
-      database: 0
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:111111}
+      database: ${REDIS_DATABASE:0}
 
 # Sa-Token 配置
 sa-token:
@@ -50,6 +52,7 @@ security:
     - /webjars/**
     - /v3/api-docs/**
     - /swagger-resources/**
+    - /swagger-ui/**
 
 # Knife4j 聚合配置
 knife4j:

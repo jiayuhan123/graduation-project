@@ -37,6 +37,16 @@ public enum ResultCode {
     PHONE_EXISTS(1003, "手机号已被注册"),
     USER_DISABLED(1004, "账号已被禁用，请联系管理员"),
     OLD_PASSWORD_ERROR(1005, "旧密码不正确"),
+    USER_NOT_FOUND(1006, "用户不存在"),
+    EMAIL_EXISTS(1007, "邮箱已被注册"),
+    LOGIN_TOO_FREQUENT(1008, "登录失败次数过多，请稍后再试"),
+    ROLE_NOT_FOUND(1009, "角色不存在"),
+    ROLE_CODE_EXISTS(1010, "角色编码已存在"),
+    BUILT_IN_ROLE_PROTECTED(1011, "内置角色不允许删除或修改编码"),
+    CANNOT_OPERATE_SELF(1012, "不能对当前登录账号执行此操作"),
+    ROLE_IN_USE(1013, "角色正在使用，不能删除"),
+    PERMISSION_NOT_FOUND(1014, "权限不存在"),
+    NEW_PASSWORD_SAME_AS_OLD(1015, "新密码不能与旧密码相同"),
 
     // =================== 文件模块（2xxx） ===================
     FILE_NOT_FOUND(2000, "文件不存在"),

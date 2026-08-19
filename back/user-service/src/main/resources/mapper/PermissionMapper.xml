@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.jiayuhan.userservice.mapper.PermissionMapper">
+    <!-- 只汇总已启用角色的权限，并去重同一权限经多个角色重复授予的情况。 -->
+    <select id="selectCodesByUserId" resultType="java.lang.String">
+        SELECT DISTINCT p.code
+        FROM sys_permission p
+        INNER JOIN sys_role_permission rp ON rp.permission_id = p.id
+        INNER JOIN sys_role r ON r.id = rp.role_id AND r.status = 1
+        INNER JOIN sys_user_role ur ON ur.role_id = r.id
+        WHERE ur.user_id = #{userId}
+        ORDER BY p.code
+    </select>
+
+    <!-- 返回角色详情所需的完整权限实体，按主键排序以保证响应顺序稳定。 -->
+    <select id="selectByRoleId" resultType="xyz.jiayuhan.userservice.entity.Permission">
+        SELECT p.*
+        FROM sys_permission p
+        INNER JOIN sys_role_permission rp ON rp.permission_id = p.id
+        WHERE rp.role_id = #{roleId}
+        ORDER BY p.id
+    </select>
+</mapper>

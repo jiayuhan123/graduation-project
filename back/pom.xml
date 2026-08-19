@@ -36,6 +36,7 @@
         <sa-token.version>1.39.0</sa-token.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <knife4j.version>4.5.0</knife4j.version>
+        <springdoc.version>3.0.3</springdoc.version>
         <lombok.version>1.18.30</lombok.version>
         <spring-security.version>7.0.2</spring-security.version>
 
@@ -105,11 +106,23 @@
                 <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+            <!-- MyBatis-Plus 3.5.9+ 将分页 SQL 解析器拆为独立模块 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
             <!-- Knife4j 网关聚合接口文档 -->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+            </dependency>
+            <!-- Spring Boot 4 使用 springdoc-openapi 3.x -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
             <!-- Lombok（覆盖 Boot 管控版本） -->
             <dependency>
