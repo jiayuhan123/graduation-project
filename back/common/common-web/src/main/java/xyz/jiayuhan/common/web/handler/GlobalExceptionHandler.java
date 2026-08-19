@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.core.result.Result;
@@ -55,6 +56,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("；"));
         log.warn("参数校验失败：{}", message);
         return Result.error(ResultCode.BAD_REQUEST.getCode(), message);
+    }
+
+    /** 文件超过服务配置的 multipart 上限时返回稳定的文件模块错误码。 */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Result<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.warn("上传文件大小超出限制：{}", e.getMessage());
+        return Result.error(ResultCode.FILE_SIZE_EXCEEDED);
     }
 
     /**

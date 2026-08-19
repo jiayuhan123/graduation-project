@@ -12,7 +12,7 @@
     <artifactId>common-web</artifactId>
 
     <name>common-web</name>
-    <description>Servlet Web 公共模块：MVC 配置、X-User-ID 拦截器、用户上下文、全局异常处理（仅业务服务引用，网关勿引）</description>
+    <description>Servlet Web 公共模块：统一异常处理与 Jakarta Validation（仅业务服务引用，网关勿引）</description>
 
     <dependencies>
         <!-- 核心公共模块 -->

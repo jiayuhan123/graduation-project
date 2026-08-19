@@ -53,6 +53,12 @@ public enum ResultCode {
     FILE_UPLOAD_FAILED(2001, "文件上传失败"),
     FILE_SIZE_EXCEEDED(2002, "文件大小超出限制"),
     FILE_TYPE_NOT_ALLOWED(2003, "文件类型不允许"),
+
+    // =================== 通知模块（3xxx） ===================
+    NOTIFICATION_NOT_FOUND(3000, "通知不存在"),
+
+    // =================== 审计模块（4xxx） ===================
+    AUDIT_LOG_NOT_FOUND(4000, "审计记录不存在"),
     ;
 
     /**

@@ -1,0 +1,62 @@
+server:
+  port: ${SERVER_PORT:8002}
+  shutdown: graceful
+
+spring:
+  application:
+    name: file-service
+  config:
+    import: optional:nacos:${spring.application.name}.yaml
+  cloud:
+    nacos:
+      server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+      discovery:
+        server-addr: ${spring.cloud.nacos.server-addr}
+      config:
+        server-addr: ${spring.cloud.nacos.server-addr}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/file_db}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:111111}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: ${FILE_MAX_SIZE:20MB}
+      max-request-size: ${FILE_MAX_REQUEST_SIZE:21MB}
+
+mybatis-plus:
+  global-config:
+    banner: false
+
+app:
+  openapi:
+    title: 通用文件服务 API
+    description: 基于阿里云 OSS 的私有文件上传、下载、元数据与删除接口
+    version: 1.0.0
+  storage:
+    oss:
+      # Bucket 需提前在阿里云创建并设为私有；真实密钥只允许通过环境变量或 Nacos 注入。
+      region: ${OSS_REGION:}
+      endpoint: ${OSS_ENDPOINT:}
+      access-key-id: ${OSS_ACCESS_KEY_ID:}
+      access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+      bucket: ${OSS_BUCKET:}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

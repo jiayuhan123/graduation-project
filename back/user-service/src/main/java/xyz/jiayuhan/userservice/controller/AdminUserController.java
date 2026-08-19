@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.jiayuhan.common.core.result.Result;
+import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.userservice.model.dto.AdminCreateUserDTO;
 import xyz.jiayuhan.userservice.model.dto.AdminUpdateUserDTO;
 import xyz.jiayuhan.userservice.model.dto.AssignRolesDTO;
 import xyz.jiayuhan.userservice.model.dto.ResetPasswordDTO;
 import xyz.jiayuhan.userservice.model.dto.UpdateStatusDTO;
 import xyz.jiayuhan.userservice.model.vo.AdminUserVO;
-import xyz.jiayuhan.userservice.model.vo.PageVO;
 import xyz.jiayuhan.userservice.service.AdminUserService;
 
 /** 管理端用户维护接口。 */
@@ -40,7 +40,7 @@ public class AdminUserController {
     @SaCheckPermission("system:user:list")
     @Operation(summary = "分页查询用户")
     @GetMapping
-    public Result<PageVO<AdminUserVO>> page(
+    public Result<PageResult<AdminUserVO>> page(
             @RequestParam(defaultValue = "1") @Min(1) long page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) long size,
             @RequestParam(required = false) String keyword,
@@ -109,4 +109,3 @@ public class AdminUserController {
         return Result.success();
     }
 }
-

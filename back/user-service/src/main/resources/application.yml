@@ -28,6 +28,14 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:111111}
       database: ${REDIS_DATABASE:0}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:root}
+    password: ${RABBITMQ_PASSWORD:111111}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    publisher-confirm-type: correlated
+    publisher-returns: true
   flyway:
     # 由 Flyway 统一维护用户与 RBAC 表结构，禁止生产环境手工改表替代迁移。
     enabled: true
@@ -62,6 +70,20 @@ security:
     lock-duration: ${LOGIN_LOCK_DURATION:15m}
 
 app:
+  openapi:
+    title: 通用用户服务 API
+    description: 认证、个人账户、用户管理与 RBAC 接口
+    version: 1.0.0
+  mq:
+    confirm-timeout: ${MQ_CONFIRM_TIMEOUT:5s}
+    outbox:
+      # 每个实例使用 FOR UPDATE SKIP LOCKED 并行领取，失败按指数退避重试。
+      fixed-delay-ms: ${OUTBOX_FIXED_DELAY_MS:5000}
+      batch-size: ${OUTBOX_BATCH_SIZE:50}
+      max-attempts: ${OUTBOX_MAX_ATTEMPTS:10}
+      # 成功事件保留 7 天后每日清理；FAILED 事件不会被自动删除。
+      retention-days: ${OUTBOX_RETENTION_DAYS:7}
+      cleanup-cron: ${OUTBOX_CLEANUP_CRON:0 0 3 * * *}
   bootstrap-admin:
     # 默认关闭；启用时密码必须由环境变量注入，不能把默认管理员密码写入仓库。
     enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}

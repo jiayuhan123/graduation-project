@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
+import xyz.jiayuhan.common.mq.MqTopology;
+import xyz.jiayuhan.common.mq.event.UserRegisteredEvent;
 import xyz.jiayuhan.userservice.entity.User;
+import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.dto.LoginDTO;
 import xyz.jiayuhan.userservice.model.dto.RegisterDTO;
@@ -36,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserDataSupport userDataSupport;
     private final RbacService rbacService;
     private final LoginAttemptService loginAttemptService;
+    private final UserEventOutboxService eventOutboxService;
 
     @Override
     public LoginVO login(LoginDTO request, String clientIp) {
@@ -109,6 +113,10 @@ public class AuthServiceImpl implements AuthService {
         userMapper.insert(user);
         // 用户写入与默认角色分配处于同一事务，防止产生没有基础角色的半成品账号。
         rbacService.assignDefaultRole(user.getId());
+        // 同事务写入发件箱；通知和审计服务随后异步消费，不延长注册接口主链路。
+        eventOutboxService.append(
+                MqTopology.USER_REGISTERED_ROUTING_KEY,
+                UserRegisteredEvent.create(user.getId(), user.getUsername(), user.getEmail()));
 
         log.info("用户注册成功：userId={}, username={}", user.getId(), user.getUsername());
         return new RegisterVO(user.getId(), user.getUsername());

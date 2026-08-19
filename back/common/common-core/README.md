@@ -7,6 +7,7 @@
 | 类型 | 位置 | 用途 |
 | --- | --- | --- |
 | `Result<T>` | `result/Result.java` | 统一接口响应结构和成功/失败工厂方法 |
+| `PageResult<T>` | `model/PageResult.java` | 跨服务统一分页响应 |
 | `ResultCode` | `exception/ResultCode.java` | 集中定义通用及各业务域错误码 |
 | `BusinessException` | `exception/BusinessException.java` | 表示可预期、可直接反馈给客户端的业务异常 |
 
@@ -36,7 +37,9 @@ return Result.error(ResultCode.BAD_REQUEST);
 | `4xx` | 参数、认证、权限、资源等通用客户端错误 |
 | `5xx` | 服务端或服务可用性错误 |
 | `1xxx` | 用户模块业务错误 |
-| `2xxx` | 文件模块业务错误（预留） |
+| `2xxx` | 文件模块业务错误 |
+| `3xxx` | 通知模块业务错误 |
+| `4xxx` | 审计模块业务错误 |
 
 新增错误码时，应优先扩展 `ResultCode`，并保持同一业务域使用稳定、互不冲突的编号区间。
 

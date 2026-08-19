@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
+import xyz.jiayuhan.common.mq.MqTopology;
 import xyz.jiayuhan.userservice.entity.User;
+import xyz.jiayuhan.userservice.event.UserAuditActions;
+import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.dto.ChangePasswordDTO;
 import xyz.jiayuhan.userservice.model.dto.UpdateProfileDTO;
@@ -27,6 +30,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     private final PasswordEncoder passwordEncoder;
     private final UserDataSupport userDataSupport;
     private final RbacService rbacService;
+    private final UserEventOutboxService eventOutboxService;
 
     @Override
     public UserProfileVO currentUser() {
@@ -53,6 +57,7 @@ public class UserAccountServiceImpl implements UserAccountService {
                 .set(User::getPhone, phone)
                 .set(User::getAvatarUrl, userDataSupport.trimToNull(request.avatarUrl()))
                 .set(User::getUpdatedAt, LocalDateTime.now()));
+        appendSelfAudit(userId, UserAuditActions.SELF_PROFILE_UPDATED, "用户修改个人资料");
         return toProfile(requireUser(userId));
     }
 
@@ -73,6 +78,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         update.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         update.setPasswordChangedAt(LocalDateTime.now());
         userMapper.updateById(update);
+        appendSelfAudit(userId, UserAuditActions.SELF_PASSWORD_CHANGED, "用户自助修改密码");
 
         // 密码变化属于高风险操作，注销该账号的全部现有会话。
         StpUtil.kickout(userId);
@@ -102,5 +108,15 @@ public class UserAccountServiceImpl implements UserAccountService {
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+    private void appendSelfAudit(Long userId, String action, String detail) {
+        eventOutboxService.appendAudit(
+                MqTopology.AUDIT_OPERATION_ROUTING_KEY,
+                userId,
+                action,
+                "USER",
+                userId,
+                detail);
     }
 }

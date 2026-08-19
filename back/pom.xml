@@ -22,6 +22,9 @@
         <module>common</module>
         <module>gateway</module>
         <module>user-service</module>
+        <module>file-service</module>
+        <module>notification-service</module>
+        <module>audit-service</module>
     </modules>
 
     <properties>
@@ -39,6 +42,7 @@
         <springdoc.version>3.0.3</springdoc.version>
         <lombok.version>1.18.30</lombok.version>
         <spring-security.version>7.0.2</spring-security.version>
+        <aliyun-oss.version>0.5.1</aliyun-oss.version>
 
         <!-- 内部模块版本 -->
         <revision>0.0.1-SNAPSHOT</revision>
@@ -78,6 +82,31 @@
             <dependency>
                 <groupId>xyz.jiayuhan</groupId>
                 <artifactId>common-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-data</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-openapi</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-observability</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>common-mq</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -135,6 +164,12 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
                 <version>${spring-security.version}</version>
+            </dependency>
+            <!-- 阿里云 OSS Java SDK V2（版本按项目依赖基线固定） -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>alibabacloud-oss-v2</artifactId>
+                <version>${aliyun-oss.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

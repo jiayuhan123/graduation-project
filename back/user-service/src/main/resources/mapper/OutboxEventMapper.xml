@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.jiayuhan.userservice.mapper.OutboxEventMapper">
+    <!-- 行锁一直持有到本批投递事务结束；其他实例跳过已锁定记录。 -->
+    <select id="selectPendingBatchForUpdate"
+            resultType="xyz.jiayuhan.userservice.entity.OutboxEvent">
+        SELECT id,
+               event_type,
+               routing_key,
+               payload,
+               status,
+               retry_count,
+               next_retry_at,
+               created_at,
+               published_at,
+               last_error
+        FROM sys_outbox_event
+        WHERE status = 'PENDING'
+          AND next_retry_at &lt;= CURRENT_TIMESTAMP
+        ORDER BY created_at
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <!-- FAILED 记录保留给运维排查，只清理已成功发布且超过保留期的历史。 -->
+    <delete id="deletePublishedBefore">
+        DELETE FROM sys_outbox_event
+        WHERE status = 'PUBLISHED'
+          AND published_at &lt; #{cutoff}
+    </delete>
+</mapper>

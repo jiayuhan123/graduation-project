@@ -16,6 +16,8 @@ services:
       - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql
+      # 仅在首次初始化空数据目录时创建各微服务独立数据库。
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
     networks:
       - micro-net
 
@@ -70,10 +72,10 @@ services:
       - micro-net
 
   # =========================================================================
-  # 4. RabbitMQ 队列 - 升级为最新的 4.0-management 版本
+  # 4. RabbitMQ 队列 - 固定到当前受支持的 4.3.4 管理版
   # =========================================================================
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:4.3.4-management
     container_name: micro-rabbitmq
     restart: always
     mem_limit: 350m

@@ -18,7 +18,10 @@
 
 | 路由 ID | 外部路径 | 目标服务 | 说明 |
 | --- | --- | --- | --- |
-| `user-service` | `/api/user/**` | `lb://user-service` | 通过 Nacos 发现实例并使用 Spring Cloud LoadBalancer 转发 |
+| `user-service` | `/api/user/**` | `lb://user-service` | 认证、账户、用户和 RBAC |
+| `file-service` | `/api/files/**` | `lb://file-service` | 私有文件 |
+| `notification-service` | `/api/notifications/**` | `lb://notification-service` | 站内通知 |
+| `audit-service` | `/api/audits/**` | `lb://audit-service` | 审计查询 |
 
 新增服务时，需要同步添加路由，并检查鉴权白名单及本文档。
 
@@ -29,6 +32,8 @@
 3. 网关通过 Sa-Token 查询 Redis，获得登录用户 ID。
 4. 网关先删除客户端传入的 `X-User-ID`，校验通过后再写入可信用户 ID。
 5. 缺少或失效令牌时，返回 HTTP `200` 和业务码 `401`。
+
+`TraceGlobalFilter` 会先生成或校验 `X-Trace-ID`，再把它传给下游并写入响应头；鉴权失败响应同样携带该标识。
 
 当前白名单包括登录、注册、健康检查和接口文档相关路径，实际清单以 [`application.yml`](./src/main/resources/application.yml) 为准。
 
@@ -68,7 +73,7 @@ Knife4j 使用 Nacos 服务发现模式聚合下游接口文档，并排除网�
 ## 运行依赖
 
 - JDK 21；
-- Nacos：用于发现 `user-service`；
+- Nacos：用于发现所有下游服务；
 - Redis：用于读取 Sa-Token 会话；
 - 已启动并注册到 Nacos 的下游服务。
 

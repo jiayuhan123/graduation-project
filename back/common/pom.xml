@@ -19,6 +19,11 @@
         <module>common-core</module>
         <module>common-web</module>
         <module>common-redis</module>
+        <module>common-data</module>
+        <module>common-security</module>
+        <module>common-openapi</module>
+        <module>common-observability</module>
+        <module>common-mq</module>
     </modules>
 
 </project>

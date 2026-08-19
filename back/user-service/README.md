@@ -14,6 +14,9 @@
 - Redis 登录失败计数，默认 15 分钟内失败 5 次后暂时锁定；
 - Flyway 自动建表与升级、MyBatis-Plus 分页/乐观锁/逻辑删除；
 - OpenAPI 3 文档和基础自动化测试。
+- 业务数据与领域事件同事务写入 `sys_outbox_event`；
+- 后台批量派发事件，支持 RabbitMQ Publisher Confirm、失败退避与并发实例安全领取；
+- 发布注册事件和用户/RBAC 管理审计事件，供通知、审计服务异步消费。
 
 ## 技术与端点
 
@@ -24,6 +27,7 @@
 | Java / Spring Boot | Java 21 / Spring Boot 4.0.6 |
 | 数据库 | PostgreSQL 18 + MyBatis-Plus 3.5.15 + Flyway |
 | 会话 | Sa-Token 1.39.0 + Redis |
+| 消息 | RabbitMQ + Transactional Outbox |
 | 文档 | `/swagger-ui.html`、`/v3/api-docs` |
 | 健康检查 | `/actuator/health` |
 
@@ -95,13 +99,14 @@ satoken: <token>
 | `sys_user_role` | 用户角色关联 |
 | `sys_role_permission` | 角色权限关联 |
 | `flyway_schema_history` | Flyway 迁移历史 |
+| `sys_outbox_event` | 领域事件事务发件箱、状态与重试信息 |
 
 迁移脚本会保留早期 `t_user` 数据并补充缺失字段。用户名和邮箱统一按小写保存；用户名、手机号、邮箱使用“未删除记录”唯一索引。内置角色：
 
 - `user`：注册账号默认角色；
 - `admin`：拥有当前全部系统管理权限。
 
-不要手工修改已经在环境中执行过的迁移文件。后续变更应新增 `V2__...sql`。
+不要手工修改已经在环境中执行过的迁移文件。后续变更必须继续新增更高版本迁移。
 
 ## 创建初始管理员
 
@@ -134,6 +139,14 @@ $env:BOOTSTRAP_ADMIN_PASSWORD="请替换为强密码"
 | `BCRYPT_STRENGTH` | `12` | BCrypt cost |
 | `LOGIN_MAX_ATTEMPTS` | `5` | 锁定前失败次数 |
 | `LOGIN_LOCK_DURATION` | `15m` | 登录失败计数有效期 |
+| `RABBITMQ_HOST` / `RABBITMQ_PORT` | `localhost` / `5672` | RabbitMQ 地址 |
+| `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | `root` / `111111` | 仅本地默认凭据 |
+| `MQ_CONFIRM_TIMEOUT` | `5s` | 等待 Broker Confirm 的时限 |
+| `OUTBOX_FIXED_DELAY_MS` | `5000` | 发件箱扫描间隔 |
+| `OUTBOX_BATCH_SIZE` | `50` | 每批领取数量 |
+| `OUTBOX_MAX_ATTEMPTS` | `10` | 转为 FAILED 前最大尝试数 |
+| `OUTBOX_RETENTION_DAYS` | `7` | 已发布事件保留天数，最小 1 |
+| `OUTBOX_CLEANUP_CRON` | `0 0 3 * * *` | 成功历史清理计划 |
 
 `application.yml` 使用 `spring.config.import=optional:nacos:user-service.yaml`，因此环境变量、本地配置和 Nacos 配置可以按 Spring 优先级覆盖。
 
@@ -142,7 +155,7 @@ $env:BOOTSTRAP_ADMIN_PASSWORD="请替换为强密码"
 在项目根目录启动基础中间件：
 
 ```powershell
-docker compose up -d postgres redis nacos
+docker compose up -d postgres redis nacos rabbitmq
 ```
 
 然后在 `back` 目录执行：
@@ -152,7 +165,13 @@ docker compose up -d postgres redis nacos
 ./mvnw.cmd -pl user-service spring-boot:run
 ```
 
-Docker 未启动时仍可执行单元测试；应用集成启动需要 PostgreSQL、Redis 和 Nacos。
+Docker 未启动时仍可执行单元测试；应用集成启动需要 PostgreSQL、Redis、Nacos 和 RabbitMQ。
+
+## 可靠事件说明
+
+注册和管理操作不会在业务事务中直接调用 RabbitMQ。业务表与发件箱先在同一 PostgreSQL 事务提交，再由调度器使用 `FOR UPDATE SKIP LOCKED` 领取待发布行。Broker Confirm 成功后记录 `PUBLISHED`；失败按指数退避，达到上限标记 `FAILED` 供运维处理。
+
+该方案保证“业务提交后事件最终可重试”，但网络与事务边界决定消息可能重复，因此下游必须用 `eventId` 唯一约束实现幂等。
 
 ## 安全边界
 

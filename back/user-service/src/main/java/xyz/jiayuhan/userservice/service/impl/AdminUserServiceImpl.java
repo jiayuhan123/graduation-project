@@ -11,8 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
+import xyz.jiayuhan.common.core.model.PageResult;
+import xyz.jiayuhan.common.mq.MqTopology;
 import xyz.jiayuhan.userservice.entity.Role;
 import xyz.jiayuhan.userservice.entity.User;
+import xyz.jiayuhan.userservice.event.UserAuditActions;
+import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.mapper.UserRoleMapper;
 import xyz.jiayuhan.userservice.entity.UserRole;
@@ -20,7 +24,6 @@ import xyz.jiayuhan.userservice.model.dto.AdminCreateUserDTO;
 import xyz.jiayuhan.userservice.model.dto.AdminUpdateUserDTO;
 import xyz.jiayuhan.userservice.model.dto.RegisterDTO;
 import xyz.jiayuhan.userservice.model.vo.AdminUserVO;
-import xyz.jiayuhan.userservice.model.vo.PageVO;
 import xyz.jiayuhan.userservice.model.vo.RegisterVO;
 import xyz.jiayuhan.userservice.model.vo.RoleSimpleVO;
 import xyz.jiayuhan.userservice.service.AdminUserService;
@@ -46,9 +49,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final RbacService rbacService;
     private final AuthService authService;
     private final UserRoleMapper userRoleMapper;
+    private final UserEventOutboxService eventOutboxService;
 
     @Override
-    public PageVO<AdminUserVO> page(long page, long size, String keyword, Integer status) {
+    public PageResult<AdminUserVO> page(long page, long size, String keyword, Integer status) {
         // 将多个模糊匹配条件放进同一个 AND 分组，确保状态过滤对所有关键字字段生效。
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<User>()
                 .eq(status != null, User::getStatus, status)
@@ -60,7 +64,12 @@ public class AdminUserServiceImpl implements AdminUserService {
                         .or().like(User::getPhone, keyword))
                 .orderByDesc(User::getCreatedAt);
         Page<User> result = userMapper.selectPage(new Page<>(page, size), wrapper);
-        return PageVO.from(result, this::toAdminUser);
+        return new PageResult<>(
+                result.getCurrent(),
+                result.getSize(),
+                result.getTotal(),
+                result.getPages(),
+                result.getRecords().stream().map(this::toAdminUser).toList());
     }
 
     @Override
@@ -86,6 +95,10 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (request.roleIds() != null && !request.roleIds().isEmpty()) {
             rbacService.replaceUserRoles(registered.id(), request.roleIds());
         }
+        appendAudit(
+                UserAuditActions.USER_CREATED,
+                registered.id(),
+                "status=" + (request.status() == null ? 1 : request.status()));
         return detail(registered.id());
     }
 
@@ -106,6 +119,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .set(User::getPhone, phone)
                 .set(User::getAvatarUrl, userDataSupport.trimToNull(request.avatarUrl()))
                 .set(User::getUpdatedAt, LocalDateTime.now()));
+        appendAudit(UserAuditActions.USER_PROFILE_UPDATED, userId, "管理员更新用户非安全资料");
         return detail(userId);
     }
 
@@ -118,6 +132,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
         requireUser(userId);
         updateStatusInternal(userId, status);
+        appendAudit(UserAuditActions.USER_STATUS_CHANGED, userId, "status=" + status);
         if (status == 0) {
             // 禁用后立即撤销全部会话，不能等待原令牌自然过期。
             StpUtil.kickout(userId);
@@ -133,6 +148,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
         requireUser(userId);
         rbacService.replaceUserRoles(userId, roleIds);
+        appendAudit(UserAuditActions.USER_ROLES_CHANGED, userId, "roleCount=" + roleIds.size());
         // 角色变更后注销旧会话，确保后续访问重新按最新授权状态登录。
         StpUtil.kickout(userId);
     }
@@ -150,6 +166,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .set(User::getPasswordHash, passwordEncoder.encode(newPassword))
                 .set(User::getPasswordChangedAt, LocalDateTime.now())
                 .set(User::getUpdatedAt, LocalDateTime.now()));
+        appendAudit(UserAuditActions.USER_PASSWORD_RESET, userId, "管理员重置用户密码");
         // 密码重置属于凭证失效事件，撤销目标账号的全部现有会话。
         StpUtil.kickout(userId);
     }
@@ -164,6 +181,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // t_user 使用逻辑删除，不会触发数据库 ON DELETE CASCADE，因此需显式清理角色关系。
         userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
         userMapper.deleteById(userId);
+        appendAudit(UserAuditActions.USER_DELETED, userId, "逻辑删除用户");
         StpUtil.kickout(userId);
     }
 
@@ -206,5 +224,15 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private RoleSimpleVO toRoleSimple(Role role) {
         return new RoleSimpleVO(role.getId(), role.getCode(), role.getName());
+    }
+
+    private void appendAudit(String action, Long targetUserId, String detail) {
+        eventOutboxService.appendAudit(
+                MqTopology.AUDIT_OPERATION_ROUTING_KEY,
+                StpUtil.getLoginIdAsLong(),
+                action,
+                "USER",
+                targetUserId,
+                detail);
     }
 }

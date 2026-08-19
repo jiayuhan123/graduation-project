@@ -5,16 +5,20 @@ This repository is a reusable full-stack foundation for a new graduation-project
 ## Retained foundation
 
 - Backend: Java 21, Spring Boot 4.0.6, Spring Cloud 2025.1.1 and Spring Cloud Alibaba 2025.1.0.0
-- Infrastructure: Nacos, Redis, PostgreSQL, RabbitMQ and MinIO
-- Modules: `gateway`, `user-service`, `common-core`, `common-web` and `common-redis`
+- Infrastructure: Nacos, Redis, PostgreSQL, RabbitMQ and Alibaba Cloud OSS
+- Services: `gateway`, `user-service`, `file-service`, `notification-service` and `audit-service`
+- Shared modules: core, web, security, data, Redis, OpenAPI, observability and messaging
 - Authentication: Sa-Token with Redis and gateway-propagated user context
 - Data access: MyBatis-Plus with PostgreSQL
 - Frontend: Vue 3 management console and UniApp client scaffold
 - Local environment: Docker Compose middleware stack
 
-## Current APIs
+## Current backend capabilities
 
-- `POST /api/user/register`
-- `POST /api/user/login`
+- `/api/user/**`: authentication, accounts, user administration and RBAC
+- `/api/files/**`: private files stored in Alibaba Cloud OSS
+- `/api/notifications/**`: in-app notifications and unread state
+- `/api/audits/**`: personal operation audit queries
+- Transactional outbox, publisher confirms, idempotent consumers, retries and dead-letter queues
 
-After the new topic is confirmed, add a new project overview, requirements, domain model, database design and business APIs instead of reusing the previous topic's rules.
+See `back/README.md` and `项目文档/README.md` for architecture, configuration, API and deployment details. Add topic-specific services instead of placing domain data in the user service.

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.userservice.entity.User;
+import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.dto.LoginDTO;
 import xyz.jiayuhan.userservice.model.dto.RegisterDTO;
@@ -37,6 +38,8 @@ class AuthServiceImplTest {
     private RbacService rbacService;
     @Mock
     private LoginAttemptService loginAttemptService;
+    @Mock
+    private UserEventOutboxService eventOutboxService;
 
     @InjectMocks
     private AuthServiceImpl authService;

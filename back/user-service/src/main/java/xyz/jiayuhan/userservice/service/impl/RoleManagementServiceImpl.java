@@ -1,14 +1,18 @@
 package xyz.jiayuhan.userservice.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
+import xyz.jiayuhan.common.mq.MqTopology;
 import xyz.jiayuhan.userservice.entity.Permission;
 import xyz.jiayuhan.userservice.entity.Role;
 import xyz.jiayuhan.userservice.entity.UserRole;
+import xyz.jiayuhan.userservice.event.UserAuditActions;
+import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.mapper.PermissionMapper;
 import xyz.jiayuhan.userservice.mapper.RoleMapper;
 import xyz.jiayuhan.userservice.mapper.UserRoleMapper;
@@ -32,6 +36,7 @@ public class RoleManagementServiceImpl implements RoleManagementService {
     private final PermissionMapper permissionMapper;
     private final UserRoleMapper userRoleMapper;
     private final RbacService rbacService;
+    private final UserEventOutboxService eventOutboxService;
 
     @Override
     public List<RoleVO> listRoles() {
@@ -52,6 +57,7 @@ public class RoleManagementServiceImpl implements RoleManagementService {
         role.setStatus(1);
         role.setBuiltIn(false);
         roleMapper.insert(role);
+        appendAudit(UserAuditActions.ROLE_CREATED, role.getId(), "code=" + role.getCode());
         return toRole(roleMapper.selectById(role.getId()));
     }
 
@@ -62,6 +68,7 @@ public class RoleManagementServiceImpl implements RoleManagementService {
         role.setName(request.name().trim());
         role.setDescription(trimToNull(request.description()));
         roleMapper.updateById(role);
+        appendAudit(UserAuditActions.ROLE_UPDATED, roleId, "修改角色名称和描述");
         return toRole(roleMapper.selectById(roleId));
     }
 
@@ -73,6 +80,7 @@ public class RoleManagementServiceImpl implements RoleManagementService {
         protectBuiltIn(role);
         role.setStatus(status);
         roleMapper.updateById(role);
+        appendAudit(UserAuditActions.ROLE_STATUS_CHANGED, roleId, "status=" + status);
     }
 
     @Override
@@ -81,6 +89,10 @@ public class RoleManagementServiceImpl implements RoleManagementService {
         Role role = requireRole(roleId);
         protectBuiltIn(role);
         rbacService.replaceRolePermissions(roleId, permissionIds);
+        appendAudit(
+                UserAuditActions.ROLE_PERMISSIONS_CHANGED,
+                roleId,
+                "permissionCount=" + permissionIds.size());
     }
 
     @Override
@@ -93,6 +105,7 @@ public class RoleManagementServiceImpl implements RoleManagementService {
             throw new BusinessException(ResultCode.ROLE_IN_USE);
         }
         roleMapper.deleteById(roleId);
+        appendAudit(UserAuditActions.ROLE_DELETED, roleId, "删除未使用的自定义角色");
     }
 
     @Override
@@ -143,5 +156,15 @@ public class RoleManagementServiceImpl implements RoleManagementService {
 
     private String trimToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private void appendAudit(String action, Long roleId, String detail) {
+        eventOutboxService.appendAudit(
+                MqTopology.AUDIT_OPERATION_ROUTING_KEY,
+                StpUtil.getLoginIdAsLong(),
+                action,
+                "ROLE",
+                roleId,
+                detail);
     }
 }

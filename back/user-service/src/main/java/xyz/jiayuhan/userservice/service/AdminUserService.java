@@ -3,7 +3,7 @@ package xyz.jiayuhan.userservice.service;
 import xyz.jiayuhan.userservice.model.dto.AdminCreateUserDTO;
 import xyz.jiayuhan.userservice.model.dto.AdminUpdateUserDTO;
 import xyz.jiayuhan.userservice.model.vo.AdminUserVO;
-import xyz.jiayuhan.userservice.model.vo.PageVO;
+import xyz.jiayuhan.common.core.model.PageResult;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface AdminUserService {
      * @param status  账号状态：1 正常、0 禁用，可为空
      * @return 管理端用户分页数据
      */
-    PageVO<AdminUserVO> page(long page, long size, String keyword, Integer status);
+    PageResult<AdminUserVO> page(long page, long size, String keyword, Integer status);
 
     /**
      * 查询指定用户详情及其当前有效角色。

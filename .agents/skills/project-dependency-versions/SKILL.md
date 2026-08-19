@@ -30,7 +30,7 @@ description: >-
 - **MyBatis-Plus**: 
   - `3.5.15` (主微服务使用 `mybatis-plus-spring-boot4-starter`)
   - `3.5.12` (部分通用模块兼容使用 `mybatis-plus-spring-boot3-starter`)
-- **MinIO SDK**: `8.5.12`
+- **阿里云 OSS Java SDK V2**: `com.aliyun:alibabacloud-oss-v2:0.5.1`
 - **PostgreSQL Driver**: `org.postgresql:postgresql` (版本由 Spring Boot 4.0.6 的 BOM 自动管控)
 
 ### 4. 权限、安全与网关组件
@@ -61,7 +61,7 @@ description: >-
 
 ## 触发条件与使用要求
 当用户要求：
-1. "帮我加一个引入 Redis/MinIO 的依赖"
+1. "帮我加一个引入 Redis/阿里云 OSS 的依赖"
 2. "我的项目好像有 Jar 包版本冲突"
 3. "帮我写前端/后端的 `pom.xml` 或 `package.json`"
 4. "增加某个第三方 SDK"
