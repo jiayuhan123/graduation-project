@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { loginApi } from '@/api/user'
+import { safeRedirect } from '@/router/redirect'
 import { useUserStore } from '@/stores/user'
 import type { LoginParams } from '@/types/user'
 
@@ -30,12 +30,11 @@ async function handleSubmit() {
 
   loading.value = true
   try {
-    const result = await loginApi({ ...form })
-    userStore.setLogin(result)
+    await userStore.login({ ...form })
     ElMessage.success('登录成功')
-    // 登录成功后回到来源页或首页
-    const redirect = (route.query.redirect as string) ?? '/'
-    router.push(redirect)
+    await router.replace(safeRedirect(route.query.redirect))
+  } catch {
+    // 统一请求层已经展示可读错误，页面只负责恢复 loading 状态。
   } finally {
     loading.value = false
   }
@@ -50,12 +49,22 @@ async function handleSubmit() {
 
       <el-form ref="formRef" :model="form" :rules="rules" size="large" @keyup.enter="handleSubmit">
         <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="请输入账号（手机号或用户名）" clearable />
+          <el-input
+            v-model="form.username"
+            name="username"
+            autocomplete="username"
+            maxlength="100"
+            placeholder="请输入账号（用户名、手机号或邮箱）"
+            clearable
+          />
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             v-model="form.password"
+            name="password"
             type="password"
+            autocomplete="current-password"
+            maxlength="100"
             placeholder="请输入密码"
             show-password
             clearable
