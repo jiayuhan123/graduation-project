@@ -1,8 +1,8 @@
 /** 登录请求参数 */
 export interface LoginParams {
-  /** 用户名或手机号 */
+  /** 用户名、手机号或邮箱 */
   username: string
-  /** 登录密码（明文传输，服务端 BCrypt 比对） */
+  /** 登录密码；生产环境必须通过 HTTPS 传输 */
   password: string
 }
 
@@ -13,12 +13,29 @@ export interface LoginResult {
   userId: number
   username: string
   role: string
-  expireAt: string
+  roles: string[]
+  permissions: string[]
+  timeout: number
+  expireAt: string | null
+}
+
+/** 当前服务端会话。 */
+export interface SessionResult {
+  userId: number
+  token: string
+  tokenName: string
+  roles: string[]
+  permissions: string[]
+  timeout: number
+  expireAt: string | null
 }
 
 /** 本地缓存的用户信息 */
 export interface UserInfo {
   userId: number
-  username: string
-  role: string
+  username?: string
+  roles: string[]
+  permissions: string[]
+  timeout: number
+  expireAt: string | null
 }
