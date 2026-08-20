@@ -24,6 +24,7 @@
         <module>common-openapi</module>
         <module>common-observability</module>
         <module>common-mq</module>
+        <module>common-feign</module>
     </modules>
 
 </project>

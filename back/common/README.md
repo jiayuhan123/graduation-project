@@ -12,8 +12,9 @@
 | `common-openapi` | 每个服务的 OpenAPI 元数据自动配置 | HTTP 业务服务 |
 | `common-observability` | `X-Trace-ID` 校验、MDC 与响应头 | Servlet 服务 |
 | `common-mq` | 交换机、事件契约、Jackson 3 转换器、可靠发布器 | MQ 生产者/消费者 |
+| `common-feign` | OpenFeign、LoadBalancer、身份与 TraceId 透传、远程异常转换 | 需要同步调用其他服务的 Servlet 服务 |
 
-依赖保持单向、能力保持可选。Gateway 是 WebFlux，不能引用 `common-web`、`common-security` 或其他 Servlet 专用模块。事件交换机由 `common-mq` 声明；队列、绑定和死信队列由消费者服务拥有。
+依赖保持单向、能力保持可选。Gateway 是 WebFlux，不能引用 `common-web`、`common-security`、`common-feign` 或其他 Servlet 专用模块。事件交换机由 `common-mq` 声明；队列、绑定和死信队列由消费者服务拥有。
 
 ```powershell
 cd back
