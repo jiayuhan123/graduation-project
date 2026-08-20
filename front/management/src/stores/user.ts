@@ -1,46 +1,147 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { TOKEN_KEY } from '@/utils/request'
-import type { LoginResult, UserInfo } from '@/types/user'
+import { currentSessionApi, loginApi, logoutApi } from '@/api/user'
+import { DEFAULT_TOKEN_NAME, LEGACY_STORAGE_KEYS, STORAGE_KEYS } from '@/constants/storage'
+import type { LoginParams, LoginResult, SessionResult, UserInfo } from '@/types/user'
+import { storage } from '@/utils/storage'
 
-const USER_INFO_KEY = 'userInfo'
+function migrateLegacyStorage(): void {
+  if (!storage.getString(STORAGE_KEYS.token)) {
+    const legacyToken = storage.getString(LEGACY_STORAGE_KEYS.token)
+    if (legacyToken) storage.setString(STORAGE_KEYS.token, legacyToken)
+  }
+  if (!storage.getString(STORAGE_KEYS.userInfo)) {
+    const legacyUser = storage.getString(LEGACY_STORAGE_KEYS.userInfo)
+    if (legacyUser) storage.setString(STORAGE_KEYS.userInfo, legacyUser)
+  }
+  storage.removeMany(Object.values(LEGACY_STORAGE_KEYS))
+}
 
-/** 用户状态：Token、登录信息、登出 */
+function normalized(values: string[] | undefined): string[] {
+  return [...new Set((values ?? []).filter(Boolean))]
+}
+
+/** 登录状态、服务端会话和 RBAC 权限。 */
 export const useUserStore = defineStore('user', () => {
-  const token = ref<string>(localStorage.getItem(TOKEN_KEY) ?? '')
-  const userInfo = ref<UserInfo | null>(loadUserInfo())
+  migrateLegacyStorage()
 
-  const isLoggedIn = computed(() => Boolean(token.value))
+  const token = ref(storage.getString(STORAGE_KEYS.token) ?? '')
+  const tokenName = ref(storage.getString(STORAGE_KEYS.tokenName) ?? DEFAULT_TOKEN_NAME)
+  const userInfo = ref<UserInfo | null>(storage.getJson<UserInfo>(STORAGE_KEYS.userInfo))
+  const initialized = ref(false)
+  let initializationTask: Promise<void> | null = null
 
-  /** 登录成功后写入状态与本地存储 */
-  function setLogin(result: LoginResult) {
+  const hasToken = computed(() => Boolean(token.value))
+  const isLoggedIn = computed(() => initialized.value && hasToken.value && Boolean(userInfo.value))
+  const roles = computed(() => userInfo.value?.roles ?? [])
+  const permissions = computed(() => userInfo.value?.permissions ?? [])
+
+  function persistSession(): void {
+    if (!token.value || !userInfo.value) return
+    storage.setString(STORAGE_KEYS.token, token.value)
+    storage.setString(STORAGE_KEYS.tokenName, tokenName.value)
+    storage.setJson(STORAGE_KEYS.userInfo, userInfo.value)
+  }
+
+  function applyLogin(result: LoginResult): void {
     token.value = result.token
+    tokenName.value = result.tokenName || DEFAULT_TOKEN_NAME
     userInfo.value = {
       userId: result.userId,
       username: result.username,
-      role: result.role,
+      roles: normalized(result.roles.length ? result.roles : [result.role]),
+      permissions: normalized(result.permissions),
+      timeout: result.timeout,
+      expireAt: result.expireAt,
     }
-    localStorage.setItem(TOKEN_KEY, result.token)
-    localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo.value))
+    initialized.value = true
+    persistSession()
   }
 
-  /** 登出：清空状态与本地存储 */
-  function logout() {
+  function applySession(result: SessionResult): void {
+    const cachedUsername =
+      userInfo.value?.userId === result.userId ? userInfo.value.username : undefined
+    token.value = result.token || token.value
+    tokenName.value = result.tokenName || tokenName.value
+    userInfo.value = {
+      userId: result.userId,
+      username: cachedUsername,
+      roles: normalized(result.roles),
+      permissions: normalized(result.permissions),
+      timeout: result.timeout,
+      expireAt: result.expireAt,
+    }
+    initialized.value = true
+    persistSession()
+  }
+
+  /** 使用服务端会话校验本地 Token，禁止直接信任缓存中的权限。 */
+  function initializeSession(): Promise<void> {
+    if (initialized.value) return Promise.resolve()
+    if (!token.value) {
+      initialized.value = true
+      userInfo.value = null
+      return Promise.resolve()
+    }
+    if (!initializationTask) {
+      initializationTask = currentSessionApi()
+        .then(applySession)
+        .finally(() => {
+          initializationTask = null
+        })
+    }
+    return initializationTask
+  }
+
+  async function login(params: LoginParams): Promise<void> {
+    applyLogin(await loginApi(params))
+  }
+
+  /** 清理浏览器内会话；供 401 和主动退出共用。 */
+  function clearSession(): void {
     token.value = ''
+    tokenName.value = DEFAULT_TOKEN_NAME
     userInfo.value = null
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(USER_INFO_KEY)
+    initialized.value = true
+    storage.removeMany(Object.values(STORAGE_KEYS))
   }
 
-  function loadUserInfo(): UserInfo | null {
-    const raw = localStorage.getItem(USER_INFO_KEY)
-    if (!raw) return null
-    try {
-      return JSON.parse(raw) as UserInfo
-    } catch {
-      return null
+  /** 优先注销服务端会话，即使请求失败也确保当前浏览器退出。 */
+  async function logout(): Promise<boolean> {
+    let serverLoggedOut = true
+    if (token.value) {
+      try {
+        await logoutApi()
+      } catch {
+        serverLoggedOut = false
+      }
     }
+    clearSession()
+    return serverLoggedOut
   }
 
-  return { token, userInfo, isLoggedIn, setLogin, logout }
+  function hasRole(role: string): boolean {
+    return roles.value.includes(role)
+  }
+
+  function hasPermission(permission: string): boolean {
+    return permissions.value.includes(permission)
+  }
+
+  return {
+    token,
+    tokenName,
+    userInfo,
+    initialized,
+    hasToken,
+    isLoggedIn,
+    roles,
+    permissions,
+    initializeSession,
+    login,
+    clearSession,
+    logout,
+    hasRole,
+    hasPermission,
+  }
 })

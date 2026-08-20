@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 
 /** 登出并跳转登录页 */
-function handleLogout() {
-  userStore.logout()
-  router.push({ name: 'login' })
+async function handleLogout() {
+  const serverLoggedOut = await userStore.logout()
+  if (serverLoggedOut) ElMessage.success('已退出登录')
+  else ElMessage.warning('本地已退出，服务端注销请求未完成')
+  await router.replace({ name: 'login' })
 }
 </script>
 
@@ -48,8 +51,9 @@ function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: var(--app-header-height);
   background-color: #fff;
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: 1px solid var(--app-border-color);
 
   .header-title {
     font-size: 18px;
@@ -71,7 +75,7 @@ function handleLogout() {
 }
 
 .layout-main {
-  padding: 16px;
-  background-color: #f5f7fa;
+  padding: var(--app-content-padding);
+  background-color: var(--app-page-bg);
 }
 </style>
