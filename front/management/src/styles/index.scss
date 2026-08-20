@@ -1,5 +1,12 @@
 /* 全局样式入口 */
 
+:root {
+  --app-header-height: 60px;
+  --app-content-padding: 16px;
+  --app-page-bg: #f5f7fa;
+  --app-border-color: #e4e7ed;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -23,6 +30,15 @@ body {
     sans-serif;
   font-size: 14px;
   color: #303133;
-  background-color: #f5f7fa;
+  background-color: var(--app-page-bg);
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+[role='button'],
+a {
+  &:focus-visible {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
+  }
 }
