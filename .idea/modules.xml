@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/front/client-app/client-app.iml" filepath="$PROJECT_DIR$/front/client-app/client-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/file-service/file-service.iml" filepath="$PROJECT_DIR$/file-service/file-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/graduation-project.iml" filepath="$PROJECT_DIR$/.idea/graduation-project.iml" />
       <module fileurl="file://$PROJECT_DIR$/management/management.iml" filepath="$PROJECT_DIR$/management/management.iml" />
       <module fileurl="file://$PROJECT_DIR$/notify-service/notify-service.iml" filepath="$PROJECT_DIR$/notify-service/notify-service.iml" />

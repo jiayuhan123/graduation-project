@@ -12,6 +12,8 @@
         <option value="$PROJECT_DIR$/back/gateway/pom.xml" />
         <option value="$PROJECT_DIR$/back/user-service/pom.xml" />
         <option value="$PROJECT_DIR$/back/common/pom.xml" />
+        <option value="$PROJECT_DIR$/back/file-service/pom.xml" />
+        <option value="$PROJECT_DIR$/back/notification-service/pom.xml" />
       </list>
     </option>
   </component>
