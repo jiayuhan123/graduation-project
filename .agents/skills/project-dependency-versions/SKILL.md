@@ -1,7 +1,7 @@
 ---
 name: project-dependency-versions
 description: >-
-  记录了本项目后端（Java/Spring）与前端（UniApp）所有核心依赖库和插件的精准版本号清单。AI 在向项目中引入新依赖、处理包冲突、排查兼容性问题时，必须严格参考此版本清单。
+  记录了本项目后端（Java/Spring）核心依赖库和插件的精准版本号清单。AI 在向项目中引入新依赖、处理包冲突、排查兼容性问题时，必须严格参考此版本清单。
 ---
 
 # 项目核心依赖版本清单 (Project Dependency Versions)
@@ -44,18 +44,13 @@ description: >-
 - **Jackson-annotations**: `2.15.2` (明确指定了版本)
 - **Commons-pool2**: 用于 Redis 连接池支持，受 Spring Boot BOM 控制。
 - **Jackson-datatype-jsr310**: 用于 Java 8+ 时间处理。
+- **Micrometer Prometheus Registry**: `io.micrometer:micrometer-registry-prometheus:1.16.5`（由 Spring Boot 4.0.6 BOM 管控，POM 中不单独写死）
+
+### 6. 本地可观测性组件
+- **Prometheus**: `3.13.1`
+- **Grafana OSS**: `13.1.3`
 
 ---
-
-## 📱 前端依赖 (Frontend / client-app)
-
-### 1. 核心框架
-- **UniApp / Vue**: 通过脚手架搭建的默认版本机制。
-
-### 2. UI 框架与工具库
-- **uview-plus**: `^3.3.36` (用于 Vue3 + UniApp 的核心 UI 组件库)
-- **dayjs**: `^1.11.10` (时间处理库)
-- **clipboard**: `^2.0.11` (剪贴板处理)
 
 ---
 
@@ -63,7 +58,7 @@ description: >-
 当用户要求：
 1. "帮我加一个引入 Redis/阿里云 OSS 的依赖"
 2. "我的项目好像有 Jar 包版本冲突"
-3. "帮我写前端/后端的 `pom.xml` 或 `package.json`"
+3. "帮我修改后端的 `pom.xml`"
 4. "增加某个第三方 SDK"
 
 **AI 响应要求：**

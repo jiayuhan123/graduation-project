@@ -20,6 +20,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- 核心公共模块（仅用 Result 统一响应结构，勿引 common-web / common-redis） -->
         <dependency>
             <groupId>xyz.jiayuhan</groupId>

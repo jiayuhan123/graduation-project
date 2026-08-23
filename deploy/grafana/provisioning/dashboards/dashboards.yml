@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: Primary Math Platform
+    orgId: 1
+    folder: 小学计算智能学习开放平台
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

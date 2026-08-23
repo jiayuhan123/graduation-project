@@ -1,120 +1,171 @@
+name: ${COMPOSE_PROJECT_NAME:-primary-math-platform}
+
 services:
-  # =========================================================================
-  # 1. PostgreSQL (业务数据库) - 升级为最新的 18 系列
-  # =========================================================================
   postgres:
     image: postgres:18
-    container_name: micro-postgres
-    restart: always
-    mem_limit: 256m
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: "111111"
+      POSTGRES_USER: ${DB_USERNAME:-root}
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-111111}"
       POSTGRES_DB: user_db
-      TZ: Asia/Shanghai
+      TZ: ${TZ:-Asia/Shanghai}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - ./data/postgres:/var/lib/postgresql
-      # 仅在首次初始化空数据目录时创建各微服务独立数据库。
+      - postgres-data:/var/lib/postgresql
+      # 仅在数据卷首次初始化时创建各微服务数据库。
       - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    mem_limit: 256m
     networks:
-      - micro-net
+      - local-net
 
-
-  # =========================================================================
-  # 2. Redis 缓存 - 升级为最新的 8.0 极速版 (或 7.4 稳定版)
-  # =========================================================================
   redis:
     image: redis:8.0
-    container_name: micro-redis
-    restart: always
-    mem_limit: 128m
-    command: >
-      redis-server 
-      --requirepass 111111 
-      --appendonly yes 
-      --maxmemory 96mb 
-      --maxmemory-policy allkeys-lru
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - "${REDIS_PASSWORD:-111111}"
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - ${REDIS_MAXMEMORY:-96mb}
+      - --maxmemory-policy
+      - allkeys-lru
     ports:
-      - "6379:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
-      - ./data/redis:/data
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a '${REDIS_PASSWORD:-111111}' ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 128m
     networks:
-      - micro-net
+      - local-net
 
-  # =========================================================================
-  # 3. Nacos 注册 & 配置中心 - 升级为 2026 年最新一代 3.2.2 版本 (支持 AI、命名空间体验优化)
-  # =========================================================================
   nacos:
     image: nacos/nacos-server:v3.2.2
-    container_name: micro-nacos
-    restart: always
-    mem_limit: 512m
+    restart: unless-stopped
     environment:
       MODE: standalone
-      JVM_XMS: 256m
-      JVM_XMX: 256m
-      JVM_XMN: 128m
-      NACOS_AUTH_IDENTITY_KEY: nacos_identity_project
-      NACOS_AUTH_IDENTITY_VALUE: nacos_identity_value_111111
-      NACOS_AUTH_TOKEN: SecretKey012345678901234567890123456789012345678901234567890123456789
-      TZ: Asia/Shanghai
+      NACOS_AUTH_ENABLE: "false"
+      NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-nacos_identity_project}
+      NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-nacos_identity_value_111111}
+      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-SecretKey012345678901234567890123456789012345678901234567890123456789}
+      JVM_XMS: ${NACOS_JVM_XMS:-256m}
+      JVM_XMX: ${NACOS_JVM_XMX:-256m}
+      JVM_XMN: ${NACOS_JVM_XMN:-128m}
+      TZ: ${TZ:-Asia/Shanghai}
     ports:
-      - "8848:8848"  # API 端口
-      - "8847:8080"  # 3.x 独立控制台端口
-      - "9848:9848"
-      - "9849:9849"
+      - "127.0.0.1:${NACOS_SERVER_PORT:-8848}:8848"
+      - "127.0.0.1:${NACOS_CONSOLE_PORT:-8847}:8080"
+      - "127.0.0.1:${NACOS_GRPC_PORT:-9848}:9848"
+      - "127.0.0.1:${NACOS_GRPC_CLIENT_PORT:-9849}:9849"
     volumes:
-      - ./data/nacos/logs:/home/nacos/logs
-      - ./data/nacos/data:/home/nacos/data
+      - nacos-logs:/home/nacos/logs
+      - nacos-data:/home/nacos/data
+    mem_limit: 512m
     networks:
-      - micro-net
+      - local-net
 
-  # =========================================================================
-  # 4. RabbitMQ 队列 - 固定到当前受支持的 4.3.4 管理版
-  # =========================================================================
   rabbitmq:
     image: rabbitmq:4.3.4-management
-    container_name: micro-rabbitmq
-    restart: always
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-root}
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-111111}"
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     mem_limit: 350m
-    environment:
-      RABBITMQ_DEFAULT_USER: root
-      RABBITMQ_DEFAULT_PASS: "111111"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq
     networks:
-      - micro-net
+      - local-net
 
-  # =========================================================================
-  # 5. Jenkins - 自动化构建部署 (极致压缩版)
-  # =========================================================================
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: micro-jenkins
-    restart: always
-    # 容器总限制压缩到 800m
-    mem_limit: 800m
-    user: root 
-    environment:
-      # 进一步压缩 Jenkins 自身的 JVM 堆内存为 256M
-      - JAVA_OPTS=-Xms128m -Xmx256m -XX:MaxMetaspaceSize=128m
-      - TZ=Asia/Shanghai
+  prometheus:
+    image: prom/prometheus:v3.13.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-15d}
     ports:
-      - "8080:8080"
-      - "50000:50000"
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
     volumes:
-      - ./data/jenkins:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      # (可选) 如果你以后想把宿主机的 Maven 仓库挂进去，可以加下面这行，加速构建
-      # - ./data/maven/repo:/root/.m2/repository
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    extra_hosts:
+      # 允许容器内的 Prometheus 抓取在宿主机运行的 Java 服务。
+      - host.docker.internal:host-gateway
+    mem_limit: 512m
     networks:
-      - micro-net
+      - local-net
+
+  grafana:
+    image: grafana/grafana:13.1.3
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    mem_limit: 384m
+    networks:
+      - local-net
+
+  # Jenkins 暂时停用，需要时再取消下面整段注释。
+  # jenkins:
+  #   profiles: ["ci"]
+  #   image: jenkins/jenkins:lts
+  #   restart: unless-stopped
+  #   user: root
+  #   environment:
+  #     JAVA_OPTS: -Xms128m -Xmx256m -XX:MaxMetaspaceSize=128m
+  #     TZ: ${TZ:-Asia/Shanghai}
+  #   ports:
+  #     - "127.0.0.1:${JENKINS_WEB_PORT:-8080}:8080"
+  #     - "127.0.0.1:${JENKINS_AGENT_PORT:-50000}:50000"
+  #   volumes:
+  #     - jenkins-data:/var/jenkins_home
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   mem_limit: 800m
+  #   networks:
+  #     - local-net
 
 networks:
-  micro-net:
+  local-net:
     driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  nacos-logs:
+  nacos-data:
+  rabbitmq-data:
+  prometheus-data:
+  grafana-data:
+  # jenkins-data:

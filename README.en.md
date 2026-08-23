@@ -10,7 +10,7 @@ This repository is a reusable full-stack foundation for a new graduation-project
 - Shared modules: core, web, security, data, Redis, OpenAPI, observability and messaging
 - Authentication: Sa-Token with Redis and gateway-propagated user context
 - Data access: MyBatis-Plus with PostgreSQL
-- Frontend: Vue 3 management console and UniApp client scaffold
+- Frontend: development is paused; only the Vue 3 management scaffold remains
 - Local environment: Docker Compose middleware stack
 
 ## Current backend capabilities

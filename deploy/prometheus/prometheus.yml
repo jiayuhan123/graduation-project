@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  # 后端服务当前直接运行在宿主机，Prometheus 运行在 Docker Desktop 中。
+  - job_name: primary-math-platform
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - host.docker.internal:10000
+        labels:
+          service: gateway
+      - targets:
+          - host.docker.internal:8001
+        labels:
+          service: user-service
+      - targets:
+          - host.docker.internal:8002
+        labels:
+          service: file-service
+      - targets:
+          - host.docker.internal:8003
+        labels:
+          service: notification-service
+      - targets:
+          - host.docker.internal:8004
+        labels:
+          service: audit-service

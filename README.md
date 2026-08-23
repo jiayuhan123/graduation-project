@@ -11,7 +11,7 @@
 - 鉴权：Sa-Token + Redis，网关统一校验并传递用户上下文
 - 数据访问：MyBatis-Plus + PostgreSQL
 - 可靠消息：事务发件箱、Publisher Confirm、指数退避、消费幂等和死信队列
-- 前端：Vue 3 管理端、UniApp 客户端基础工程
+- 前端：暂缓开发，仅保留 Vue 3 管理端基础工程
 - 本地环境：Docker Compose 中间件编排
 
 ## 目录结构
@@ -20,9 +20,8 @@
 graduation-project/
 ├── back/                 # Maven 多模块后端
 ├── front/
-│   ├── management/       # Vue 3 管理端
-│   └── client-app/       # UniApp 客户端
-├── 项目文档/             # 通用技术、架构、接口、部署和测试资料
+│   └── management/       # 保留但暂缓开发的 Vue 3 管理端
+├── primary-math-platform-feature-plan.docx  # 当前初步功能规划
 └── docker-compose.yaml   # 本地中间件
 ```
 
