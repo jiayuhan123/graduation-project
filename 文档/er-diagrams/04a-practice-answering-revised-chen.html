@@ -1,0 +1,285 @@
+<div id="er-practice-answering-revised" class="chen-er-root">
+  <style>
+    #er-practice-answering-revised {
+      color: var(--foreground);
+      font-family: system-ui, "Microsoft YaHei", sans-serif;
+      width: 100%;
+    }
+    #er-practice-answering-revised h2 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-weight: 500;
+    }
+    #er-practice-answering-revised .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    #er-practice-answering-revised .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #er-practice-answering-revised .legend svg {
+      width: 42px;
+      height: 28px;
+    }
+    #er-practice-answering-revised .diagram {
+      display: block;
+      width: 100%;
+      max-width: 720px;
+      height: auto;
+      margin: 0 auto;
+      overflow: visible;
+    }
+    #er-practice-answering-revised .entity {
+      fill: color-mix(in srgb, var(--viz-series-1) 14%, var(--background));
+      stroke: var(--viz-series-1);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    #er-practice-answering-revised .relation {
+      fill: color-mix(in srgb, var(--viz-series-2) 16%, var(--background));
+      stroke: var(--viz-series-2);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    #er-practice-answering-revised .attribute {
+      fill: color-mix(in srgb, var(--muted) 72%, var(--background));
+      stroke: var(--border);
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+    }
+    #er-practice-answering-revised .link {
+      fill: none;
+      stroke: var(--foreground);
+      stroke-width: 1.35;
+      opacity: 0.75;
+      vector-effect: non-scaling-stroke;
+    }
+    #er-practice-answering-revised text {
+      fill: var(--foreground);
+      font-size: 16px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+    #er-practice-answering-revised .node-label { font-weight: 500; }
+    #er-practice-answering-revised .cardinality {
+      font-size: 14px;
+      font-weight: 500;
+      paint-order: stroke;
+      stroke: var(--background);
+      stroke-width: 5px;
+      stroke-linejoin: round;
+    }
+    #er-practice-answering-revised .key-label { text-decoration: underline; }
+    #er-practice-answering-revised .reuse { stroke-dasharray: 5 4; }
+    #er-practice-answering-revised .panel-note {
+      fill: var(--muted-foreground);
+      font-size: 14px;
+    }
+    #er-practice-answering-revised .diagram-mobile { display: none; }
+    @media (max-width: 520px) {
+      #er-practice-answering-revised .diagram-desktop { display: none; }
+      #er-practice-answering-revised .diagram-mobile { display: block; }
+    }
+  </style>
+
+  <h2>练习与在线作答概念实体联系图</h2>
+  <div class="legend" aria-label="图例">
+    <span class="legend-item"><svg viewBox="0 0 42 28" aria-hidden="true"><rect class="entity" x="4" y="5" width="34" height="18" /></svg><span>实体</span></span>
+    <span class="legend-item"><svg viewBox="0 0 42 28" aria-hidden="true"><polygon class="relation" points="21,3 39,14 21,25 3,14" /></svg><span>联系</span></span>
+    <span class="legend-item"><svg viewBox="0 0 42 28" aria-hidden="true"><ellipse class="attribute" cx="21" cy="14" rx="18" ry="10" /></svg><span>属性</span></span>
+    <span class="legend-item"><span class="key-label">带下划线的属性</span><span>为主键</span></span>
+  </div>
+
+  <svg class="diagram diagram-desktop" viewBox="0 0 720 600" role="img" aria-labelledby="practice-revised-title practice-revised-desc">
+    <title id="practice-revised-title">练习与在线作答概念实体联系图</title>
+    <desc id="practice-revised-desc">学生进行练习，练习包含题目并产生作答记录，题目与作答记录相对应。题目顺序和题目分值属于包含联系。</desc>
+
+    <g aria-hidden="true">
+      <line class="link" x1="128" y1="145" x2="143" y2="145" />
+      <line class="link" x1="247" y1="145" x2="272" y2="145" />
+      <text class="cardinality" x="134" y="126">1</text>
+      <text class="cardinality" x="258" y="126">N</text>
+
+      <line class="link" x1="388" y1="145" x2="418" y2="145" />
+      <line class="link" x1="522" y1="145" x2="582" y2="145" />
+      <text class="cardinality" x="401" y="126">M</text>
+      <text class="cardinality" x="554" y="126">N</text>
+
+      <line class="link" x1="330" y1="167" x2="330" y2="312" />
+      <line class="link" x1="330" y1="358" x2="330" y2="428" />
+      <text class="cardinality" x="345" y="193">1</text>
+      <text class="cardinality" x="345" y="408">N</text>
+
+      <line class="link" x1="640" y1="167" x2="620" y2="312" />
+      <line class="link" x1="568" y1="335" x2="388" y2="450" />
+      <text class="cardinality" x="648" y="195">1</text>
+      <text class="cardinality" x="419" y="422">N</text>
+
+      <line class="link" x1="275" y1="52" x2="314" y2="123" />
+      <line class="link" x1="380" y1="52" x2="345" y2="123" />
+      <line class="link" x1="225" y1="245" x2="303" y2="167" />
+      <line class="link" x1="435" y1="245" x2="357" y2="167" />
+
+      <line class="link" x1="475" y1="50" x2="470" y2="122" />
+      <line class="link" x1="570" y1="77" x2="488" y2="128" />
+
+      <line class="link" x1="150" y1="450" x2="272" y2="450" />
+      <line class="link" x1="195" y1="550" x2="302" y2="472" />
+      <line class="link" x1="300" y1="570" x2="321" y2="472" />
+      <line class="link" x1="415" y1="570" x2="350" y2="472" />
+      <line class="link" x1="535" y1="535" x2="373" y2="472" />
+      <line class="link" x1="505" y1="450" x2="388" y2="450" />
+    </g>
+
+    <g>
+      <rect class="entity reuse" x="12" y="123" width="116" height="44" />
+      <text class="node-label" x="70" y="145">学生</text>
+      <text class="panel-note" x="70" y="192">沿用学生实体</text>
+
+      <polygon class="relation" points="195,122 247,145 195,168 143,145" />
+      <text class="node-label" x="195" y="145">进行</text>
+
+      <rect class="entity" x="272" y="123" width="116" height="44" />
+      <text class="node-label" x="330" y="145">练习</text>
+      <ellipse class="attribute" cx="275" cy="52" rx="49" ry="19" />
+      <text class="key-label" x="275" y="52">练习编号</text>
+      <ellipse class="attribute" cx="380" cy="52" rx="49" ry="19" />
+      <text x="380" y="52">练习类型</text>
+      <ellipse class="attribute" cx="225" cy="245" rx="49" ry="19" />
+      <text x="225" y="245">开始时间</text>
+      <ellipse class="attribute" cx="435" cy="245" rx="49" ry="19" />
+      <text x="435" y="245">练习状态</text>
+
+      <polygon class="relation" points="470,122 522,145 470,168 418,145" />
+      <text class="node-label" x="470" y="145">包含</text>
+      <ellipse class="attribute" cx="475" cy="50" rx="49" ry="19" />
+      <text x="475" y="50">题目顺序</text>
+      <ellipse class="attribute" cx="570" cy="77" rx="49" ry="19" />
+      <text x="570" y="77">题目分值</text>
+
+      <rect class="entity reuse" x="582" y="123" width="116" height="44" />
+      <text class="node-label" x="640" y="145">题目</text>
+      <text class="panel-note" x="640" y="192">沿用题目实体</text>
+
+      <polygon class="relation" points="330,312 382,335 330,358 278,335" />
+      <text class="node-label" x="330" y="335">产生</text>
+
+      <polygon class="relation" points="620,312 672,335 620,358 568,335" />
+      <text class="node-label" x="620" y="335">对应</text>
+
+      <rect class="entity" x="272" y="428" width="116" height="44" />
+      <text class="node-label" x="330" y="450">作答记录</text>
+      <ellipse class="attribute" cx="150" cy="450" rx="49" ry="19" />
+      <text x="150" y="450">是否正确</text>
+      <ellipse class="attribute" cx="195" cy="550" rx="49" ry="19" />
+      <text class="key-label" x="195" y="550">作答编号</text>
+      <ellipse class="attribute" cx="300" cy="570" rx="49" ry="19" />
+      <text x="300" y="570">学生答案</text>
+      <ellipse class="attribute" cx="415" cy="570" rx="57" ry="19" />
+      <text x="415" y="570">答题开始时间</text>
+      <ellipse class="attribute" cx="535" cy="535" rx="49" ry="19" />
+      <text x="535" y="535">答题用时</text>
+      <ellipse class="attribute" cx="505" cy="450" rx="49" ry="19" />
+      <text x="505" y="450">本题得分</text>
+    </g>
+  </svg>
+
+  <svg class="diagram diagram-mobile" viewBox="0 0 360 880" role="img" aria-labelledby="practice-mobile-title practice-mobile-desc">
+    <title id="practice-mobile-title">练习与在线作答概念实体联系图</title>
+    <desc id="practice-mobile-desc">学生进行练习，练习包含题目并产生作答记录，题目与作答记录相对应。</desc>
+
+    <g aria-hidden="true">
+      <line class="link" x1="112" y1="95" x2="112" y2="95" />
+      <line class="link" x1="208" y1="95" x2="232" y2="95" />
+      <text class="cardinality" x="119" y="76">1</text>
+      <text class="cardinality" x="219" y="76">N</text>
+
+      <line class="link" x1="285" y1="117" x2="285" y2="217" />
+      <line class="link" x1="285" y1="263" x2="285" y2="338" />
+      <text class="cardinality" x="300" y="143">M</text>
+      <text class="cardinality" x="300" y="318">N</text>
+
+      <polyline class="link" points="338,95 350,95 350,470 153,500" />
+      <line class="link" x1="105" y1="523" x2="170" y2="608" />
+      <text class="cardinality" x="340" y="445">1</text>
+      <text class="cardinality" x="139" y="570">N</text>
+
+      <line class="link" x1="285" y1="382" x2="285" y2="477" />
+      <line class="link" x1="257" y1="518" x2="220" y2="608" />
+      <text class="cardinality" x="300" y="407">1</text>
+      <text class="cardinality" x="248" y="566">N</text>
+
+      <line class="link" x1="240" y1="24" x2="265" y2="73" />
+      <line class="link" x1="320" y1="34" x2="304" y2="73" />
+      <line class="link" x1="235" y1="168" x2="267" y2="117" />
+      <line class="link" x1="318" y1="178" x2="302" y2="117" />
+
+      <line class="link" x1="80" y1="235" x2="233" y2="240" />
+      <line class="link" x1="105" y1="292" x2="243" y2="252" />
+
+      <line class="link" x1="70" y1="630" x2="137" y2="630" />
+      <line class="link" x1="320" y1="630" x2="253" y2="630" />
+      <line class="link" x1="70" y1="745" x2="170" y2="652" />
+      <line class="link" x1="175" y1="782" x2="190" y2="652" />
+      <line class="link" x1="290" y1="755" x2="220" y2="652" />
+      <line class="link" x1="180" y1="845" x2="205" y2="652" />
+    </g>
+
+    <g>
+      <rect class="entity reuse" x="8" y="73" width="104" height="44" />
+      <text class="node-label" x="60" y="95">学生</text>
+      <text class="panel-note" x="60" y="139">沿用学生实体</text>
+
+      <polygon class="relation" points="160,72 208,95 160,118 112,95" />
+      <text class="node-label" x="160" y="95">进行</text>
+
+      <rect class="entity" x="232" y="73" width="106" height="44" />
+      <text class="node-label" x="285" y="95">练习</text>
+      <ellipse class="attribute" cx="240" cy="24" rx="43" ry="18" />
+      <text class="key-label" x="240" y="24">练习编号</text>
+      <ellipse class="attribute" cx="320" cy="34" rx="37" ry="18" />
+      <text x="320" y="34">练习类型</text>
+      <ellipse class="attribute" cx="235" cy="168" rx="43" ry="18" />
+      <text x="235" y="168">开始时间</text>
+      <ellipse class="attribute" cx="318" cy="178" rx="39" ry="18" />
+      <text x="318" y="178">练习状态</text>
+
+      <polygon class="relation" points="285,217 337,240 285,263 233,240" />
+      <text class="node-label" x="285" y="240">包含</text>
+      <ellipse class="attribute" cx="80" cy="235" rx="45" ry="18" />
+      <text x="80" y="235">题目顺序</text>
+      <ellipse class="attribute" cx="105" cy="292" rx="45" ry="18" />
+      <text x="105" y="292">题目分值</text>
+
+      <rect class="entity reuse" x="232" y="338" width="106" height="44" />
+      <text class="node-label" x="285" y="360">题目</text>
+      <text class="panel-note" x="285" y="405">沿用题目实体</text>
+
+      <polygon class="relation" points="105,477 153,500 105,523 57,500" />
+      <text class="node-label" x="105" y="500">产生</text>
+      <polygon class="relation" points="285,477 333,500 285,523 237,500" />
+      <text class="node-label" x="285" y="500">对应</text>
+
+      <rect class="entity" x="137" y="608" width="116" height="44" />
+      <text class="node-label" x="195" y="630">作答记录</text>
+      <ellipse class="attribute" cx="70" cy="630" rx="45" ry="18" />
+      <text x="70" y="630">是否正确</text>
+      <ellipse class="attribute" cx="320" cy="630" rx="38" ry="18" />
+      <text x="320" y="630">本题得分</text>
+      <ellipse class="attribute" cx="70" cy="745" rx="45" ry="18" />
+      <text class="key-label" x="70" y="745">作答编号</text>
+      <ellipse class="attribute" cx="175" cy="782" rx="45" ry="18" />
+      <text x="175" y="782">学生答案</text>
+      <ellipse class="attribute" cx="290" cy="755" rx="57" ry="18" />
+      <text x="290" y="755">答题开始时间</text>
+      <ellipse class="attribute" cx="180" cy="845" rx="45" ry="18" />
+      <text x="180" y="845">答题用时</text>
+    </g>
+  </svg>
+</div>
