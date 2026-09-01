@@ -35,6 +35,11 @@ import java.util.List;
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     private List<String> whitelist;
+    private final ObjectMapper objectMapper;
+
+    public AuthGlobalFilter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     /** 绑定配置文件中的匿名访问路径模式。 */
     public void setWhitelist(List<String> whitelist) {
@@ -42,7 +47,6 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -99,11 +103,11 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     /**
      * 写出项目统一格式的未授权响应。
      *
-     * <p>HTTP 状态沿用项目现有的 200 约定，真实错误语义由响应体业务码 401 表达。</p>
+     * <p>响应体保留统一业务码，同时使用真实的 HTTP 401 状态。</p>
      */
     private Mono<Void> writeUnauthorized(ServerWebExchange exchange, String msg) {
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.OK);
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         Result<Void> result = Result.error(401, msg);

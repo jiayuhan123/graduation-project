@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>xyz.jiayuhan</groupId>
+        <artifactId>user</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>user-service</artifactId>
+
+    <name>user-service</name>
+    <description>用户服务：账号注册、登录与身份认证</description>
+
+    <dependencies>
+        <!-- 监控端点 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- ==================== 内部公共模块 ==================== -->
+        <!-- 核心：统一响应、错误码、业务异常 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <!-- Web：MVC 配置、用户上下文、全局异常处理、参数校验 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-web</artifactId>
+        </dependency>
+        <!-- Redis：Sa-Token 会话持久化 + RedisTemplate 统一序列化 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <!-- 数据：分页、乐观锁和审计字段自动配置 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-data</artifactId>
+        </dependency>
+        <!-- OpenAPI：统一文档元数据和 Sa-Token 请求头 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-openapi</artifactId>
+        </dependency>
+        <!-- 可观测性：TraceId 响应头和日志 MDC -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-observability</artifactId>
+        </dependency>
+        <!-- MQ：领域事件契约、RabbitMQ 拓扑与可靠发布器 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>common-mq</artifactId>
+        </dependency>
+        <!-- 用户目录内部接口契约，与调用方共享请求/响应模型和路径定义 -->
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>user-api</artifactId>
+        </dependency>
+
+        <!-- ==================== 持久层 ==================== -->
+        <!-- PostgreSQL 驱动 -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- 数据库版本迁移（版本由 Spring Boot BOM 管理） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ==================== 安全 ==================== -->
+        <!-- BCrypt 密码哈希（仅 crypto 模块，不引入 Spring Security 全家桶） -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <!-- ==================== 微服务基础设施 ==================== -->
+        <!-- Nacos 服务注册与发现 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- Nacos 配置中心 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ==================== 测试 ==================== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 可执行 jar 打包（配置继承父工程 pluginManagement） -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

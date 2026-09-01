@@ -7,6 +7,7 @@ public final class MqTopology {
     public static final String DEAD_LETTER_EXCHANGE = "app.dead-letter";
 
     public static final String USER_REGISTERED_ROUTING_KEY = "user.registered";
+    public static final String USER_LIFECYCLE_ROUTING_KEY = "user.lifecycle.changed";
     public static final String AUDIT_OPERATION_ROUTING_KEY = "audit.operation";
 
     public static final String NOTIFICATION_USER_REGISTERED_QUEUE = "notification.user-registered.v1";

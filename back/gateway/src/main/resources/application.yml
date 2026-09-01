@@ -4,15 +4,7 @@ server:
 spring:
   application:
     name: gateway
-  config:
-    import: optional:nacos:${spring.application.name}.yaml
   cloud:
-    nacos:
-      server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
-      discovery:
-        server-addr: ${spring.cloud.nacos.server-addr}
-      config:
-        server-addr: ${spring.cloud.nacos.server-addr}
     gateway:
       server:
         webflux:
@@ -36,13 +28,6 @@ spring:
               uri: lb://audit-service
               predicates:
                 - Path=/api/audits/**
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:111111}
-      database: ${REDIS_DATABASE:0}
-
 # Sa-Token 配置
 sa-token:
   token-name: satoken
@@ -57,6 +42,7 @@ sa-token:
 security:
   whitelist:
     - /api/user/login
+    - /api/user/login/wechat
     - /api/user/register
     - /actuator/health
     - /actuator/info

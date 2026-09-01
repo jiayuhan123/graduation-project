@@ -13,10 +13,13 @@ node_modules/
 *.iml
 .env
 .env.local
+/data/
 
 # Logs and generated files
 *.log
 coverage/
+/.codex-tmp/
+/output/
 
 # Other files and folders
 .settings/

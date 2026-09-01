@@ -21,7 +21,7 @@
     <modules>
         <module>common</module>
         <module>gateway</module>
-        <module>user-service</module>
+        <module>user</module>
         <module>file-service</module>
         <module>notification-service</module>
         <module>audit-service</module>
@@ -107,6 +107,11 @@
             <dependency>
                 <groupId>xyz.jiayuhan</groupId>
                 <artifactId>common-mq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>user-api</artifactId>
                 <version>${revision}</version>
             </dependency>
 

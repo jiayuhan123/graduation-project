@@ -1,0 +1,9 @@
+spring:
+  config:
+    import: ""
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+      config:
+        enabled: false

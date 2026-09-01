@@ -19,46 +19,57 @@ import lombok.Getter;
 public enum ResultCode {
 
     // =================== 通用成功 ===================
-    SUCCESS(200, "操作成功"),
+    SUCCESS(200, "操作成功", 200),
 
     // =================== 通用错误 ===================
-    BAD_REQUEST(400, "请求参数错误"),
-    UNAUTHORIZED(401, "未登录，请先登录"),
-    FORBIDDEN(403, "无权限访问"),
-    NOT_FOUND(404, "资源不存在"),
-    CONFLICT(409, "数据冲突"),
-    TOO_MANY_REQUESTS(429, "请求过于频繁，请稍后再试"),
-    INTERNAL_SERVER_ERROR(500, "服务器内部错误"),
-    SERVICE_UNAVAILABLE(503, "服务暂不可用"),
+    BAD_REQUEST(400, "请求参数错误", 400),
+    UNAUTHORIZED(401, "未登录，请先登录", 401),
+    FORBIDDEN(403, "无权限访问", 403),
+    NOT_FOUND(404, "资源不存在", 404),
+    CONFLICT(409, "数据冲突", 409),
+    TOO_MANY_REQUESTS(429, "请求过于频繁，请稍后再试", 429),
+    INTERNAL_SERVER_ERROR(500, "服务器内部错误", 500),
+    SERVICE_UNAVAILABLE(503, "服务暂不可用", 503),
 
     // =================== 用户账号（1xxx） ===================
-    USERNAME_OR_PASSWORD_ERROR(1001, "用户名或密码错误"),
-    USERNAME_EXISTS(1002, "用户名已存在"),
-    PHONE_EXISTS(1003, "手机号已被注册"),
-    USER_DISABLED(1004, "账号已被禁用，请联系管理员"),
-    OLD_PASSWORD_ERROR(1005, "旧密码不正确"),
-    USER_NOT_FOUND(1006, "用户不存在"),
-    EMAIL_EXISTS(1007, "邮箱已被注册"),
-    LOGIN_TOO_FREQUENT(1008, "登录失败次数过多，请稍后再试"),
-    ROLE_NOT_FOUND(1009, "角色不存在"),
-    ROLE_CODE_EXISTS(1010, "角色编码已存在"),
-    BUILT_IN_ROLE_PROTECTED(1011, "内置角色不允许删除或修改编码"),
-    CANNOT_OPERATE_SELF(1012, "不能对当前登录账号执行此操作"),
-    ROLE_IN_USE(1013, "角色正在使用，不能删除"),
-    PERMISSION_NOT_FOUND(1014, "权限不存在"),
-    NEW_PASSWORD_SAME_AS_OLD(1015, "新密码不能与旧密码相同"),
+    USERNAME_OR_PASSWORD_ERROR(1001, "用户名或密码错误", 401),
+    USERNAME_EXISTS(1002, "用户名已存在", 409),
+    PHONE_EXISTS(1003, "手机号已被注册", 409),
+    USER_DISABLED(1004, "账号已被禁用，请联系管理员", 403),
+    OLD_PASSWORD_ERROR(1005, "旧密码不正确", 400),
+    USER_NOT_FOUND(1006, "用户不存在", 404),
+    EMAIL_EXISTS(1007, "邮箱已被注册", 409),
+    LOGIN_TOO_FREQUENT(1008, "登录失败次数过多，请稍后再试", 429),
+    ROLE_NOT_FOUND(1009, "角色不存在", 404),
+    ROLE_CODE_EXISTS(1010, "角色编码已存在", 409),
+    BUILT_IN_ROLE_PROTECTED(1011, "内置角色不允许删除或修改编码", 409),
+    CANNOT_OPERATE_SELF(1012, "不能对当前登录账号执行此操作", 409),
+    ROLE_IN_USE(1013, "角色正在使用，不能删除", 409),
+    PERMISSION_NOT_FOUND(1014, "权限不存在", 404),
+    NEW_PASSWORD_SAME_AS_OLD(1015, "新密码不能与旧密码相同", 400),
+    WECHAT_LOGIN_NOT_CONFIGURED(1016, "微信登录尚未配置", 503),
+    WECHAT_CODE_INVALID(1017, "微信登录凭证无效或已过期", 401),
+    WECHAT_ALREADY_BOUND(1018, "该微信账号已绑定其他用户", 409),
+    LOGIN_CREDENTIAL_REQUIRED(1019, "账号必须至少保留一种登录方式", 409),
+    STUDENT_PROFILE_REQUIRED(1020, "学生角色必须配置学生资料", 409),
+    TEACHER_PROFILE_REQUIRED(1021, "教师角色必须配置教师资料", 409),
+    INVALID_ROLE_COMBINATION(1022, "学生和教师角色不能同时分配", 409),
+    STUDENT_NO_EXISTS(1023, "学号已存在", 409),
+    TEACHER_NO_EXISTS(1024, "教师工号已存在", 409),
+    PASSWORD_NOT_SET(1025, "当前账号尚未设置密码", 409),
+    PASSWORD_ALREADY_SET(1026, "当前账号已经设置密码", 409),
 
     // =================== 文件模块（2xxx） ===================
-    FILE_NOT_FOUND(2000, "文件不存在"),
-    FILE_UPLOAD_FAILED(2001, "文件上传失败"),
-    FILE_SIZE_EXCEEDED(2002, "文件大小超出限制"),
-    FILE_TYPE_NOT_ALLOWED(2003, "文件类型不允许"),
+    FILE_NOT_FOUND(2000, "文件不存在", 404),
+    FILE_UPLOAD_FAILED(2001, "文件上传失败", 500),
+    FILE_SIZE_EXCEEDED(2002, "文件大小超出限制", 413),
+    FILE_TYPE_NOT_ALLOWED(2003, "文件类型不允许", 415),
 
     // =================== 通知模块（3xxx） ===================
-    NOTIFICATION_NOT_FOUND(3000, "通知不存在"),
+    NOTIFICATION_NOT_FOUND(3000, "通知不存在", 404),
 
     // =================== 审计模块（4xxx） ===================
-    AUDIT_LOG_NOT_FOUND(4000, "审计记录不存在"),
+    AUDIT_LOG_NOT_FOUND(4000, "审计记录不存在", 404),
     ;
 
     /**
@@ -70,4 +81,22 @@ public enum ResultCode {
      * 描述信息
      */
     private final String message;
+
+    /**
+     * 对应的 HTTP 状态码。业务码用于客户端精确判断，HTTP 状态用于网关、客户端和监控识别错误类型。
+     */
+    private final Integer httpStatus;
+
+    /** 将业务码解析为 HTTP 状态；未登记的自定义业务异常按客户端请求错误处理。 */
+    public static int resolveHttpStatus(Integer code) {
+        if (code == null) {
+            return INTERNAL_SERVER_ERROR.httpStatus;
+        }
+        for (ResultCode resultCode : values()) {
+            if (resultCode.code.equals(code)) {
+                return resultCode.httpStatus;
+            }
+        }
+        return code >= 400 && code <= 599 ? code : BAD_REQUEST.httpStatus;
+    }
 }

@@ -7,7 +7,8 @@
 | 模块 | 端口 | 职责 |
 | --- | ---: | --- |
 | `gateway` | 10000 | 路由、Token 校验、身份头重建、TraceId、跨域、文档聚合 |
-| `user-service` | 8001 | 注册登录、会话、账户、用户管理、RBAC、事务发件箱 |
+| `user/user-api` | - | 用户服务内部 HTTP 契约、OpenFeign 客户端和服务间 Token 注入 |
+| `user/user-service` | 8001 | 注册登录、会话、账户、用户管理、RBAC、事务发件箱 |
 | `file-service` | 8002 | 阿里云 OSS 私有文件和 PostgreSQL 元数据 |
 | `notification-service` | 8003 | 站内通知、注册事件消费和未读状态 |
 | `audit-service` | 8004 | 用户与管理操作审计事件持久化 |
@@ -24,6 +25,8 @@
 user-service 业务事务 -> sys_outbox_event -> RabbitMQ topic exchange
                                            +-> notification-service
                                            +-> audit-service
+
+其他业务服务 -> UserFeignClient -> Nacos + LoadBalancer -> user-service /internal/users/**
 ```
 
 网关校验 `satoken` 后删除外部伪造的身份头，再向下游写入 `X-User-ID`。同时建立 `X-Trace-ID`；Servlet 服务会把它写入响应头和日志 MDC。业务服务不得直接暴露到公网。
@@ -54,6 +57,19 @@ cd back
 docker compose up -d postgres redis nacos rabbitmq
 ```
 
+后端不会默认选择运行环境。启动 Java 服务前必须显式激活 `local`、`test` 或 `prod`：
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="local"
+```
+
+- `application.yml`：端口、业务参数、监控等环境无关配置。
+- `application-local.yml`：本机 Docker 连接信息，允许使用 `.env.example` 中的开发默认值，Nacos 导入可选。
+- `application-test.yml`：关闭 Nacos，测试所需外部连接由测试代码或 CI 注入。
+- `application-prod.yml`：Nacos 导入为强制，数据库、Redis、RabbitMQ 和 Nacos 凭据均无默认值；缺少环境变量时启动失败。
+
+生产变量可参考仓库根目录的 `.env.prod.example`，真实密码不得提交到 Git。
+
 Compose 只在 PostgreSQL 空数据目录首次初始化时创建 `user_db`、`file_db`、`notification_db` 和 `audit_db`。已有数据目录需由管理员补建数据库。
 
 推荐启动顺序：基础设施 -> `user-service` -> `file-service` / `notification-service` / `audit-service` -> `gateway`。文件服务还必须配置已创建的阿里云 OSS 私有 Bucket：
@@ -70,11 +86,12 @@ $env:OSS_BUCKET="<private-bucket>"
 
 ## 统一约定
 
-- JSON 接口返回 `Result<T>`；分页统一返回 `PageResult<T>`，单页上限 100。
+- JSON 接口返回 `Result<T>`；错误响应同时使用真实 HTTP 状态（4xx/5xx），分页统一返回 `PageResult<T>`，单页上限 100。
+- HTTP 入参使用 `*Request`，出参使用 `*Response`；跨服务契约归属对应的 `*-api` 模块，不放入全局公共模块。
 - 数据结构由各服务的 Flyway 脚本管理，已执行的迁移文件不得修改。
 - 消费者按 `eventId` 幂等；重试耗尽进入服务自己的死信队列。
 - RabbitMQ Broker Confirm 成功但数据库状态提交失败时允许重复投递，不承诺“仅一次”。
-- 配置使用 `application.yml`、环境变量或 Nacos，不使用 `bootstrap.yml`。
+- 配置使用 `application-{profile}.yml`、环境变量或 Nacos，不使用 `bootstrap.yml`。
 - 生产环境必须替换本地密码、收紧 CORS，并只从网关或可信内网访问业务服务。
 
 详细架构、接口和部署说明见 [项目文档](../项目文档/README.md)。
