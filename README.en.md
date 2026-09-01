@@ -23,7 +23,7 @@ The developer open platform is paused. Real-time one-to-one PK is an optional la
 
 ## Content model
 
-Version 1 uses the compact structure `content module -> knowledge point -> question`. Grade, semester, publisher, edition notes, question count, time limit, pass threshold, and user role are modeled as attributes instead of unnecessary standalone entities. A textbook-chapter mapping can be added later if real textbook alignment is required.
+Version 1 uses the compact structure `content module -> knowledge point -> question`. Grade, semester, publisher, edition notes, question count, time limit, and pass threshold are modeled as attributes instead of unnecessary standalone entities. The conceptual ER diagram presents student, teacher, and administrator as business entities, while the implementation still uses a shared-account RBAC model. A textbook-chapter mapping can be added later if real textbook alignment is required.
 
 ## Current codebase
 
@@ -36,5 +36,5 @@ Version 1 uses the compact structure `content module -> knowledge point -> quest
 
 - [Chinese business summary](./文档/系统功能总结.docx)
 - [Chinese Markdown summary](./文档/系统功能总结.md)
-- [Simplified overall ER diagram](./文档/系统核心业务(1).pdf)
+- [Simplified overall ER diagram](./文档/er图.pdf)
 

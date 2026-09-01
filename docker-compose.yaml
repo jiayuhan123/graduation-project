@@ -12,8 +12,8 @@ services:
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql
-      # 仅在数据卷首次初始化时创建各微服务数据库。
+      - ./data/postgres:/var/lib/postgresql
+      # 仅在数据目录首次初始化时创建各微服务数据库。
       - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -41,7 +41,7 @@ services:
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
-      - redis-data:/data
+      - ./data/redis:/data
     healthcheck:
       test: ["CMD-SHELL", "redis-cli --no-auth-warning -a '${REDIS_PASSWORD:-111111}' ping | grep -q PONG"]
       interval: 10s
@@ -56,7 +56,11 @@ services:
     restart: unless-stopped
     environment:
       MODE: standalone
-      NACOS_AUTH_ENABLE: "false"
+      # 本地默认关闭，服务器覆盖文件会强制开启，并要求提供独立密钥。
+      NACOS_AUTH_ENABLE: "${NACOS_AUTH_ENABLE:-false}"
+      NACOS_AUTH_SYSTEM_TYPE: "${NACOS_AUTH_SYSTEM_TYPE:-nacos}"
+      NACOS_AUTH_ADMIN_ENABLE: "${NACOS_AUTH_ADMIN_ENABLE:-true}"
+      NACOS_AUTH_CONSOLE_ENABLE: "${NACOS_AUTH_CONSOLE_ENABLE:-true}"
       NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-nacos_identity_project}
       NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-nacos_identity_value_111111}
       NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-SecretKey012345678901234567890123456789012345678901234567890123456789}
@@ -70,8 +74,8 @@ services:
       - "127.0.0.1:${NACOS_GRPC_PORT:-9848}:9848"
       - "127.0.0.1:${NACOS_GRPC_CLIENT_PORT:-9849}:9849"
     volumes:
-      - nacos-logs:/home/nacos/logs
-      - nacos-data:/home/nacos/data
+      - ./data/nacos/logs:/home/nacos/logs
+      - ./data/nacos/data:/home/nacos/data
     mem_limit: 512m
     networks:
       - local-net
@@ -87,14 +91,14 @@ services:
       - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
       - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+      - ./data/rabbitmq:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 20s
-    mem_limit: 350m
+    mem_limit: 320m
     networks:
       - local-net
 
@@ -109,11 +113,11 @@ services:
       - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+      - ./data/prometheus:/prometheus
     extra_hosts:
       # 允许容器内的 Prometheus 抓取在宿主机运行的 Java 服务。
       - host.docker.internal:host-gateway
-    mem_limit: 512m
+    mem_limit: 192m
     networks:
       - local-net
 
@@ -130,42 +134,41 @@ services:
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
     volumes:
-      - grafana-data:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana
       - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    mem_limit: 384m
+    mem_limit: 160m
     networks:
       - local-net
 
-  # Jenkins 暂时停用，需要时再取消下面整段注释。
-  # jenkins:
-  #   profiles: ["ci"]
-  #   image: jenkins/jenkins:lts
-  #   restart: unless-stopped
-  #   user: root
-  #   environment:
-  #     JAVA_OPTS: -Xms128m -Xmx256m -XX:MaxMetaspaceSize=128m
-  #     TZ: ${TZ:-Asia/Shanghai}
-  #   ports:
-  #     - "127.0.0.1:${JENKINS_WEB_PORT:-8080}:8080"
-  #     - "127.0.0.1:${JENKINS_AGENT_PORT:-50000}:50000"
-  #   volumes:
-  #     - jenkins-data:/var/jenkins_home
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   mem_limit: 800m
-  #   networks:
-  #     - local-net
+  # CI 控制器与其余服务一起启动。
+  # Docker socket 仅允许受信任的 Jenkins Job 使用，详见 deploy/server/README.md。
+  jenkins:
+    build:
+      context: ./deploy/jenkins
+      dockerfile: Dockerfile
+    image: primary-math-platform-jenkins:lts-jdk21
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: "${JENKINS_JAVA_OPTS:--Xms128m -Xmx320m -XX:MaxMetaspaceSize=160m -Djava.awt.headless=true} -Djenkins.install.runSetupWizard=false"
+      CASC_JENKINS_CONFIG: /var/jenkins_config/casc.yaml
+      JENKINS_ADMIN_USERNAME: "${JENKINS_ADMIN_USERNAME:-admin}"
+      JENKINS_ADMIN_PASSWORD: "${JENKINS_ADMIN_PASSWORD:-change-me-before-production}"
+      TZ: ${TZ:-Asia/Shanghai}
+    # 使用 Docker socket 所属组，而非让 Jenkins 主进程以 root 身份运行。
+    # 服务器必须将 DOCKER_GID 设为 `stat -c '%g' /var/run/docker.sock` 的输出。
+    group_add:
+      - "${DOCKER_GID:-999}"
+    ports:
+      - "127.0.0.1:${JENKINS_WEB_PORT:-8080}:8080"
+    volumes:
+      - ./data/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./deploy/jenkins/casc.yaml:/var/jenkins_config/casc.yaml:ro
+    mem_limit: 640m
+    networks:
+      - local-net
 
 networks:
   local-net:
     driver: bridge
-
-volumes:
-  postgres-data:
-  redis-data:
-  nacos-logs:
-  nacos-data:
-  rabbitmq-data:
-  prometheus-data:
-  grafana-data:
-  # jenkins-data:
