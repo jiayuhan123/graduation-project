@@ -5,9 +5,6 @@ server:
 spring:
   application:
     name: file-service
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
   servlet:
     multipart:
       max-file-size: ${FILE_MAX_SIZE:20MB}

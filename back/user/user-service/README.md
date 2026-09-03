@@ -109,7 +109,7 @@ HTTP 入参统一以 `Request` 结尾，HTTP 出参统一以 `Response` 结尾�
 
 ## 当前数据库说明
 
-Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。按照当前开发顺序，仓库中的旧 Flyway `V1/V2` 尚未同步，正式启动服务前必须单独完成迁移基线与目标数据库对齐。
+Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。服务当前不执行自动数据库迁移，正式启动前必须按项目建表文档手工创建并核对 `user_db` 结构。
 
 ## 验证
 

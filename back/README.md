@@ -88,7 +88,7 @@ $env:OSS_BUCKET="<private-bucket>"
 
 - JSON 接口返回 `Result<T>`；错误响应同时使用真实 HTTP 状态（4xx/5xx），分页统一返回 `PageResult<T>`，单页上限 100。
 - HTTP 入参使用 `*Request`，出参使用 `*Response`；跨服务契约归属对应的 `*-api` 模块，不放入全局公共模块。
-- 数据结构由各服务的 Flyway 脚本管理，已执行的迁移文件不得修改。
+- 当前不启用自动数据库迁移；首次运行前需按项目建表文档手工创建并核对数据库结构。
 - 消费者按 `eventId` 幂等；重试耗尽进入服务自己的死信队列。
 - RabbitMQ Broker Confirm 成功但数据库状态提交失败时允许重复投递，不承诺“仅一次”。
 - 配置使用 `application-{profile}.yml`、环境变量或 Nacos，不使用 `bootstrap.yml`。

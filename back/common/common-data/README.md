@@ -9,4 +9,4 @@ app:
     overflow: false
 ```
 
-分页最大返回 100 条；超过总页数默认返回空页。实体字段只有标注 `@TableField(fill = ...)` 才会自动填充 `createdAt` / `updatedAt`。数据库表结构仍由各服务自己的 Flyway 管理。
+分页最大返回 100 条；超过总页数默认返回空页。实体字段只有标注 `@TableField(fill = ...)` 才会自动填充 `createdAt` / `updatedAt`。数据库表结构需按项目建表文档手工维护。

@@ -33,4 +33,4 @@
 
 服务不会自动创建 Bucket，避免为运行身份授予 Bucket 管理权限。AccessKey 不提供仓库默认值，必须由环境变量或 Nacos 安全注入。
 
-数据库默认为 `file_db`，Flyway 创建 `file_object`。本地启动前需准备 PostgreSQL、Nacos 和上述 OSS 配置。
+数据库默认为 `file_db`。本地启动前需按项目建表文档手工创建 `file_object`，并准备 PostgreSQL、Nacos 和上述 OSS 配置。
