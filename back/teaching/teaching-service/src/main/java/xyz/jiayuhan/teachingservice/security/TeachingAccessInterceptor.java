@@ -2,7 +2,7 @@ package xyz.jiayuhan.teachingservice.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.jiayuhan.common.core.exception.BusinessException;
@@ -15,13 +15,16 @@ import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 
 /** 按教学接口用途实时校验教师权限或学生身份。 */
 @Component
-@RequiredArgsConstructor
 public class TeachingAccessInterceptor implements HandlerInterceptor {
 
     public static final String CLASS_PERMISSION = "teaching:class:manage";
     public static final String ASSIGNMENT_PERMISSION = "teaching:assignment:manage";
 
     private final UserFeignClient userFeignClient;
+
+    public TeachingAccessInterceptor(@Lazy UserFeignClient userFeignClient) {
+        this.userFeignClient = userFeignClient;
+    }
 
     @Override
     public boolean preHandle(

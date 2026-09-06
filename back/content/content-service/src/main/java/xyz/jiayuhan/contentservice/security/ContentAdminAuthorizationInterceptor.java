@@ -2,7 +2,7 @@ package xyz.jiayuhan.contentservice.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.jiayuhan.common.core.exception.BusinessException;
@@ -14,12 +14,15 @@ import xyz.jiayuhan.userapi.model.response.UserPermissionResponse;
 
 /** 内容管理接口的跨服务权限守卫。 */
 @Component
-@RequiredArgsConstructor
 public class ContentAdminAuthorizationInterceptor implements HandlerInterceptor {
 
     public static final String CONTENT_MANAGE_PERMISSION = "content:manage";
 
     private final UserFeignClient userFeignClient;
+
+    public ContentAdminAuthorizationInterceptor(@Lazy UserFeignClient userFeignClient) {
+        this.userFeignClient = userFeignClient;
+    }
 
     @Override
     public boolean preHandle(
