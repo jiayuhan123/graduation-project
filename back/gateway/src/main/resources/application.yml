@@ -2,6 +2,10 @@ server:
   port: ${SERVER_PORT:10000}
 
 spring:
+  config:
+    import: optional:file:./.env[.properties]
+  profiles:
+    default: local
   application:
     name: gateway
   cloud:
@@ -28,6 +32,22 @@ spring:
               uri: lb://audit-service
               predicates:
                 - Path=/api/audits/**
+            - id: content-service
+              uri: lb://content-service
+              predicates:
+                - Path=/api/content/**
+            - id: learning-service
+              uri: lb://learning-service
+              predicates:
+                - Path=/api/learning/**
+            - id: teaching-service
+              uri: lb://teaching-service
+              predicates:
+                - Path=/api/teaching/**
+            - id: game-service
+              uri: lb://game-service
+              predicates:
+                - Path=/api/games/**
 # Sa-Token 配置
 sa-token:
   token-name: satoken
@@ -43,6 +63,7 @@ security:
   whitelist:
     - /api/user/login
     - /api/user/login/wechat
+    - /api/user/login/wechat/web/**
     - /api/user/register
     - /actuator/health
     - /actuator/info

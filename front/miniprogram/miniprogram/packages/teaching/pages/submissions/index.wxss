@@ -1,0 +1,111 @@
+.submission-page {
+  padding-bottom: calc(64rpx + env(safe-area-inset-bottom));
+}
+.submission-hero {
+  padding: 24rpx 8rpx;
+}
+.submission-hero__eyebrow,
+.submission-hero__title,
+.submission-hero__description,
+.submission-card__name,
+.submission-card__meta,
+.teacher-comment {
+  display: block;
+}
+.submission-hero__eyebrow {
+  color: #e96f24;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.submission-hero__title {
+  margin-top: 8rpx;
+  font-size: 42rpx;
+  font-weight: 800;
+}
+.submission-hero__description {
+  margin-top: 12rpx;
+  color: #7b8188;
+  font-size: 24rpx;
+}
+.assignment-picker {
+  display: grid;
+  margin-bottom: 28rpx;
+  padding: 24rpx 28rpx;
+  grid-template-columns: 150rpx 1fr;
+}
+.assignment-picker > text {
+  color: #8a8f98;
+}
+.assignment-picker picker {
+  font-weight: 650;
+  text-align: right;
+}
+.submission-list {
+  display: grid;
+  gap: 18rpx;
+}
+.submission-card {
+  padding: 28rpx;
+}
+.submission-card__top,
+.score-line,
+.comment-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.submission-card__name {
+  font-size: 29rpx;
+  font-weight: 700;
+}
+.submission-card__meta {
+  margin-top: 7rpx;
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.score-line {
+  margin-top: 24rpx;
+  padding: 18rpx;
+  background: #f8f9fb;
+  border-radius: 18rpx;
+}
+.score-line text:first-child {
+  color: #e96f24;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+.score-line text:last-child {
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.comment-input {
+  width: 100%;
+  min-height: 110rpx;
+  margin-top: 20rpx;
+  padding: 18rpx;
+  background: #f8f9fb;
+  border-radius: 18rpx;
+  font-size: 25rpx;
+}
+.comment-action {
+  margin-top: 14rpx;
+  justify-content: flex-end;
+}
+.teacher-comment {
+  margin-top: 18rpx;
+  padding: 18rpx;
+  background: #fff4ec;
+  border-radius: 16rpx;
+  color: #8f4a1e;
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+.service-note {
+  margin-top: 30rpx;
+  color: #9aa0a6;
+  font-size: 22rpx;
+  line-height: 1.6;
+  text-align: center;
+}

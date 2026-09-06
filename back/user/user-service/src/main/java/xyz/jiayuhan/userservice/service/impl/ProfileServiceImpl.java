@@ -119,9 +119,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void validateRoleProfiles(Long userId, List<String> roleCodes) {
-        if (roleCodes.contains(RoleCodes.STUDENT) && roleCodes.contains(RoleCodes.TEACHER)) {
-            throw new BusinessException(ResultCode.INVALID_ROLE_COMBINATION);
-        }
         if (roleCodes.contains(RoleCodes.STUDENT) && studentProfileMapper.selectById(userId) == null) {
             throw new BusinessException(ResultCode.STUDENT_PROFILE_REQUIRED);
         }

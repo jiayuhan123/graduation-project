@@ -1,0 +1,52 @@
+<view class="page-shell">
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在加载教师资料" />
+  </view>
+
+  <block wx:else>
+    <view class="teacher-banner">
+      <view class="teacher-banner__icon">📐</view>
+      <view>
+        <text class="teacher-banner__title">教师公开资料</text>
+        <text class="teacher-banner__text">资料会在班级和作业场景中展示</text>
+      </view>
+    </view>
+
+    <text class="section-heading">职业信息</text>
+    <view class="surface-card">
+      <view class="field">
+        <text class="field__label">教师工号</text>
+        <text class="readonly-value">{{teacherNo || '暂未分配'}}</text>
+        <text class="field-hint">教师工号由管理员维护</text>
+      </view>
+      <view class="field">
+        <text class="field__label">职称或岗位</text>
+        <input
+          class="field__control"
+          maxlength="50"
+          placeholder="例如：数学教师"
+          value="{{title}}"
+          bindinput="onTitleInput"
+        />
+      </view>
+      <view class="field">
+        <text class="field__label">个人简介</text>
+        <textarea
+          class="field__textarea"
+          maxlength="500"
+          auto-height
+          placeholder="介绍教学方向或擅长领域"
+          value="{{introduction}}"
+          bindinput="onIntroductionInput"
+        ></textarea>
+        <text class="character-count">{{introduction.length}} / 500</text>
+      </view>
+    </view>
+
+    <view class="form-actions">
+      <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+        保存教师资料
+      </t-button>
+    </view>
+  </block>
+</view>

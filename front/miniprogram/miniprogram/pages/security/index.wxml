@@ -1,0 +1,91 @@
+<view class="page-shell">
+  <view class="security-banner">
+    <view class="security-banner__icon">🔐</view>
+    <text class="security-banner__title">保护你的账号</text>
+    <text class="security-banner__description">微信用户可以设置密码，之后也能使用账号密码登录其他客户端</text>
+  </view>
+
+  <view class="password-state">
+    <view class="password-state__icon">{{passwordSet ? '✓' : '!'}}</view>
+    <view>
+      <text class="password-state__title">{{passwordSet ? '账号密码已设置' : '账号尚未设置密码'}}</text>
+      <text class="password-state__description">
+        {{passwordSet ? '请输入当前密码后设置新密码' : '设置后可使用账号密码登录'}}
+      </text>
+    </view>
+  </view>
+
+  <view class="surface-card password-card">
+    <view wx:if="{{mode === 'change'}}" class="field">
+      <text class="field__label">当前密码</text>
+      <input
+        class="field__control"
+        password
+        maxlength="72"
+        placeholder="请输入当前密码"
+        data-field="oldPassword"
+        value="{{oldPassword}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+    <view class="field">
+      <text class="field__label">新密码</text>
+      <input
+        class="field__control"
+        password
+        maxlength="72"
+        placeholder="请输入 6-72 位新密码"
+        data-field="newPassword"
+        value="{{newPassword}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+    <view class="field">
+      <text class="field__label">确认新密码</text>
+      <input
+        class="field__control"
+        password
+        maxlength="72"
+        placeholder="请再次输入新密码"
+        data-field="confirmPassword"
+        value="{{confirmPassword}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+  </view>
+
+  <view class="security-tip">
+    <t-icon name="info-circle" size="34rpx" color="#ff8a3d" />
+    <text>
+      {{mode === 'initialize' ? '仅适用于还没有设置过密码的微信账号。' : '修改成功后，当前账号的所有登录会话都会失效。'}}
+    </text>
+  </view>
+
+  <text class="section-heading">微信身份</text>
+  <view class="surface-card wechat-card">
+    <view class="wechat-card__icon">微</view>
+    <view class="wechat-card__content">
+      <text class="wechat-card__title">微信小程序</text>
+      <text class="wechat-card__description">
+        {{wechatDescription}}
+      </text>
+    </view>
+    <t-button
+      size="small"
+      shape="round"
+      theme="{{wechatActionTheme}}"
+      variant="{{wechatActionVariant}}"
+      disabled="{{wechatActionDisabled}}"
+      loading="{{bindingWechat}}"
+      bind:tap="handleWechatAction"
+    >
+      {{wechatActionText}}
+    </t-button>
+  </view>
+
+  <view class="form-actions">
+    <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+      {{mode === 'initialize' ? '设置密码' : '确认修改'}}
+    </t-button>
+  </view>
+</view>

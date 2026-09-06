@@ -1,0 +1,7 @@
+package xyz.jiayuhan.learningservice.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import xyz.jiayuhan.learningservice.entity.PracticeTaskQuestion;
+
+public interface PracticeTaskQuestionMapper extends BaseMapper<PracticeTaskQuestion> {
+}

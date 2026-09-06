@@ -62,11 +62,7 @@ public class RbacServiceImpl implements RbacService {
         if (roles.size() != distinctIds.size()) {
             throw new BusinessException(ResultCode.ROLE_NOT_FOUND);
         }
-        List<String> codes = roles.stream().map(Role::getCode).toList();
-        if (codes.contains(RoleCodes.STUDENT) && codes.contains(RoleCodes.TEACHER)) {
-            throw new BusinessException(ResultCode.INVALID_ROLE_COMBINATION);
-        }
-        return codes;
+        return roles.stream().map(Role::getCode).toList();
     }
 
     @Override

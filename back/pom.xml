@@ -22,6 +22,10 @@
         <module>common</module>
         <module>gateway</module>
         <module>user</module>
+        <module>content</module>
+        <module>learning</module>
+        <module>teaching</module>
+        <module>game</module>
         <module>file-service</module>
         <module>notification-service</module>
         <module>audit-service</module>
@@ -112,6 +116,26 @@
             <dependency>
                 <groupId>xyz.jiayuhan</groupId>
                 <artifactId>user-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>content-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>learning-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>teaching-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>game-api</artifactId>
                 <version>${revision}</version>
             </dependency>
 

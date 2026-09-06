@@ -3,6 +3,10 @@ server:
   shutdown: graceful
 
 spring:
+  config:
+    import: optional:file:./.env[.properties]
+  profiles:
+    default: local
   application:
     name: user-service
 
@@ -39,6 +43,14 @@ app:
       app-id: ${WECHAT_APP_ID:}
       secret: ${WECHAT_APP_SECRET:}
       code-session-url: ${WECHAT_CODE_SESSION_URL:https://api.weixin.qq.com/sns/jscode2session}
+      web:
+        enabled: ${WECHAT_WEB_ENABLED:false}
+        app-id: ${WECHAT_WEB_APP_ID:}
+        secret: ${WECHAT_WEB_APP_SECRET:}
+        redirect-uri: ${WECHAT_WEB_REDIRECT_URI:}
+        authorize-url: ${WECHAT_WEB_AUTHORIZE_URL:https://open.weixin.qq.com/connect/qrconnect}
+        access-token-url: ${WECHAT_WEB_ACCESS_TOKEN_URL:https://api.weixin.qq.com/sns/oauth2/access_token}
+        state-ttl: ${WECHAT_WEB_STATE_TTL:10m}
   internal-api:
     enabled: ${INTERNAL_API_ENABLED:false}
     token: ${INTERNAL_API_TOKEN:}

@@ -1,0 +1,223 @@
+.assignment-page {
+  padding-bottom: calc(64rpx + env(safe-area-inset-bottom));
+}
+.assignment-hero {
+  padding: 24rpx 8rpx;
+}
+.assignment-hero__eyebrow,
+.assignment-hero__title,
+.assignment-hero__description,
+.assignment-card__title,
+.assignment-card__date,
+.question-stem,
+.question-meta,
+.detail-question__meta,
+.detail-question__stem,
+.detail-question__answer {
+  display: block;
+}
+.assignment-hero__eyebrow {
+  color: #e96f24;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.assignment-hero__title {
+  margin-top: 8rpx;
+  font-size: 42rpx;
+  font-weight: 800;
+}
+.assignment-hero__description {
+  margin-top: 12rpx;
+  color: #7b8188;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+.top-action {
+  margin-bottom: 24rpx;
+}
+.create-panel {
+  margin-bottom: 28rpx;
+}
+.picker-control {
+  padding: 20rpx;
+  background: #f7f8fa;
+  border-radius: 18rpx;
+}
+.compact-textarea {
+  min-height: 110rpx;
+}
+.time-grid {
+  display: grid;
+  padding: 24rpx 28rpx;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+}
+.time-grid > view {
+  padding: 18rpx;
+  background: #f7f8fa;
+  border-radius: 18rpx;
+}
+.time-grid text {
+  display: block;
+  margin-bottom: 8rpx;
+  color: #8a8f98;
+  font-size: 21rpx;
+}
+.panel-heading {
+  display: block;
+  padding: 10rpx 28rpx 16rpx;
+  font-weight: 700;
+}
+.question-list {
+  max-height: 620rpx;
+  overflow-y: auto;
+  border-top: 1rpx solid #f0f2f5;
+}
+.question-row {
+  padding: 20rpx 28rpx;
+  border-bottom: 1rpx solid #f0f2f5;
+}
+.question-row__head {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 42rpx 1fr;
+  gap: 16rpx;
+}
+.question-row--selected {
+  background: #fff7f1;
+}
+.question-mark {
+  display: flex;
+  width: 40rpx;
+  height: 40rpx;
+  align-items: center;
+  justify-content: center;
+  background: #eef0f3;
+  border-radius: 50%;
+  color: transparent;
+}
+.question-row--selected .question-mark {
+  background: #ff8a3d;
+  color: #fff;
+}
+.question-stem {
+  font-size: 26rpx;
+  font-weight: 650;
+}
+.question-meta {
+  margin-top: 5rpx;
+  color: #8a8f98;
+  font-size: 21rpx;
+}
+.question-settings {
+  display: grid;
+  margin: 18rpx 0 0 58rpx;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+}
+.question-settings label {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 64rpx 1fr;
+  gap: 8rpx;
+  color: #7b8188;
+  font-size: 22rpx;
+}
+.question-settings input {
+  height: 62rpx;
+  padding: 0 14rpx;
+  background: #fff;
+  border: 1rpx solid #e4e7eb;
+  border-radius: 14rpx;
+  color: #2d3436;
+}
+.inner-action {
+  padding: 26rpx 28rpx;
+}
+.assignment-list,
+.detail-list {
+  display: grid;
+  gap: 18rpx;
+}
+.assignment-card,
+.detail-question {
+  padding: 28rpx;
+}
+.assignment-card__top,
+.assignment-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.assignment-card__top > text {
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.assignment-card__title {
+  margin-top: 24rpx;
+  font-size: 31rpx;
+  font-weight: 750;
+}
+.assignment-card__date {
+  margin-top: 9rpx;
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.assignment-card__actions {
+  margin-top: 24rpx;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.detail-question__meta,
+.detail-question__answer {
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.layer-panel {
+  padding: 8rpx 0 24rpx;
+}
+.layer-student {
+  display: grid;
+  padding: 22rpx 28rpx;
+  align-items: center;
+  border-bottom: 1rpx solid #f0f2f5;
+  grid-template-columns: 1fr 150rpx;
+  gap: 16rpx;
+}
+.layer-student__name,
+.layer-student__meta {
+  display: block;
+}
+.layer-student__name {
+  font-weight: 650;
+}
+.layer-student__meta {
+  margin-top: 5rpx;
+  color: #8a8f98;
+  font-size: 21rpx;
+}
+.layer-picker {
+  padding: 16rpx;
+  background: #fff3eb;
+  border-radius: 16rpx;
+  color: #e96f24;
+  text-align: center;
+}
+.layer-actions {
+  display: flex;
+  padding: 24rpx 28rpx 0;
+  justify-content: flex-end;
+  gap: 14rpx;
+}
+.detail-question__stem {
+  margin-top: 10rpx;
+  font-size: 28rpx;
+  font-weight: 650;
+  line-height: 1.55;
+}
+.detail-question__answer {
+  margin-top: 14rpx;
+  line-height: 1.5;
+}

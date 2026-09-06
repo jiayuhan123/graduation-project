@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批改详情</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <div style="height: 44px;"></div>
+      <!-- 顶部导航 -->
+      <header class="h-[48px] flex items-center justify-between px-4 bg-white sticky top-0 z-20" style="border-bottom: 1px solid #ECEFF2;">
+        <button>
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[15px] font-semibold" style="color: #2D3436;">张明 · 两位数加减法</h1>
+        <button class="text-[14px] font-medium" style="color: #FF8A3D;">下一个</button>
+      </header>
+
+      <!-- 学生信息条 -->
+      <div class="bg-white px-4 py-3" style="border-bottom: 1px solid #ECEFF2;">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-semibold" style="background: rgba(255,138,61,0.12); color: #FF8A3D;">张</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[15px] font-semibold" style="color: #2D3436;">张明</span>
+              <span class="px-2 py-0.5 rounded text-[10px]" style="background: rgba(76,175,80,0.12); color: #4CAF50;">已提交</span>
+            </div>
+            <div class="text-[12px] mt-0.5" style="color: #636E72;">三年级2班 · 9月4日 19:30</div>
+          </div>
+        </div>
+        <!-- 批改进度条 -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[12px]" style="color: #636E72;">批改进度</span>
+            <span class="text-[12px] font-semibold" style="color: #FF8A3D;">已批 3/10</span>
+          </div>
+          <div class="w-full h-2 rounded-full overflow-hidden" style="background: #F0F2F5;">
+            <div class="h-full rounded-full" style="width: 30%; background: #FF8A3D;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 逐题批改卡片 -->
+      <div class="px-4 pt-3 pb-3 space-y-3 pb-28">
+        <!-- 批改卡片 -->
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <!-- 题目信息 -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-[14px] font-semibold" style="color: #2D3436;">第4题</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px]" style="background: #F0F2F5; color: #636E72;">口算</span>
+            </div>
+            <span class="text-[12px]" style="color: #636E72;">分值 <span class="font-semibold" style="color: #FF8A3D;">2分</span></span>
+          </div>
+
+          <!-- 题目内容 -->
+          <div class="text-[18px] font-medium mb-3 py-3 px-4 rounded-lg text-center" style="color: #2D3436; background: #F8F9FB;">
+            56 + 38 = ?
+          </div>
+
+          <!-- 学生答案 -->
+          <div class="mb-3 p-3 rounded-lg" style="background: rgba(76,175,80,0.06); border: 1px solid rgba(76,175,80,0.2);">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-5 h-5" style="color: #4CAF50;"></i>
+                <span class="text-[12px]" style="color: #636E72;">学生答案</span>
+                <span class="text-[20px] font-bold" style="color: #4CAF50;">94</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-medium" style="color: #4CAF50;">正确</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px]" style="background: rgba(76,175,80,0.12); color: #4CAF50;">AI置信度 98%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 教师评分 -->
+          <div class="mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[13px] font-medium" style="color: #2D3436;">教师评分</span>
+              <div class="flex items-center gap-1">
+                <span class="text-[16px] font-bold" style="color: #4CAF50;">2</span>
+                <span class="text-[12px]" style="color: #636E72;">/ 2分</span>
+              </div>
+            </div>
+            <input type="text" placeholder="请输入批注..." class="w-full px-3 py-2 rounded-lg text-[13px] outline-none" style="background: #F8F9FB; border: 1px solid #ECEFF2; color: #2D3436;" />
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex gap-2">
+            <button class="flex-1 py-2 rounded-lg text-[13px] font-medium" style="background: #F0F2F5; color: #636E72;">
+              <div class="flex items-center justify-center gap-1">
+                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                标为错误
+              </div>
+            </button>
+            <button class="flex-1 py-2 rounded-lg text-[13px] font-semibold" style="background: #FF8A3D; color: #FFFFFF;">
+              <div class="flex items-center justify-center gap-1">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                确认评分
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI辅助信息卡片 -->
+        <div class="rounded-xl p-4" style="background: #F8F9FB; border: 1px solid #ECEFF2;">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: rgba(151,117,250,0.12);">
+              <i data-lucide="sparkles" class="w-4 h-4" style="color: #9775FA;"></i>
+            </div>
+            <span class="text-[13px] font-semibold" style="color: #2D3436;">AI辅助分析</span>
+          </div>
+          <p class="text-[12px] mb-3" style="color: #636E72;">系统识别: 答案正确，计算步骤清晰</p>
+          <div class="mb-2">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px]" style="color: #636E72;">置信度</span>
+              <span class="text-[11px] font-semibold" style="color: #4CAF50;">98%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: #ECEFF2;">
+              <div class="h-full rounded-full" style="width: 98%; background: #4CAF50;"></div>
+            </div>
+          </div>
+          <p class="text-[11px]" style="color: #9775FA;">如有异议可手动修改评分</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部固定操作栏 -->
+    <div class="max-w-md mx-auto w-full fixed bottom-0 left-0 right-0 bg-white px-4 py-3 flex items-center gap-2" style="border-top: 1px solid #ECEFF2; z-index: 30;">
+      <button class="flex-1 py-2.5 rounded-lg text-[14px] font-medium" style="background: #F0F2F5; color: #636E72;">
+        <div class="flex items-center justify-center gap-1">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          上一题
+        </div>
+      </button>
+      <button class="flex-1 py-2.5 rounded-lg text-[14px] font-medium" style="background: #F0F2F5; color: #636E72;">
+        <div class="flex items-center justify-center gap-1">
+          <i data-lucide="skip-forward" class="w-4 h-4"></i>
+          跳过
+        </div>
+      </button>
+      <button class="flex-1 py-2.5 rounded-lg text-[14px] font-semibold" style="background: #FF8A3D; color: #FFFFFF;">
+        <div class="flex items-center justify-center gap-1">
+          下一题
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </div>
+      </button>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

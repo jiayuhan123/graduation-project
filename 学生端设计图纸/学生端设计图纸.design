@@ -1,0 +1,622 @@
+{
+  "data": [
+    {
+      "id": "page-home",
+      "title": "首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1032,
+          "viewportWidth": 415,
+          "sourceHash": "fnv1a-39ca6a5e",
+          "measuredAt": 1788540288762
+        },
+        "deviceType": "freeSize",
+        "windowSize": {
+          "width": 415,
+          "height": 1032
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-photo-camera",
+      "title": "拍照批改-拍照页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 169,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-e93413ff",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/photo-camera.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-photo-result",
+      "title": "拍照批改-批改结果",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 338,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 914,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-074d4050",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/photo-result.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-practice-setup",
+      "title": "口算练习-选择页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 507,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-5e55e906",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/practice-setup.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-practice-exam",
+      "title": "口算练习-答题页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 676,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-58fd0f66",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/practice-exam.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-practice-result",
+      "title": "口算练习-结果页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 845,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-9efa1d0d",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/practice-result.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-game-map",
+      "title": "闯关挑战-关卡地图",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 1014,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1289,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-dbc7444b",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-map.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-game-play",
+      "title": "闯关挑战-答题页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 1183,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-d891ab47",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-play.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-game-victory",
+      "title": "闯关挑战-通关页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 1352,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 955,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-9c067ee6",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-victory.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-activity",
+      "title": "学习动态",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 1521,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1168,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-e40fb10f",
+          "measuredAt": 1788520065260
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/activity.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-profile",
+      "title": "个人中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454000000,
+      "canvasData": {
+        "x": 1690,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1090,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-5ff01d6c",
+          "measuredAt": 1788672930912
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-settings",
+      "title": "设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 1859,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1248,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-f02e5f9e",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/settings.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-account-info",
+      "title": "账号信息",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2028,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1005,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-8a623d93",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/account-info.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-edit-avatar",
+      "title": "修改头像",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2197,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-c1909776",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/edit-avatar.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-change-password",
+      "title": "修改密码",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2366,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-05a186bb",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/change-password.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-wrong-book",
+      "title": "错题本",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2535,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1233,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-a5e90bf7",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/wrong-book.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-learning-report",
+      "title": "学习报告",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2704,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1346,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-124e7713",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/learning-report.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-achievement-detail",
+      "title": "成就详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454100000,
+      "canvasData": {
+        "x": 2873,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1098,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-cb411f36",
+          "measuredAt": 1788540288762
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/achievement-detail.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-team-create",
+      "title": "组队闯关-创建队伍",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 3211,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/team-game-create.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-team-result",
+      "title": "团队闯关-结算页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 3380,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/team-game-result.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-game-fail",
+      "title": "闯关失败页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 3549,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-fail.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-consolidation",
+      "title": "巩固练习页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 3718,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/consolidation-practice.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-notifications",
+      "title": "消息通知中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 3887,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/notifications.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-wrong-practice",
+      "title": "错题练习-答题页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454200000,
+      "canvasData": {
+        "x": 4056,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/wrong-practice.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-assignment-list",
+      "title": "作业列表",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 4225,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/assignment-list.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-assignment-doing",
+      "title": "作业作答",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 4394,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/assignment-doing.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-assignment-result",
+      "title": "作业结果",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 4563,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/assignment-result.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-knowledge-mastery",
+      "title": "知识点掌握详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 4732,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/knowledge-mastery.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-leaderboard",
+      "title": "排行榜",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 4901,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/leaderboard.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-class-join",
+      "title": "加入班级",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788454300000,
+      "canvasData": {
+        "x": 5070,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/class-join.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "mobile",
+    "projectName": "学生端设计图纸",
+    "showEdge": true,
+    "visualEditorEnabled": false
+  }
+}

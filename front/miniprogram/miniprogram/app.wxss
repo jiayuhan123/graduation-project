@@ -1,0 +1,128 @@
+page {
+  --td-brand-color: #ff8a3d;
+  --td-brand-color-active: #e96f24;
+  --td-brand-color-disabled: #ffc69f;
+  --td-brand-color-light: #fff3eb;
+  --td-brand-color-light-active: #ffe3d0;
+  min-height: 100%;
+  background: #f8f9fb;
+  color: #2d3436;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 28rpx;
+}
+
+view,
+text,
+image,
+button,
+input,
+textarea,
+scroll-view {
+  box-sizing: border-box;
+}
+
+button::after {
+  border: none;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 28rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.page-loading {
+  display: flex;
+  min-height: 60vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.surface-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #f0f2f5;
+  border-radius: 32rpx;
+  box-shadow: 0 10rpx 32rpx rgba(45, 52, 54, 0.06);
+}
+
+.section-heading {
+  margin: 36rpx 8rpx 18rpx;
+  color: #2d3436;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.field {
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid #f0f2f5;
+}
+
+.field:last-child {
+  border-bottom: 0;
+}
+
+.field__label {
+  display: block;
+  margin-bottom: 14rpx;
+  color: #636e72;
+  font-size: 25rpx;
+}
+
+.field__control {
+  width: 100%;
+  height: 76rpx;
+  color: #2d3436;
+  font-size: 29rpx;
+  line-height: 76rpx;
+}
+
+.field__textarea {
+  width: 100%;
+  min-height: 180rpx;
+  color: #2d3436;
+  font-size: 29rpx;
+  line-height: 1.6;
+}
+
+.form-actions {
+  margin-top: 40rpx;
+}
+
+.hint-text {
+  color: #8a8f98;
+  font-size: 24rpx;
+  line-height: 1.65;
+}
+
+.role-switch {
+  display: flex;
+  margin-top: 20rpx;
+  gap: 16rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.role-chip {
+  display: flex;
+  min-width: 154rpx;
+  padding: 16rpx 22rpx;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 2rpx solid #eceff2;
+  border-radius: 999rpx;
+  color: #636e72;
+  font-size: 26rpx;
+  gap: 10rpx;
+}
+
+.role-chip--active {
+  background: #fff3eb;
+  border-color: #ff8a3d;
+  color: #e96f24;
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: 72rpx 32rpx;
+}

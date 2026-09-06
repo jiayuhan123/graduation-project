@@ -34,7 +34,7 @@ export function isApiError(error: unknown): error is ApiError {
 export interface PageResult<T = unknown> {
   total: number
   pages: number
-  current: number
+  page: number
   size: number
   records: T[]
 }

@@ -1,0 +1,27 @@
+/* Neutral base theme - each page overrides variables per style */
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}

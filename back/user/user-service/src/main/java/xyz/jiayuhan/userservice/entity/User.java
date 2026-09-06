@@ -30,6 +30,12 @@ public class User {
     /** 微信小程序唯一身份；只在服务端使用，绝不直接返回给客户端。 */
     private String wechatOpenid;
 
+    /** 微信开放平台网站应用唯一身份；与小程序 OpenID 不可混用。 */
+    private String wechatWebOpenid;
+
+    /** 同一微信开放平台账号下的跨应用身份，用于关联 Web 与小程序账号。 */
+    private String wechatUnionid;
+
     /** BCrypt 密码哈希，对应历史数据库列 {@code password}。 */
     @TableField("password")
     private String passwordHash;

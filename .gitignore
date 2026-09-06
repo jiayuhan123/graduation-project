@@ -13,6 +13,7 @@ node_modules/
 *.iml
 .env
 .env.local
+文档/服务器中间件登录说明.md
 /data/
 
 # Logs and generated files

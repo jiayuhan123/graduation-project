@@ -22,8 +22,10 @@ describe('user store', () => {
     vi.mocked(loginApi).mockResolvedValue({
       token: 'token-1',
       tokenName: 'satoken',
-      userId: 1,
+      userId: '1',
       username: 'admin',
+      nickname: null,
+      avatarUrl: null,
       role: 'admin',
       roles: ['admin'],
       permissions: ['user:read'],
@@ -43,7 +45,7 @@ describe('user store', () => {
   it('replaces cached permissions with the server session', async () => {
     storage.setString(STORAGE_KEYS.token, 'token-1')
     storage.setJson(STORAGE_KEYS.userInfo, {
-      userId: 1,
+      userId: '1',
       username: 'admin',
       roles: ['forged-role'],
       permissions: ['forged:permission'],
@@ -51,7 +53,7 @@ describe('user store', () => {
       expireAt: null,
     })
     vi.mocked(currentSessionApi).mockResolvedValue({
-      userId: 1,
+      userId: '1',
       token: 'token-1',
       tokenName: 'satoken',
       roles: ['admin'],

@@ -12,14 +12,22 @@
 | `file-service` | 8002 | 阿里云 OSS 私有文件和 PostgreSQL 元数据 |
 | `notification-service` | 8003 | 站内通知、注册事件消费和未读状态 |
 | `audit-service` | 8004 | 用户与管理操作审计事件持久化 |
+| `content/content-api` | - | 题目、知识点内部查询契约与 OpenFeign 客户端 |
+| `content/content-service` | 8005 | 内容模块、知识点、题目和错因字典的管理、审核、查询与可靠审计 |
+| `learning/learning-api` | - | 练习任务内部查询契约与 OpenFeign 客户端 |
+| `learning/learning-service` | 8006 | 练习、作答、诊断、掌握度、推荐和拍照批改的持久层及查询接口 |
+| `teaching/teaching-api` | - | 作业内部查询契约与 OpenFeign 客户端 |
+| `teaching/teaching-service` | 8007 | 班级成员、统一/分层作业、发布快照、提交汇总与可靠审计 |
+| `game/game-api` | - | 游戏对局内部查询契约与 OpenFeign 客户端 |
+| `game/game-service` | 8008 | 关卡、单人/团队对局、进度和奖励的持久层及查询接口 |
 | `common/*` | - | 可选公共能力 Jar，不注册为服务 |
 
 ## 请求与事件链路
 
 ```text
-客户端 -> Gateway -> user/file/notification/audit
-             |              |
-             |              +-> 各服务独立 PostgreSQL 数据库
+客户端 -> Gateway -> user/content/learning/teaching/game/file/notification/audit
+             |                            |
+             |                            +-> 各服务独立 PostgreSQL 数据库
              +-> Redis 校验 Sa-Token
 
 user-service 业务事务 -> sys_outbox_event -> RabbitMQ topic exchange
@@ -27,6 +35,8 @@ user-service 业务事务 -> sys_outbox_event -> RabbitMQ topic exchange
                                            +-> audit-service
 
 其他业务服务 -> UserFeignClient -> Nacos + LoadBalancer -> user-service /internal/users/**
+
+teaching-service / game-service -> learning-service -> content-service / file-service
 ```
 
 网关校验 `satoken` 后删除外部伪造的身份头，再向下游写入 `X-User-ID`。同时建立 `X-Trace-ID`；Servlet 服务会把它写入响应头和日志 MDC。业务服务不得直接暴露到公网。
@@ -51,28 +61,31 @@ cd back
 .\mvnw.cmd clean verify
 ```
 
-首次本地启动在仓库根目录执行：
+本地调试统一连接共享开发服务器上的 PostgreSQL、Redis、Nacos 和 RabbitMQ，无需启动本地基础设施。连接地址和凭据统一保存在仓库根目录的 `.env` 中；该文件已被 Git 忽略，禁止把真实密码复制进 `application-local.yml`。若需要离线开发或隔离环境，可在仓库根目录自行启动本地组件，并修改 `.env` 中的连接地址：
 
 ```powershell
 docker compose up -d postgres redis nacos rabbitmq
 ```
 
-后端不会默认选择运行环境。启动 Java 服务前必须显式激活 `local`、`test` 或 `prod`：
+推荐使用统一脚本启动本地服务。脚本会加载根目录 `.env`、检查当前服务需要的变量、构建模块，并以 `local` 环境启动：
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE="local"
+.\back\run-local-service.ps1 -Service user-service -CheckOnly
+.\back\run-local-service.ps1 -Service user-service
 ```
 
+已经构建过时可以增加 `-SkipBuild`。其他服务把 `user-service` 替换为 `gateway`、`content-service`、`learning-service`、`teaching-service`、`game-service`、`file-service`、`notification-service` 或 `audit-service`。本地环境是默认 profile；从仓库根目录打开 IDEA 并直接运行 Spring Boot 主类时，服务会读取根目录 `.env`。测试和生产启动必须显式激活 `test` 或 `prod`。
+
 - `application.yml`：端口、业务参数、监控等环境无关配置。
-- `application-local.yml`：本机 Docker 连接信息，允许使用 `.env.example` 中的开发默认值，Nacos 导入可选。
+- `application-local.yml`：本地联调配置；共享服务器连接地址和凭据全部由根目录 `.env` 注入，Nacos 配置导入可选。
 - `application-test.yml`：关闭 Nacos，测试所需外部连接由测试代码或 CI 注入。
 - `application-prod.yml`：Nacos 导入为强制，数据库、Redis、RabbitMQ 和 Nacos 凭据均无默认值；缺少环境变量时启动失败。
 
 生产变量可参考仓库根目录的 `.env.prod.example`，真实密码不得提交到 Git。
 
-Compose 只在 PostgreSQL 空数据目录首次初始化时创建 `user_db`、`file_db`、`notification_db` 和 `audit_db`。已有数据目录需由管理员补建数据库。
+Compose 只在 PostgreSQL 空数据目录首次初始化时创建 `user_db`、`content_db`、`learning_db`、`teaching_db`、`game_db`、`file_db`、`notification_db` 和 `audit_db`。已有数据目录需由管理员补建数据库。
 
-推荐启动顺序：基础设施 -> `user-service` -> `file-service` / `notification-service` / `audit-service` -> `gateway`。文件服务还必须配置已创建的阿里云 OSS 私有 Bucket：
+推荐启动顺序：基础设施 -> `user-service` / `content-service` / `file-service` -> `learning-service` -> `teaching-service` / `game-service` / `notification-service` / `audit-service` -> `gateway`。文件服务还必须配置已创建的阿里云 OSS 私有 Bucket：
 
 ```powershell
 $env:OSS_REGION="cn-hangzhou"

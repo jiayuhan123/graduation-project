@@ -22,6 +22,10 @@
 | `file-service` | `/api/files/**` | `lb://file-service` | 私有文件 |
 | `notification-service` | `/api/notifications/**` | `lb://notification-service` | 站内通知 |
 | `audit-service` | `/api/audits/**` | `lb://audit-service` | 审计查询 |
+| `content-service` | `/api/content/**` | `lb://content-service` | 内容题库查询 |
+| `learning-service` | `/api/learning/**` | `lb://learning-service` | 学习档案查询 |
+| `teaching-service` | `/api/teaching/**` | `lb://teaching-service` | 教学数据查询 |
+| `game-service` | `/api/games/**` | `lb://game-service` | 游戏闯关查询 |
 
 新增服务时，需要同步添加路由，并检查鉴权白名单及本文档。
 
@@ -106,7 +110,7 @@ GET http://localhost:10000/actuator/health
 | `security.whitelist` | 无需登录即可访问的路径 |
 | `knife4j.gateway` | 接口文档聚合策略 |
 
-配置文件使用 `NACOS_SERVER_ADDR`、`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD` 和 `REDIS_DATABASE` 环境变量，并可由 Nacos 配置覆盖。生产环境不得沿用本地默认密码。
+配置文件使用 `NACOS_SERVER_ADDR`、`NACOS_USERNAME`、`NACOS_PASSWORD`、`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD` 和 `REDIS_DATABASE` 环境变量，并可由 Nacos 配置覆盖。生产环境不得沿用本地默认密码。
 
 ## 安全边界与已知限制
 

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闯关挑战-关卡地图</title>
+    <style id="theme-vars">
+/* Neutral base theme - each page overrides variables per style */
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top navigation bar -->
+      <header class="px-4 h-[52px] flex items-center justify-between">
+        <button class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #F0F2F5;" aria-label="返回">
+          <i data-lucide="arrow-left" class="w-5 h-5" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[18px] font-semibold text-foreground">闯关挑战</h1>
+        <button class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #F0F2F5;" aria-label="排行榜">
+          <i data-lucide="trophy" class="w-5 h-5" style="color: #FF8A3D;"></i>
+        </button>
+      </header>
+
+      <!-- 3. Chapter info card -->
+      <section class="px-4 mt-2 mb-3">
+        <div class="bg-card rounded-[20px] p-4 shadow-sm flex items-center gap-3" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, #FF8A3D, #FFB347); box-shadow: 0 4px 12px rgba(255,138,61,0.3);">
+            <span class="text-[28px] leading-none">🏰</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[18px] font-bold text-card-foreground">乘法城堡</h2>
+            <p class="text-[13px] text-muted-foreground mt-0.5">共12关 · 已通关5关</p>
+            <div class="w-full rounded-full overflow-hidden mt-2" style="height: 8px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 41.7%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Level map (snake path) -->
+      <section class="map-section py-2 mb-2" style="background-color: #FFFCF8;">
+
+        <!-- Level 1 · right · done 3★ -->
+        <div class="level-row" data-side="right">
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第1关</p>
+            <p class="text-[15px] font-semibold text-card-foreground leading-tight mt-0.5">加法入门</p>
+            <p class="text-[12px] text-muted-foreground mt-1">最佳成绩 <span class="font-medium" style="color: #4CAF50;">95%</span></p>
+          </div>
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[12px] leading-none">⭐⭐⭐</span></div>
+            <div class="node-circle node-done"><i data-lucide="check" class="w-8 h-8"></i></div>
+          </div>
+        </div>
+
+        <!-- connector 1→2 right→left -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 87 0 C 87 20, 13 20, 13 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 2 · left · done 3★ -->
+        <div class="level-row" data-side="left">
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[12px] leading-none">⭐⭐⭐</span></div>
+            <div class="node-circle node-done"><i data-lucide="check" class="w-8 h-8"></i></div>
+          </div>
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第2关</p>
+            <p class="text-[15px] font-semibold text-card-foreground leading-tight mt-0.5">减法基础</p>
+            <p class="text-[12px] text-muted-foreground mt-1">最佳成绩 <span class="font-medium" style="color: #4CAF50;">90%</span></p>
+          </div>
+        </div>
+
+        <!-- connector 2→3 left→right -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 13 0 C 13 20, 87 20, 87 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 3 · right · done 2★ -->
+        <div class="level-row" data-side="right">
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第3关</p>
+            <p class="text-[15px] font-semibold text-card-foreground leading-tight mt-0.5">乘法口诀</p>
+            <p class="text-[12px] text-muted-foreground mt-1">最佳成绩 <span class="font-medium" style="color: #4CAF50;">85%</span></p>
+          </div>
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[12px] leading-none">⭐⭐<span style="opacity: 0.35;">☆</span></span></div>
+            <div class="node-circle node-done"><i data-lucide="check" class="w-8 h-8"></i></div>
+          </div>
+        </div>
+
+        <!-- connector 3→4 right→left -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 87 0 C 87 20, 13 20, 13 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 4 · left · done 3★ -->
+        <div class="level-row" data-side="left">
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[12px] leading-none">⭐⭐⭐</span></div>
+            <div class="node-circle node-done"><i data-lucide="check" class="w-8 h-8"></i></div>
+          </div>
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第4关</p>
+            <p class="text-[15px] font-semibold text-card-foreground leading-tight mt-0.5">除法入门</p>
+            <p class="text-[12px] text-muted-foreground mt-1">最佳成绩 <span class="font-medium" style="color: #4CAF50;">92%</span></p>
+          </div>
+        </div>
+
+        <!-- connector 4→5 left→right -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 13 0 C 13 20, 87 20, 87 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 5 · right · done 2★ -->
+        <div class="level-row" data-side="right">
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第5关</p>
+            <p class="text-[15px] font-semibold text-card-foreground leading-tight mt-0.5">混合运算</p>
+            <p class="text-[12px] text-muted-foreground mt-1">最佳成绩 <span class="font-medium" style="color: #4CAF50;">80%</span></p>
+          </div>
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[12px] leading-none">⭐⭐<span style="opacity: 0.35;">☆</span></span></div>
+            <div class="node-circle node-done"><i data-lucide="check" class="w-8 h-8"></i></div>
+          </div>
+        </div>
+
+        <!-- connector 5→6 right→left -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 87 0 C 87 20, 13 20, 13 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 6 · left · current -->
+        <div class="level-row" data-side="left">
+          <div class="node-wrap">
+            <div class="node-top"><span class="text-[11px] font-medium px-2 py-0.5 rounded-full" style="background-color: rgba(255,138,61,0.15); color: #FF8A3D;">进行中</span></div>
+            <div class="node-circle node-current"><span class="text-[24px] font-bold leading-none">6</span></div>
+          </div>
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第6关</p>
+            <p class="text-[15px] font-semibold leading-tight mt-0.5" style="color: #FF8A3D;">乘法进阶</p>
+            <span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1" style="background-color: rgba(255,138,61,0.15); color: #FF8A3D;">继续挑战</span>
+          </div>
+        </div>
+
+        <!-- connector 6→7 left→right -->
+        <svg class="connector" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 13 0 C 13 20, 87 20, 87 40" fill="none" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+
+        <!-- Level 7 · right · locked -->
+        <div class="level-row" data-side="right">
+          <div class="info-card">
+            <p class="text-[12px] text-muted-foreground leading-tight">第7关</p>
+            <p class="text-[15px] font-semibold text-muted-foreground leading-tight mt-0.5">挑战BOSS</p>
+            <span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1" style="background-color: #F0F2F5; color: #9AA0A6;">未解锁</span>
+          </div>
+          <div class="node-wrap">
+            <div class="node-top"></div>
+            <div class="node-circle node-locked"><i data-lucide="lock" class="w-7 h-7"></i></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 5. Bottom hint -->
+      <div class="text-center px-4 mt-3 mb-6">
+        <p class="text-[13px] text-muted-foreground">💡 通过关卡解锁更多有趣的内容！</p>
+      </div>
+    </main>
+
+    <!-- 6. Bottom navigation -->
+    <nav data-mobile-nav="global" class="w-full h-[64px]"><div class="w-full max-w-md mx-auto grid grid-cols-4 h-full"><a data-nav-key="home" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="home" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span></a><a data-nav-key="practice" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="pencil" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">练习</span></a><a data-nav-key="games" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="gamepad-2" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">闯关</span></a><a data-nav-key="profile" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="user" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span></a></div></nav>
+
+    <script>lucide.createIcons();</script>
+    <style id="game-map-styles">
+.level-row { display: flex; align-items: center; gap: 14px; padding: 6px 16px; }
+.level-row[data-side="right"] { flex-direction: row-reverse; }
+.node-wrap { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
+.node-top { min-height: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+.node-circle { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+.node-done { background-color: #4CAF50; color: #FFFFFF; box-shadow: 0 6px 14px rgba(76,175,80,0.32); }
+.node-current { background-color: #FF8A3D; color: #FFFFFF; animation: gm-pulse 1.8s infinite; }
+.node-locked { background-color: #E0E4E8; color: #9AA0A6; }
+.info-card { flex: 1 1 0%; min-width: 0; }
+.level-row[data-side="right"] .info-card { text-align: right; }
+.connector { width: 100%; height: 40px; display: block; }
+@keyframes gm-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,138,61,0.5), 0 6px 14px rgba(255,138,61,0.35); }
+  70% { box-shadow: 0 0 0 14px rgba(255,138,61,0), 0 6px 14px rgba(255,138,61,0.35); }
+  100% { box-shadow: 0 0 0 0 rgba(255,138,61,0), 0 6px 14px rgba(255,138,61,0.35); }
+}
+    </style>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+nav[data-mobile-nav] a[data-active="true"] { color: #FF8A3D; }
+nav[data-mobile-nav] a[data-active="true"] svg { color: #FF8A3D; stroke: #FF8A3D; }
+nav[data-mobile-nav] a:not([data-active="true"]) { color: #636E72; }
+nav[data-mobile-nav] a:not([data-active="true"]) svg { color: #636E72; stroke: #636E72; }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+nav[data-mobile-nav] { flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #F0F2F5; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

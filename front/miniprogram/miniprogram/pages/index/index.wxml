@@ -1,0 +1,142 @@
+<view class="page-shell">
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在连接用户服务" />
+  </view>
+
+  <block wx:else>
+    <view class="home-heading">
+      <view>
+        <text class="home-heading__eyebrow">欢迎回来</text>
+        <text class="home-heading__title">{{displayName}}</text>
+      </view>
+      <view class="mini-avatar" bindtap="openProfile">
+        <image wx:if="{{avatarUrl}}" class="mini-avatar__image" src="{{avatarUrl}}" mode="aspectFill" />
+        <text wx:else>{{avatarText}}</text>
+      </view>
+    </view>
+
+    <view class="surface-card identity-card">
+      <view class="identity-card__glow"></view>
+      <view class="identity-card__top">
+        <view class="identity-card__icon">
+          <text wx:if="{{activeRole === 'student'}}">🎒</text>
+          <text wx:elif="{{activeRole === 'teacher'}}">📐</text>
+          <text wx:elif="{{activeRole === 'admin'}}">🛡️</text>
+          <text wx:else>👤</text>
+        </view>
+        <view class="identity-card__content">
+          <text class="identity-card__label">当前身份</text>
+          <text class="identity-card__role">{{activeRoleLabel}}</text>
+          <text class="identity-card__line">{{identityLine}}</text>
+        </view>
+      </view>
+      <view class="identity-card__footer">
+        <text>{{activeRoleDescription}}</text>
+        <t-tag theme="success" variant="light" shape="round" size="small">已连接</t-tag>
+      </view>
+    </view>
+
+    <view wx:if="{{roleOptions.length > 1}}">
+      <text class="section-heading section-heading--compact">切换身份</text>
+      <scroll-view class="role-switch" scroll-x enhanced show-scrollbar="{{false}}">
+        <view
+          wx:for="{{roleOptions}}"
+          wx:key="code"
+          class="role-chip {{item.code === activeRole ? 'role-chip--active' : ''}}"
+          data-role="{{item.code}}"
+          bindtap="switchRole"
+        >
+          <text>{{item.icon}}</text>
+          <text>{{item.label}}</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <block wx:if="{{isStudentRole}}">
+      <text class="section-heading">学习与班级</text>
+      <view class="surface-card menu-card">
+        <t-cell title="我的班级" description="使用班级码加入教学班" left-icon="usergroup" arrow bind:click="openTeachingClasses" />
+        <t-cell title="我的作业" description="查看老师发布的作业" left-icon="edit-1" arrow bind:click="openTeachingAssignments" />
+        <t-cell title="提交记录" description="查看作答与批改状态" left-icon="check-circle" arrow bind:click="openTeachingSubmissions" />
+        <t-cell
+          title="自主练习"
+          description="按教材模块选择知识点和难度"
+          left-icon="education"
+          arrow
+          bind:click="openPractice"
+        />
+      </view>
+    </block>
+
+    <block wx:if="{{isTeacherRole}}">
+      <text class="section-heading">教学工作台</text>
+      <view class="surface-card menu-card">
+        <t-cell title="班级管理" description="创建班级并维护学生" left-icon="usergroup" arrow bind:click="openTeachingClasses" />
+        <t-cell title="作业管理" description="选题、发布与结束作业" left-icon="edit-1" arrow bind:click="openTeachingAssignments" />
+        <t-cell title="学生提交" description="查看学情并维护评语" left-icon="chart" arrow bind:click="openTeachingSubmissions" />
+      </view>
+    </block>
+
+    <text class="section-heading">账号服务</text>
+    <view class="surface-card menu-card">
+      <t-cell title="个人资料" description="昵称、姓名与联系方式" left-icon="user" arrow bind:click="openProfile" />
+      <t-cell
+        wx:if="{{hasStudentRole}}"
+        title="学生资料"
+        description="年级与当前学期"
+        left-icon="education"
+        arrow
+        bind:click="openStudentProfile"
+      />
+      <t-cell
+        wx:if="{{hasTeacherRole}}"
+        title="教师资料"
+        description="职称与公开简介"
+        left-icon="root-list"
+        arrow
+        bind:click="openTeacherProfile"
+      />
+      <t-cell title="账号安全" description="设置或修改登录密码" left-icon="lock-on" arrow bind:click="openSecurity" />
+      <t-cell
+        wx:if="{{isAdminRole && canManageUsers}}"
+        title="用户目录"
+        description="查询用户、状态与角色"
+        left-icon="usergroup"
+        arrow
+        bind:click="openAdminUsers"
+      />
+      <t-cell
+        wx:if="{{isAdminRole && canManageRoles}}"
+        title="角色与权限"
+        description="查看角色权限配置"
+        left-icon="secured"
+        arrow
+        bind:click="openAdminRoles"
+      />
+    </view>
+
+    <text class="section-heading">连接状态</text>
+    <view class="surface-card status-grid">
+      <view class="status-item">
+        <text class="status-item__value">{{roleCount}}</text>
+        <text class="status-item__label">账号角色</text>
+      </view>
+      <view class="status-item">
+        <text class="status-item__value">{{permissionCount}}</text>
+        <text class="status-item__label">有效权限</text>
+      </view>
+      <view class="status-item">
+        <text class="status-item__value">{{wechatBound ? '已绑定' : '未绑定'}}</text>
+        <text class="status-item__label">微信身份</text>
+      </view>
+    </view>
+
+    <view wx:if="{{isAdminRole}}" class="admin-note">
+      <text class="admin-note__icon">🛡️</text>
+      <view>
+        <text class="admin-note__title">管理员身份已启用</text>
+        <text class="admin-note__text">可在个人中心核对当前账号的角色、资料和有效权限。</text>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,123 @@
+.teaching-page {
+  padding-bottom: calc(64rpx + env(safe-area-inset-bottom));
+}
+.teaching-hero {
+  padding: 24rpx 8rpx;
+}
+.teaching-hero__eyebrow,
+.teaching-hero__title,
+.teaching-hero__description,
+.class-card__name,
+.class-card__school,
+.class-card__meta,
+.student-row__name,
+.student-row__meta {
+  display: block;
+}
+
+.student-row__action {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.teaching-hero__eyebrow {
+  color: #e96f24;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.teaching-hero__title {
+  margin-top: 8rpx;
+  font-size: 42rpx;
+  font-weight: 800;
+}
+.teaching-hero__description {
+  margin-top: 12rpx;
+  color: #7b8188;
+  font-size: 24rpx;
+}
+.top-action {
+  margin-bottom: 24rpx;
+}
+.join-form,
+.create-form {
+  margin-top: 12rpx;
+}
+.form-inner-action {
+  padding: 24rpx 28rpx;
+}
+.picker-grid {
+  display: grid;
+  padding: 24rpx 28rpx 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+.picker-control {
+  padding: 22rpx;
+  background: #f7f8fa;
+  border-radius: 18rpx;
+  text-align: center;
+}
+.class-list {
+  display: grid;
+  gap: 18rpx;
+}
+.class-card {
+  padding: 28rpx;
+}
+.class-card__top,
+.class-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.class-code {
+  color: #e96f24;
+  font-size: 23rpx;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+.class-card__name {
+  margin-top: 26rpx;
+  color: #2d3436;
+  font-size: 33rpx;
+  font-weight: 750;
+}
+.class-card__school {
+  margin-top: 8rpx;
+  color: #7b8188;
+  font-size: 24rpx;
+}
+.class-card__meta {
+  margin-top: 24rpx;
+  color: #8a8f98;
+  font-size: 22rpx;
+}
+.class-card__actions {
+  margin-top: 24rpx;
+  justify-content: flex-end;
+}
+.student-panel {
+  padding-bottom: 12rpx;
+}
+.student-actions {
+  display: flex;
+  padding: 20rpx 28rpx;
+  justify-content: flex-end;
+  gap: 12rpx;
+}
+.student-row {
+  display: flex;
+  padding: 22rpx 28rpx;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1rpx solid #f0f2f5;
+}
+.student-row__name {
+  font-weight: 650;
+}
+.student-row__meta {
+  margin-top: 5rpx;
+  color: #8a8f98;
+  font-size: 22rpx;
+}

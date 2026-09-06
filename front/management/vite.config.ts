@@ -2,8 +2,6 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
@@ -11,14 +9,7 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    plugins: [
-      vue(),
-      Components({
-        resolvers: [ElementPlusResolver()],
-        dts: 'src/types/components.d.ts',
-      }),
-      ...(command === 'serve' ? [vueDevTools()] : []),
-    ],
+    plugins: [vue(), ...(command === 'serve' ? [vueDevTools()] : [])],
     server: {
       port: 5173,
       proxy: {

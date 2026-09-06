@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preflight Google</title>
+    <style id="theme-vars">
+/* Google Material 3 Style Theme - Tonal, colorful, structured */
+:root {
+  /* Brand primary - Google blue */
+  --gg-background: #FEF7FF;
+  --gg-foreground: #1D1B20;
+  --gg-card: #FFFFFF;
+  --gg-card-foreground: #1D1B20;
+  --gg-popover: #FFFFFF;
+  --gg-popover-foreground: #1D1B20;
+  --gg-primary: #6750A4;
+  --gg-primary-foreground: #FFFFFF;
+  --gg-muted: #E7E0EC;
+  --gg-muted-foreground: #625B71;
+  --gg-border: #CAC4D0;
+  --gg-input: #CAC4D0;
+  --gg-ring: #6750A4;
+
+  /* State colors */
+  --state-success: #386A20;
+  --state-warning: #7D5700;
+  --state-error: #B3261E;
+  --state-info: #00639B;
+
+  /* Radius scale - Material 3 shapes */
+  --gg-radius-sm: 8px;
+  --gg-radius-md: 12px;
+  --gg-radius-lg: 16px;
+
+  /* Typography */
+  --gg-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--gg-background);
+    --color-foreground: var(--gg-foreground);
+    --color-card: var(--gg-card);
+    --color-card-foreground: var(--gg-card-foreground);
+    --color-popover: var(--gg-popover);
+    --color-popover-foreground: var(--gg-popover-foreground);
+    --color-primary: var(--gg-primary);
+    --color-primary-foreground: var(--gg-primary-foreground);
+    --color-muted: var(--gg-muted);
+    --color-muted-foreground: var(--gg-muted-foreground);
+    --color-border: var(--gg-border);
+    --color-input: var(--gg-input);
+    --color-ring: var(--gg-ring);
+    --radius-sm: var(--gg-radius-sm);
+    --radius-md: var(--gg-radius-md);
+    --radius-lg: var(--gg-radius-lg);
+  }
+  @layer base {
+    body { background: var(--gg-background); color: var(--gg-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--gg-background); }
+      .text-background { color: var(--gg-background); }
+      .border-background { border-color: var(--gg-background); }
+      .ring-background { --tw-ring-color: var(--gg-background); }
+      .bg-foreground { background-color: var(--gg-foreground); }
+      .text-foreground { color: var(--gg-foreground); }
+      .border-foreground { border-color: var(--gg-foreground); }
+      .ring-foreground { --tw-ring-color: var(--gg-foreground); }
+      .bg-card { background-color: var(--gg-card); }
+      .text-card { color: var(--gg-card); }
+      .border-card { border-color: var(--gg-card); }
+      .ring-card { --tw-ring-color: var(--gg-card); }
+      .bg-card-foreground { background-color: var(--gg-card-foreground); }
+      .text-card-foreground { color: var(--gg-card-foreground); }
+      .border-card-foreground { border-color: var(--gg-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--gg-card-foreground); }
+      .bg-popover { background-color: var(--gg-popover); }
+      .text-popover { color: var(--gg-popover); }
+      .border-popover { border-color: var(--gg-popover); }
+      .ring-popover { --tw-ring-color: var(--gg-popover); }
+      .bg-popover-foreground { background-color: var(--gg-popover-foreground); }
+      .text-popover-foreground { color: var(--gg-popover-foreground); }
+      .border-popover-foreground { border-color: var(--gg-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--gg-popover-foreground); }
+      .bg-primary { background-color: var(--gg-primary); }
+      .text-primary { color: var(--gg-primary); }
+      .border-primary { border-color: var(--gg-primary); }
+      .ring-primary { --tw-ring-color: var(--gg-primary); }
+      .bg-primary-foreground { background-color: var(--gg-primary-foreground); }
+      .text-primary-foreground { color: var(--gg-primary-foreground); }
+      .border-primary-foreground { border-color: var(--gg-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--gg-primary-foreground); }
+      .bg-muted { background-color: var(--gg-muted); }
+      .text-muted { color: var(--gg-muted); }
+      .border-muted { border-color: var(--gg-muted); }
+      .ring-muted { --tw-ring-color: var(--gg-muted); }
+      .bg-muted-foreground { background-color: var(--gg-muted-foreground); }
+      .text-muted-foreground { color: var(--gg-muted-foreground); }
+      .border-muted-foreground { border-color: var(--gg-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--gg-muted-foreground); }
+      .bg-border { background-color: var(--gg-border); }
+      .text-border { color: var(--gg-border); }
+      .border-border { border-color: var(--gg-border); }
+      .ring-border { --tw-ring-color: var(--gg-border); }
+      .bg-input { background-color: var(--gg-input); }
+      .text-input { color: var(--gg-input); }
+      .border-input { border-color: var(--gg-input); }
+      .ring-input { --tw-ring-color: var(--gg-input); }
+      .bg-ring { background-color: var(--gg-ring); }
+      .text-ring { color: var(--gg-ring); }
+      .border-ring { border-color: var(--gg-ring); }
+      .ring-ring { --tw-ring-color: var(--gg-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -5,9 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import xyz.jiayuhan.common.core.exception.BusinessException;
-import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.userservice.entity.StudentProfile;
+import xyz.jiayuhan.userservice.entity.TeacherProfile;
 import xyz.jiayuhan.userservice.mapper.StudentProfileMapper;
 import xyz.jiayuhan.userservice.mapper.TeacherProfileMapper;
 import xyz.jiayuhan.userservice.service.impl.ProfileServiceImpl;
@@ -16,7 +15,6 @@ import xyz.jiayuhan.userservice.service.impl.UserDataSupport;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -56,14 +54,15 @@ class ProfileServiceImplTest {
     }
 
     @Test
-    void rejectsStudentAndTeacherRoleCombination() {
+    void acceptsStudentAndTeacherRolesWhenBothProfilesExist() {
         ProfileServiceImpl service = new ProfileServiceImpl(
                 studentProfileMapper, teacherProfileMapper, userDataSupport);
+        when(studentProfileMapper.selectById(10L)).thenReturn(new StudentProfile());
+        when(teacherProfileMapper.selectById(10L)).thenReturn(new TeacherProfile());
 
-        assertThatThrownBy(() -> service.validateRoleProfiles(
-                10L, List.of("student", "teacher")))
-                .isInstanceOfSatisfying(BusinessException.class,
-                        exception -> assertThat(exception.getCode())
-                                .isEqualTo(ResultCode.INVALID_ROLE_COMBINATION.getCode()));
+        service.validateRoleProfiles(10L, List.of("student", "teacher"));
+
+        verify(studentProfileMapper).selectById(10L);
+        verify(teacherProfileMapper).selectById(10L);
     }
 }

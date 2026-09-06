@@ -255,7 +255,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 user.getAvatarUrl(),
                 user.getStatus(),
                 roles,
-                user.getWechatOpenid() != null,
+                user.getWechatOpenid() != null || user.getWechatWebOpenid() != null,
                 profileService.studentProfile(user.getId()),
                 profileService.teacherProfile(user.getId()),
                 user.getLastLoginAt(),

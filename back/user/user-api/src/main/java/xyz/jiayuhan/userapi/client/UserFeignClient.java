@@ -12,6 +12,7 @@ import xyz.jiayuhan.common.core.result.Result;
 import xyz.jiayuhan.userapi.UserApiConstants;
 import xyz.jiayuhan.userapi.model.request.BatchUserQueryRequest;
 import xyz.jiayuhan.userapi.model.response.UserSummaryResponse;
+import xyz.jiayuhan.userapi.model.response.UserPermissionResponse;
 import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 
 import java.util.List;
@@ -38,4 +39,13 @@ public interface UserFeignClient {
             @RequestParam(name = "role", required = false)
             @Pattern(regexp = "^[a-z][a-z0-9_-]{1,63}$", message = "角色编码格式不正确")
             String role);
+
+    @GetMapping("/{userId}/authorize")
+    Result<UserPermissionResponse> authorizeUser(
+            @PathVariable("userId") Long userId,
+            @RequestParam("permission")
+            @Pattern(
+                    regexp = "^[a-z][a-z0-9_-]*(?::[a-z][a-z0-9_-]*)+$",
+                    message = "权限编码格式不正确")
+            String permission);
 }

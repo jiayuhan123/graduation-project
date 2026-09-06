@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学情分析</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top header: back + title + export -->
+      <header class="px-4 pt-3 pb-2 flex items-center justify-between">
+        <button class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #F0F2F5;" aria-label="返回">
+          <i data-lucide="arrow-left" class="w-5 h-5" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[18px] font-bold tracking-tight text-foreground">学情分析</h1>
+        <button class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);" aria-label="导出">
+          <i data-lucide="download" class="w-5 h-5" style="color: #FF8A3D;"></i>
+        </button>
+      </header>
+
+      <!-- 3. Class selection -->
+      <section class="mt-3">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar px-4 pb-1">
+          <button class="px-4 py-1.5 rounded-full text-[13px] font-medium shrink-0 whitespace-nowrap" style="background-color: #FF8A3D; color: #FFFFFF;">三年级2班</button>
+          <button class="px-4 py-1.5 rounded-full text-[13px] font-medium shrink-0 whitespace-nowrap" style="background-color: #F0F2F5; color: #636E72;">四年级1班</button>
+          <button class="px-4 py-1.5 rounded-full text-[13px] font-medium shrink-0 whitespace-nowrap" style="background-color: #F0F2F5; color: #636E72;">五年级3班</button>
+        </div>
+      </section>
+
+      <!-- 4. Time range -->
+      <section class="mt-2.5">
+        <div class="flex gap-2 px-4">
+          <button class="px-3.5 py-1.5 rounded-full text-[12px] font-medium shrink-0" style="background-color: #FF8A3D; color: #FFFFFF;">本周</button>
+          <button class="px-3.5 py-1.5 rounded-full text-[12px] font-medium shrink-0" style="background-color: #F0F2F5; color: #636E72;">本月</button>
+          <button class="px-3.5 py-1.5 rounded-full text-[12px] font-medium shrink-0" style="background-color: #F0F2F5; color: #636E72;">本学期</button>
+        </div>
+      </section>
+
+      <!-- 5. Core metric cards -->
+      <section class="px-4 mt-4">
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="grid grid-cols-4 gap-2">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2" style="background-color: rgba(255,138,61,0.12);">
+                <i data-lucide="target" class="w-5 h-5" style="color: #FF8A3D;"></i>
+              </div>
+              <span class="text-[20px] font-bold text-foreground leading-none">83%</span>
+              <span class="text-[11px] text-muted-foreground mt-1">平均正确率</span>
+            </div>
+            <div class="flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2" style="background-color: rgba(77,171,247,0.12);">
+                <i data-lucide="clock" class="w-5 h-5" style="color: #4DABF7;"></i>
+              </div>
+              <span class="text-[20px] font-bold text-foreground leading-none">3.2</span>
+              <span class="text-[11px] text-muted-foreground mt-1">平均用时</span>
+            </div>
+            <div class="flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2" style="background-color: rgba(76,175,80,0.12);">
+                <i data-lucide="check-circle" class="w-5 h-5" style="color: #4CAF50;"></i>
+              </div>
+              <span class="text-[20px] font-bold text-foreground leading-none">85%</span>
+              <span class="text-[11px] text-muted-foreground mt-1">完成率</span>
+            </div>
+            <div class="flex flex-col items-center text-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2" style="background-color: rgba(151,117,250,0.12);">
+                <i data-lucide="users" class="w-5 h-5" style="color: #9775FA;"></i>
+              </div>
+              <span class="text-[20px] font-bold text-foreground leading-none">92%</span>
+              <span class="text-[11px] text-muted-foreground mt-1">参与率</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Knowledge points mastery -->
+      <section class="px-4 mt-6">
+        <h2 class="text-[16px] font-bold text-foreground mb-3">知识点掌握</h2>
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[14px] text-foreground">100以内加法</span>
+              <span class="text-[14px] font-bold text-foreground">85%</span>
+            </div>
+            <div class="w-full rounded-full overflow-hidden" style="height: 6px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 85%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[14px] text-foreground">100以内减法</span>
+              <span class="text-[14px] font-bold text-foreground">78%</span>
+            </div>
+            <div class="w-full rounded-full overflow-hidden" style="height: 6px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 78%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[14px] text-foreground">乘法口诀</span>
+              <span class="text-[14px] font-bold text-foreground">92%</span>
+            </div>
+            <div class="w-full rounded-full overflow-hidden" style="height: 6px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 92%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[14px] text-foreground">表内除法</span>
+              <span class="text-[14px] font-bold text-foreground">65%</span>
+            </div>
+            <div class="w-full rounded-full overflow-hidden" style="height: 6px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 65%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[14px] text-foreground">混合运算</span>
+              <span class="text-[14px] font-bold text-foreground">55%</span>
+            </div>
+            <div class="w-full rounded-full overflow-hidden" style="height: 6px; background-color: #FFF0E5;">
+              <div class="h-full rounded-full" style="width: 55%; background-color: #FF8A3D;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. High-frequency wrong questions -->
+      <section class="px-4 mt-6">
+        <h2 class="text-[16px] font-bold text-foreground mb-3">高频错题</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">1</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-[15px] text-foreground">56 - 19 = ?</span>
+            </div>
+            <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap" style="background-color: rgba(255,59,48,0.10); color: #FF3B30;">错误率 42%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">2</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-[15px] text-foreground">7 × 8 = ?</span>
+            </div>
+            <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap" style="background-color: rgba(255,138,61,0.10); color: #FF8A3D;">错误率 35%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">3</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-[15px] text-foreground">36 ÷ 6 = ?</span>
+            </div>
+            <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap" style="background-color: rgba(255,193,7,0.14); color: #F9A825;">错误率 28%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Student ranking -->
+      <section class="px-4 mt-6 mb-6">
+        <h2 class="text-[16px] font-bold text-foreground mb-3">学生表现</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: #FF8A3D; color: #FFFFFF;">1</div>
+            <span class="text-[15px] text-foreground flex-1 min-w-0 truncate">王小红</span>
+            <span class="text-[14px] font-bold text-foreground">95%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">2</div>
+            <span class="text-[15px] text-foreground flex-1 min-w-0 truncate">刘洋</span>
+            <span class="text-[14px] font-bold text-foreground">92%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">3</div>
+            <span class="text-[15px] text-foreground flex-1 min-w-0 truncate">张明</span>
+            <span class="text-[14px] font-bold text-foreground">88%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(99,110,114,0.12); color: #636E72;">4</div>
+            <span class="text-[15px] text-foreground flex-1 min-w-0 truncate">李华</span>
+            <span class="text-[14px] font-bold text-foreground">83%</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold" style="background-color: rgba(99,110,114,0.12); color: #636E72;">5</div>
+            <div class="flex-1 min-w-0 flex items-center gap-1.5">
+              <span class="text-[15px] text-foreground truncate">赵强</span>
+              <span class="text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap" style="background-color: rgba(255,59,48,0.10); color: #FF3B30;">需关注</span>
+            </div>
+            <span class="text-[14px] font-bold shrink-0" style="color: #FF3B30;">50%</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 9. Bottom navigation -->
+    <nav data-mobile-nav="global" class="w-full h-[64px]"><div class="w-full max-w-md mx-auto grid grid-cols-4 h-full"><a data-nav-key="home" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="home" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span></a><a data-nav-key="classes" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="users" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">班级</span></a><a data-nav-key="grade" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="clipboard-check" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">批改</span></a><a data-nav-key="profile" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="user" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span></a></div></nav>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+nav[data-mobile-nav] a[data-active="true"] { color: #FF8A3D; }
+nav[data-mobile-nav] a[data-active="true"] svg { color: #FF8A3D; stroke: #FF8A3D; }
+nav[data-mobile-nav] a:not([data-active="true"]) { color: #636E72; }
+nav[data-mobile-nav] a:not([data-active="true"]) svg { color: #636E72; stroke: #636E72; }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+nav[data-mobile-nav] { flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #ECEFF2; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

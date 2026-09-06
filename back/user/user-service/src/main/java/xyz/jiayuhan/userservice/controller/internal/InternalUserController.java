@@ -16,6 +16,7 @@ import xyz.jiayuhan.common.core.result.Result;
 import xyz.jiayuhan.userapi.UserApiConstants;
 import xyz.jiayuhan.userapi.model.request.BatchUserQueryRequest;
 import xyz.jiayuhan.userapi.model.response.UserSummaryResponse;
+import xyz.jiayuhan.userapi.model.response.UserPermissionResponse;
 import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 import xyz.jiayuhan.userservice.service.UserDirectoryService;
 
@@ -48,5 +49,16 @@ public class InternalUserController {
             @Pattern(regexp = "^[a-z][a-z0-9_-]{1,63}$", message = "角色编码格式不正确")
             String role) {
         return Result.success(userDirectoryService.validate(userId, role));
+    }
+
+    @GetMapping("/{userId}/authorize")
+    public Result<UserPermissionResponse> authorize(
+            @PathVariable Long userId,
+            @RequestParam
+            @Pattern(
+                    regexp = "^[a-z][a-z0-9_-]*(?::[a-z][a-z0-9_-]*)+$",
+                    message = "权限编码格式不正确")
+            String permission) {
+        return Result.success(userDirectoryService.authorize(userId, permission));
     }
 }

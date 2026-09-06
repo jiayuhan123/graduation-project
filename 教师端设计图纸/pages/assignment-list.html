@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业列表</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <div style="height: 44px;"></div>
+      <!-- 顶部导航 -->
+      <header class="h-[48px] flex items-center justify-between px-4 bg-white sticky top-0 z-20" style="border-bottom: 1px solid #ECEFF2;">
+        <button>
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold" style="color: #2D3436;">作业列表</h1>
+        <button>
+          <i data-lucide="plus" class="w-6 h-6" style="color: #FF8A3D;"></i>
+        </button>
+      </header>
+
+      <!-- 统计概览 -->
+      <div class="grid grid-cols-4 gap-2 px-4 pt-3">
+        <!-- 进行中 -->
+        <div class="bg-white rounded-xl p-2.5 text-center" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="w-7 h-7 mx-auto mb-1.5 rounded-lg flex items-center justify-center" style="background: rgba(255,138,61,0.12);">
+            <i data-lucide="file-text" class="w-4 h-4" style="color: #FF8A3D;"></i>
+          </div>
+          <div class="text-[18px] font-bold leading-none mb-0.5" style="color: #2D3436;">3</div>
+          <div class="text-[10px]" style="color: #636E72;">进行中</div>
+        </div>
+        <!-- 已截止 -->
+        <div class="bg-white rounded-xl p-2.5 text-center" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="w-7 h-7 mx-auto mb-1.5 rounded-lg flex items-center justify-center" style="background: rgba(99,110,114,0.1);">
+            <i data-lucide="archive" class="w-4 h-4" style="color: #636E72;"></i>
+          </div>
+          <div class="text-[18px] font-bold leading-none mb-0.5" style="color: #2D3436;">8</div>
+          <div class="text-[10px]" style="color: #636E72;">已截止</div>
+        </div>
+        <!-- 草稿 -->
+        <div class="bg-white rounded-xl p-2.5 text-center" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="w-7 h-7 mx-auto mb-1.5 rounded-lg flex items-center justify-center" style="background: rgba(77,171,247,0.12);">
+            <i data-lucide="edit" class="w-4 h-4" style="color: #4DABF7;"></i>
+          </div>
+          <div class="text-[18px] font-bold leading-none mb-0.5" style="color: #2D3436;">2</div>
+          <div class="text-[10px]" style="color: #636E72;">草稿</div>
+        </div>
+        <!-- 待批改 -->
+        <div class="bg-white rounded-xl p-2.5 text-center" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="w-7 h-7 mx-auto mb-1.5 rounded-lg flex items-center justify-center" style="background: rgba(255,59,48,0.12);">
+            <i data-lucide="alert-circle" class="w-4 h-4" style="color: #FF3B30;"></i>
+          </div>
+          <div class="text-[18px] font-bold leading-none mb-0.5" style="color: #2D3436;">15</div>
+          <div class="text-[10px]" style="color: #636E72;">待批改</div>
+        </div>
+      </div>
+
+      <!-- Tab筛选 -->
+      <div class="flex gap-2 px-4 pt-3 overflow-x-auto no-scrollbar">
+        <button class="px-3 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap" style="background: #FF8A3D; color: #FFFFFF;">全部</button>
+        <button class="px-3 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap bg-white" style="color: #636E72; box-shadow: 0 1px 4px rgba(45,52,54,0.06);">进行中</button>
+        <button class="px-3 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap bg-white" style="color: #636E72; box-shadow: 0 1px 4px rgba(45,52,54,0.06);">已截止</button>
+        <button class="px-3 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap bg-white" style="color: #636E72; box-shadow: 0 1px 4px rgba(45,52,54,0.06);">草稿</button>
+      </div>
+
+      <!-- 班级筛选下拉 -->
+      <div class="px-4 pt-3 pb-1">
+        <button class="flex items-center gap-1 text-[13px]" style="color: #636E72;">
+          全部班级
+          <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- 作业卡片列表 -->
+      <div class="px-4 py-2 space-y-3 pb-6">
+        <!-- 卡片1 -->
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <h3 class="text-[15px] font-semibold mb-1.5" style="color: #2D3436;">两位数加减法练习</h3>
+              <div class="flex items-center gap-1.5 text-[11px]" style="color: #636E72;">
+                <span class="px-1.5 py-0.5 rounded" style="background: #F0F2F5;">三年级2班</span>
+                <span>·</span>
+                <span>100以内加减法</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap" style="background: rgba(255,138,61,0.12); color: #FF8A3D;">进行中</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] mb-3" style="color: #636E72;">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+            <span>截止 9月5日 20:00</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-2.5">
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">已提交</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">32/42人</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">平均分</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">82分</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">正确率</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">78%</div>
+            </div>
+          </div>
+          <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: #F0F2F5;">
+            <div class="h-full rounded-full" style="width: 76%; background: #FF8A3D;"></div>
+          </div>
+        </div>
+
+        <!-- 卡片2 -->
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <h3 class="text-[15px] font-semibold mb-1.5" style="color: #2D3436;">乘法口诀专项</h3>
+              <div class="flex items-center gap-1.5 text-[11px]" style="color: #636E72;">
+                <span class="px-1.5 py-0.5 rounded" style="background: #F0F2F5;">三年级1班</span>
+                <span>·</span>
+                <span>表内乘法</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap" style="background: rgba(255,138,61,0.12); color: #FF8A3D;">进行中</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] mb-3" style="color: #636E72;">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+            <span>截止 9月7日 18:00</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-2.5">
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">已提交</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">28/40人</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">平均分</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">85分</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">正确率</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">81%</div>
+            </div>
+          </div>
+          <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: #F0F2F5;">
+            <div class="h-full rounded-full" style="width: 70%; background: #FF8A3D;"></div>
+          </div>
+        </div>
+
+        <!-- 卡片3 -->
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <h3 class="text-[15px] font-semibold mb-1.5" style="color: #2D3436;">混合运算测试</h3>
+              <div class="flex items-center gap-1.5 text-[11px]" style="color: #636E72;">
+                <span class="px-1.5 py-0.5 rounded" style="background: #F0F2F5;">三年级2班</span>
+                <span>·</span>
+                <span>混合运算</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap" style="background: rgba(99,110,114,0.1); color: #636E72;">已截止</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] mb-3" style="color: #636E72;">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+            <span>截止 9月3日 20:00</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-2.5">
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">已提交</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">40/42人</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">平均分</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">79分</div>
+            </div>
+            <div>
+              <div class="text-[10px] mb-0.5" style="color: #636E72;">正确率</div>
+              <div class="text-[13px] font-semibold" style="color: #2D3436;">72%</div>
+            </div>
+          </div>
+          <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: #F0F2F5;">
+            <div class="h-full rounded-full" style="width: 95%; background: #636E72;"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

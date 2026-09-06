@@ -1,0 +1,74 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/index",
+    "pages/profile/index",
+    "pages/profile-edit/index",
+    "pages/student-profile/index",
+    "pages/teacher-profile/index",
+    "pages/security/index",
+    "pages/admin-users/index",
+    "pages/admin-roles/index",
+    "pages/notifications/index"
+  ],
+  "subpackages": [
+    {
+      "root": "packages/learning",
+      "pages": [
+        "pages/practice/index",
+        "pages/errors/index",
+        "pages/mastery/index",
+        "pages/recommendations/index",
+        "pages/photo-marking/index"
+      ]
+    },
+    {
+      "root": "packages/teaching",
+      "pages": ["pages/classes/index", "pages/assignments/index", "pages/submissions/index"]
+    },
+    {
+      "root": "packages/game",
+      "pages": [
+        "pages/levels/index",
+        "pages/sessions/index",
+        "pages/progress/index",
+        "pages/rewards/index"
+      ]
+    }
+  ],
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-cell": "tdesign-miniprogram/cell/cell",
+    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-tag": "tdesign-miniprogram/tag/tag"
+  },
+  "window": {
+    "navigationBarTitleText": "小学数学",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f7fa",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#8a8f98",
+    "selectedColor": "#ff8a3d",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

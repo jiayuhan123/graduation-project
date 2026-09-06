@@ -25,5 +25,5 @@ user
 只构建可运行用户服务及其依赖：
 
 ```powershell
-.\mvnw.cmd -pl user-service -am test
+.\mvnw.cmd -pl user/user-service -am test
 ```

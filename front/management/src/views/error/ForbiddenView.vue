@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { Button as TButton } from 'tdesign-vue-next'
 
 const router = useRouter()
 </script>
 
 <template>
   <main class="error-page">
-    <el-result icon="warning" title="403" sub-title="你没有访问该页面的权限">
-      <template #extra>
-        <el-button type="primary" @click="router.push({ name: 'dashboard' })">返回首页</el-button>
-      </template>
-    </el-result>
+    <section>
+      <h1>403</h1>
+      <p>你没有访问该页面的权限</p>
+      <t-button theme="primary" @click="router.push({ name: 'dashboard' })">返回首页</t-button>
+    </section>
   </main>
 </template>
 

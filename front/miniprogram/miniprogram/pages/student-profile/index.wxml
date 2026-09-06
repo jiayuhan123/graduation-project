@@ -1,0 +1,53 @@
+<view class="page-shell">
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在加载学生资料" />
+  </view>
+
+  <block wx:else>
+    <view class="student-banner">
+      <view class="student-banner__icon">🎒</view>
+      <view>
+        <text class="student-banner__title">学生身份资料</text>
+        <text class="student-banner__text">年级和学期会影响后续的学习内容推荐</text>
+      </view>
+    </view>
+
+    <text class="section-heading">学习信息</text>
+    <view class="surface-card">
+      <view class="field">
+        <text class="field__label">学号</text>
+        <text class="readonly-value">{{studentNo || '暂未分配'}}</text>
+        <text class="field-hint">学号由教师或管理员维护</text>
+      </view>
+      <picker mode="selector" range="{{grades}}" value="{{gradeIndex}}" bindchange="onGradeChange">
+        <view class="picker-field">
+          <view>
+            <text class="field__label">当前年级</text>
+            <text class="picker-field__value">{{grades[gradeIndex]}}</text>
+          </view>
+          <t-icon name="chevron-right" size="40rpx" color="#b2bac2" />
+        </view>
+      </picker>
+      <picker
+        mode="selector"
+        range="{{semesters}}"
+        value="{{semesterIndex}}"
+        bindchange="onSemesterChange"
+      >
+        <view class="picker-field picker-field--last">
+          <view>
+            <text class="field__label">当前学期</text>
+            <text class="picker-field__value">{{semesters[semesterIndex]}}</text>
+          </view>
+          <t-icon name="chevron-right" size="40rpx" color="#b2bac2" />
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-actions">
+      <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+        保存学生资料
+      </t-button>
+    </view>
+  </block>
+</view>

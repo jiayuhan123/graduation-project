@@ -1,4 +1,8 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { accountRoutes } from '@/router/modules/account'
+import { contentRoutes } from '@/router/modules/content'
+import { systemRoutes } from '@/router/modules/system'
+import { teachingRoutes } from '@/router/modules/teaching'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -6,6 +10,12 @@ export const routes: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('@/views/login/LoginView.vue'),
     meta: { title: '登录', requiresAuth: false, hidden: true },
+  },
+  {
+    path: '/login/wechat/callback',
+    name: 'wechat-login-callback',
+    component: () => import('@/views/login/WechatCallbackView.vue'),
+    meta: { title: '微信登录', requiresAuth: false, hidden: true },
   },
   {
     path: '/403',
@@ -25,6 +35,10 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/dashboard/DashboardView.vue'),
         meta: { title: '控制台', requiresAuth: true },
       },
+      ...accountRoutes,
+      ...teachingRoutes,
+      ...contentRoutes,
+      ...systemRoutes,
     ],
   },
   {

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preflight Apple</title>
+    <style id="theme-vars">
+/* Apple Style Theme - Clean, minimal, frosted */
+:root {
+  /* Brand primary - Apple blue */
+  --ap-background: #F2F2F7;
+  --ap-foreground: #1C1C1E;
+  --ap-card: #FFFFFF;
+  --ap-card-foreground: #1C1C1E;
+  --ap-popover: #F2F2F7;
+  --ap-popover-foreground: #1C1C1E;
+  --ap-primary: #007AFF;
+  --ap-primary-foreground: #FFFFFF;
+  --ap-muted: #E5E5EA;
+  --ap-muted-foreground: #8E8E93;
+  --ap-border: #E5E5EA;
+  --ap-input: #C7C7CC;
+  --ap-ring: #007AFF;
+
+  /* State colors */
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  /* Radius scale - Apple continuous corners */
+  --ap-radius-sm: 8px;
+  --ap-radius-md: 12px;
+  --ap-radius-lg: 20px;
+
+  /* Typography */
+  --ap-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--ap-background);
+    --color-foreground: var(--ap-foreground);
+    --color-card: var(--ap-card);
+    --color-card-foreground: var(--ap-card-foreground);
+    --color-popover: var(--ap-popover);
+    --color-popover-foreground: var(--ap-popover-foreground);
+    --color-primary: var(--ap-primary);
+    --color-primary-foreground: var(--ap-primary-foreground);
+    --color-muted: var(--ap-muted);
+    --color-muted-foreground: var(--ap-muted-foreground);
+    --color-border: var(--ap-border);
+    --color-input: var(--ap-input);
+    --color-ring: var(--ap-ring);
+    --radius-sm: var(--ap-radius-sm);
+    --radius-md: var(--ap-radius-md);
+    --radius-lg: var(--ap-radius-lg);
+  }
+  @layer base {
+    body { background: var(--ap-background); color: var(--ap-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--ap-background); }
+      .text-background { color: var(--ap-background); }
+      .border-background { border-color: var(--ap-background); }
+      .ring-background { --tw-ring-color: var(--ap-background); }
+      .bg-foreground { background-color: var(--ap-foreground); }
+      .text-foreground { color: var(--ap-foreground); }
+      .border-foreground { border-color: var(--ap-foreground); }
+      .ring-foreground { --tw-ring-color: var(--ap-foreground); }
+      .bg-card { background-color: var(--ap-card); }
+      .text-card { color: var(--ap-card); }
+      .border-card { border-color: var(--ap-card); }
+      .ring-card { --tw-ring-color: var(--ap-card); }
+      .bg-card-foreground { background-color: var(--ap-card-foreground); }
+      .text-card-foreground { color: var(--ap-card-foreground); }
+      .border-card-foreground { border-color: var(--ap-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--ap-card-foreground); }
+      .bg-popover { background-color: var(--ap-popover); }
+      .text-popover { color: var(--ap-popover); }
+      .border-popover { border-color: var(--ap-popover); }
+      .ring-popover { --tw-ring-color: var(--ap-popover); }
+      .bg-popover-foreground { background-color: var(--ap-popover-foreground); }
+      .text-popover-foreground { color: var(--ap-popover-foreground); }
+      .border-popover-foreground { border-color: var(--ap-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--ap-popover-foreground); }
+      .bg-primary { background-color: var(--ap-primary); }
+      .text-primary { color: var(--ap-primary); }
+      .border-primary { border-color: var(--ap-primary); }
+      .ring-primary { --tw-ring-color: var(--ap-primary); }
+      .bg-primary-foreground { background-color: var(--ap-primary-foreground); }
+      .text-primary-foreground { color: var(--ap-primary-foreground); }
+      .border-primary-foreground { border-color: var(--ap-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--ap-primary-foreground); }
+      .bg-muted { background-color: var(--ap-muted); }
+      .text-muted { color: var(--ap-muted); }
+      .border-muted { border-color: var(--ap-muted); }
+      .ring-muted { --tw-ring-color: var(--ap-muted); }
+      .bg-muted-foreground { background-color: var(--ap-muted-foreground); }
+      .text-muted-foreground { color: var(--ap-muted-foreground); }
+      .border-muted-foreground { border-color: var(--ap-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--ap-muted-foreground); }
+      .bg-border { background-color: var(--ap-border); }
+      .text-border { color: var(--ap-border); }
+      .border-border { border-color: var(--ap-border); }
+      .ring-border { --tw-ring-color: var(--ap-border); }
+      .bg-input { background-color: var(--ap-input); }
+      .text-input { color: var(--ap-input); }
+      .border-input { border-color: var(--ap-input); }
+      .ring-input { --tw-ring-color: var(--ap-input); }
+      .bg-ring { background-color: var(--ap-ring); }
+      .text-ring { color: var(--ap-ring); }
+      .border-ring { border-color: var(--ap-ring); }
+      .ring-ring { --tw-ring-color: var(--ap-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -11,4 +11,4 @@
 
 服务使用独立 `notification_db`。`source_event_id` 唯一约束保证重复注册事件不会生成多条通知。消费最多尝试 4 次，失败后进入 `notification.dead-letter.v1`，运维处理前不得直接丢弃死信。
 
-运行依赖 PostgreSQL、Nacos 和 RabbitMQ，配置沿用 `DB_*`、`NACOS_SERVER_ADDR`、`RABBITMQ_*` 环境变量。
+运行依赖 PostgreSQL、Nacos 和 RabbitMQ，配置沿用 `DB_*`、`NACOS_*`、`RABBITMQ_*` 环境变量。

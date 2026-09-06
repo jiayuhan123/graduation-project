@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错因分类管理</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top header -->
+      <header class="h-[48px] px-4 flex items-center justify-between">
+        <button class="flex items-center justify-center -ml-2 w-8 h-8 shrink-0" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">错因分类</h1>
+        <button class="flex items-center justify-center w-8 h-8 -mr-2 shrink-0" aria-label="添加分类">
+          <i data-lucide="plus" class="w-6 h-6" style="color: #FF8A3D;"></i>
+        </button>
+      </header>
+
+      <!-- 3. Stats overview -->
+      <section class="px-4 mt-2">
+        <div class="bg-white rounded-xl p-4" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col items-center text-center">
+              <span class="text-[22px] font-bold text-foreground leading-none">8</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">分类总数</span>
+            </div>
+            <div class="flex flex-col items-center text-center" style="border-left: 1px solid #ECEFF2; border-right: 1px solid #ECEFF2;">
+              <span class="text-[22px] font-bold text-foreground leading-none">2,341</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">关联错题</span>
+            </div>
+            <div class="flex flex-col items-center text-center">
+              <span class="text-[22px] font-bold leading-none" style="color: #FF8A3D;">2</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">本月新增</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Category group: 计算错误 -->
+      <section class="px-4 mt-5">
+        <div class="flex items-center gap-2 mb-2.5 px-1">
+          <div class="w-1 h-4 rounded-full" style="background-color: #FF8A3D;"></div>
+          <h2 class="text-[15px] font-bold text-foreground">计算错误</h2>
+          <span class="text-[12px] text-muted-foreground">3个子类</span>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <!-- 子类别 1 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">进位遗漏</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">32%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 156次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 子类别 2 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">退位错误</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">20%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 98次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 子类别 3 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">运算符号错误</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(255,138,61,0.12); color: #FF8A3D;">9%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 45次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Category group: 概念错误 -->
+      <section class="px-4 mt-5">
+        <div class="flex items-center gap-2 mb-2.5 px-1">
+          <div class="w-1 h-4 rounded-full" style="background-color: #9775FA;"></div>
+          <h2 class="text-[15px] font-bold text-foreground">概念错误</h2>
+          <span class="text-[12px] text-muted-foreground">2个子类</span>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <!-- 子类别 4 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">乘法口诀混淆</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(151,117,250,0.12); color: #9775FA;">25%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 120次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 子类别 5 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">加减法混淆</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(151,117,250,0.12); color: #9775FA;">14%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 67次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Category group: 其他 -->
+      <section class="px-4 mt-5">
+        <div class="flex items-center gap-2 mb-2.5 px-1">
+          <div class="w-1 h-4 rounded-full" style="background-color: #636E72;"></div>
+          <h2 class="text-[15px] font-bold text-foreground">其他</h2>
+          <span class="text-[12px] text-muted-foreground">2个子类</span>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06);">
+          <!-- 子类别 6 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">粗心失误</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(99,110,114,0.10); color: #636E72;">18%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 89次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 子类别 7 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[15px] text-foreground">审题不清</span>
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(99,110,114,0.10); color: #636E72;">7%</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground mt-0.5">使用 34次</p>
+            </div>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="编辑">
+              <i data-lucide="pencil" class="w-4 h-4" style="color: #636E72;"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center shrink-0" aria-label="删除">
+              <i data-lucide="trash-2" class="w-4 h-4" style="color: #FF3B30;"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Bottom tip -->
+      <section class="px-4 mt-5 mb-6">
+        <div class="rounded-xl p-3.5 flex items-start gap-2.5" style="background-color: #F0F2F5;">
+          <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5" style="color: #636E72;"></i>
+          <p class="text-[12px] text-muted-foreground leading-relaxed">错因分类用于诊断和推荐，修改会影响已有错题的分类标记</p>
+        </div>
+      </section>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

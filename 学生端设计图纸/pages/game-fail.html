@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闯关失败</title>
+    <style id="theme-vars">
+/* Neutral base theme - each page overrides variables per style */
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top navigation: back + centered title + share -->
+      <header class="px-4 h-[48px] flex items-center justify-between">
+        <button class="w-10 h-10 -ml-2 flex items-center justify-center rounded-full" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">闯关结果</h1>
+        <button class="w-10 h-10 -mr-2 flex items-center justify-center rounded-full" aria-label="分享">
+          <i data-lucide="share-2" class="w-5 h-5" style="color: #2D3436;"></i>
+        </button>
+      </header>
+
+      <!-- 3. Result area -->
+      <section class="px-4 pt-6 pb-5 flex flex-col items-center text-center">
+        <div class="text-[64px] leading-none mb-3">😅</div>
+        <h2 class="text-[28px] font-bold leading-tight" style="color: #FF8A3D;">差一点点！</h2>
+        <p class="text-[15px] text-muted-foreground mt-1.5">第6关 · 乘法进阶</p>
+        <p class="text-[14px] text-muted-foreground mt-1">正确率 60%，需达到 80% 才能通关</p>
+      </section>
+
+      <!-- 4. Battle stats card -->
+      <section class="px-4 mb-5">
+        <div class="bg-card rounded-[20px] px-4 py-5 shadow-sm" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="flex items-stretch justify-between">
+            <div class="flex flex-col items-center flex-1">
+              <span class="text-[18px] leading-none mb-1">✅</span>
+              <span class="text-[18px] font-bold text-card-foreground leading-none">6/10</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">正确</span>
+            </div>
+            <div class="w-px bg-border"></div>
+            <div class="flex flex-col items-center flex-1">
+              <span class="text-[18px] leading-none mb-1">📊</span>
+              <span class="text-[18px] font-bold text-card-foreground leading-none">60%</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">正确率</span>
+            </div>
+            <div class="w-px bg-border"></div>
+            <div class="flex flex-col items-center flex-1">
+              <span class="text-[18px] leading-none mb-1">⏱️</span>
+              <span class="text-[18px] font-bold text-card-foreground leading-none">03:20</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">用时</span>
+            </div>
+            <div class="w-px bg-border"></div>
+            <div class="flex flex-col items-center flex-1">
+              <span class="text-[18px] leading-none mb-1">❤️</span>
+              <span class="text-[18px] font-bold text-card-foreground leading-none">1/3</span>
+              <span class="text-[12px] text-muted-foreground mt-1.5">剩余生命</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Error analysis -->
+      <section class="px-4 mb-5">
+        <h3 class="text-[17px] font-semibold text-foreground mb-3 flex items-center gap-1.5">
+          <span>📝</span> 错题分析
+        </h3>
+        <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="px-4 py-3.5">
+            <div class="flex items-start gap-2.5">
+              <span class="text-[16px] leading-tight shrink-0" style="color: #FF3B30;">❌</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-[14px] text-card-foreground leading-snug">7 × 8 = ?</p>
+                <p class="text-[13px] mt-1 leading-snug">
+                  你的答案 <span class="font-medium" style="color: #FF3B30;">54</span>
+                  <span class="mx-1.5 text-muted-foreground">→</span>
+                  正确答案 <span class="font-semibold" style="color: #FF8A3D;">56</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="h-px bg-border ml-4"></div>
+          <div class="px-4 py-3.5">
+            <div class="flex items-start gap-2.5">
+              <span class="text-[16px] leading-tight shrink-0" style="color: #FF3B30;">❌</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-[14px] text-card-foreground leading-snug">6 × 9 = ?</p>
+                <p class="text-[13px] mt-1 leading-snug">
+                  你的答案 <span class="font-medium" style="color: #FF3B30;">48</span>
+                  <span class="mx-1.5 text-muted-foreground">→</span>
+                  正确答案 <span class="font-semibold" style="color: #FF8A3D;">54</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="h-px bg-border ml-4"></div>
+          <div class="px-4 py-3.5">
+            <div class="flex items-start gap-2.5">
+              <span class="text-[16px] leading-tight shrink-0" style="color: #FF3B30;">❌</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-[14px] text-card-foreground leading-snug">4 × 7 = ?</p>
+                <p class="text-[13px] mt-1 leading-snug">
+                  你的答案 <span class="font-medium" style="color: #FF3B30;">24</span>
+                  <span class="mx-1.5 text-muted-foreground">→</span>
+                  正确答案 <span class="font-semibold" style="color: #FF8A3D;">28</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="h-px bg-border ml-4"></div>
+          <div class="px-4 py-3.5">
+            <div class="flex items-start gap-2.5">
+              <span class="text-[16px] leading-tight shrink-0" style="color: #FF3B30;">❌</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-[14px] text-card-foreground leading-snug">3 × 8 = ?</p>
+                <p class="text-[13px] mt-1 leading-snug">
+                  你的答案 <span class="font-medium" style="color: #FF3B30;">18</span>
+                  <span class="mx-1.5 text-muted-foreground">→</span>
+                  正确答案 <span class="font-semibold" style="color: #FF8A3D;">24</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Consolidation practice -->
+      <section class="px-4 mb-6">
+        <h3 class="text-[17px] font-semibold text-foreground mb-3 flex items-center gap-1.5">
+          <span>💪</span> 巩固练习
+        </h3>
+        <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="h-1 w-full" style="background-color: #FF8A3D;"></div>
+          <div class="px-4 py-4">
+            <p class="text-[13px] text-muted-foreground leading-relaxed mb-3.5">系统已根据你的错题生成了巩固练习，完成后可再次挑战</p>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex items-center gap-2 rounded-[12px] px-3 py-2.5" style="background-color: #FFF5ED;">
+                <span class="text-[18px] leading-none">📋</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[12px] text-muted-foreground leading-none mb-0.5">题量</span>
+                  <span class="text-[14px] font-semibold text-card-foreground leading-tight">5道相似题</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 rounded-[12px] px-3 py-2.5" style="background-color: #FFF5ED;">
+                <span class="text-[18px] leading-none">📚</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[12px] text-muted-foreground leading-none mb-0.5">类型</span>
+                  <span class="text-[14px] font-semibold text-card-foreground leading-tight">乘法口诀</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 rounded-[12px] px-3 py-2.5" style="background-color: #FFF5ED;">
+                <span class="text-[18px] leading-none">🎯</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[12px] text-muted-foreground leading-none mb-0.5">难度</span>
+                  <span class="text-[14px] font-semibold text-card-foreground leading-tight">简单难度</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 rounded-[12px] px-3 py-2.5" style="background-color: #FFF5ED;">
+                <span class="text-[18px] leading-none">⏳</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[12px] text-muted-foreground leading-none mb-0.5">预计</span>
+                  <span class="text-[14px] font-semibold text-card-foreground leading-tight">约3分钟</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Bottom buttons -->
+      <section class="px-4 pb-2 flex flex-col items-center gap-3">
+        <button class="w-full rounded-full py-3.5 text-[16px] font-semibold text-white" style="background-color: #FF8A3D; box-shadow: 0 6px 16px rgba(255,138,61,0.35);">
+          开始巩固练习
+        </button>
+        <button class="w-full rounded-full py-3.5 text-[16px] font-semibold" style="background-color: #FFFFFF; color: #FF8A3D; border: 1.5px solid #FF8A3D;">
+          再次挑战
+        </button>
+        <button class="text-[13px] text-muted-foreground py-1.5" style="color: #8E8E93;">
+          返回地图
+        </button>
+      </section>
+
+      <!-- 8. Bottom safe area -->
+      <div style="height: 24px;"></div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+nav[data-mobile-nav] a[data-active="true"] { color: #FF8A3D; }
+nav[data-mobile-nav] a[data-active="true"] svg { color: #FF8A3D; stroke: #FF8A3D; }
+nav[data-mobile-nav] a:not([data-active="true"]) { color: #636E72; }
+nav[data-mobile-nav] a:not([data-active="true"]) svg { color: #636E72; stroke: #636E72; }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+nav[data-mobile-nav] { flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #F0F2F5; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排行榜</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top navigation bar -->
+      <header class="px-4 h-[48px] flex items-center justify-between">
+        <button class="w-9 h-9 flex items-center justify-center -ml-1.5 shrink-0" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">排行榜</h1>
+        <span class="w-9 shrink-0"></span>
+      </header>
+
+      <!-- 3. Time filter tags -->
+      <section class="mb-3">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar px-4">
+          <button class="text-[13px] font-semibold px-4 py-1.5 rounded-full whitespace-nowrap shrink-0" style="background-color: #FF8A3D; color: #FFFFFF;">本周</button>
+          <button class="text-[13px] font-medium px-4 py-1.5 rounded-full whitespace-nowrap shrink-0" style="background-color: #F8F9FB; color: #636E72;">本月</button>
+          <button class="text-[13px] font-medium px-4 py-1.5 rounded-full whitespace-nowrap shrink-0" style="background-color: #F8F9FB; color: #636E72;">全部</button>
+        </div>
+      </section>
+
+      <!-- 4. Range filter tags -->
+      <section class="mb-4 px-4">
+        <div class="flex gap-2">
+          <button class="text-[13px] font-semibold px-4 py-1.5 rounded-full whitespace-nowrap shrink-0" style="background-color: #FF8A3D; color: #FFFFFF;">班级</button>
+          <button class="text-[13px] font-medium px-4 py-1.5 rounded-full whitespace-nowrap shrink-0" style="background-color: #F8F9FB; color: #636E72;">年级</button>
+        </div>
+      </section>
+
+      <!-- 5. Top 3 podium -->
+      <section class="px-4 mb-5">
+        <div class="rounded-[24px] p-5 pt-6 relative overflow-hidden" style="background: linear-gradient(160deg, #FFB37A 0%, #FF8A3D 60%, #FF7019 100%); box-shadow: 0 8px 24px rgba(255,138,61,0.30);">
+          <!-- decorative blobs -->
+          <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full" style="background: rgba(255,255,255,0.15);"></div>
+          <div class="absolute bottom-2 -left-8 w-20 h-20 rounded-full" style="background: rgba(255,255,255,0.12);"></div>
+          <!-- podium columns -->
+          <div class="relative flex items-end justify-center gap-3">
+            <!-- 2nd place -->
+            <div class="flex flex-col items-center" style="width: 30%;">
+              <div class="flex items-center justify-center rounded-full mb-2" style="width: 56px; height: 56px; background-color: rgba(255,255,255,0.95); font-size: 32px;">🦊</div>
+              <span class="text-[14px] font-bold text-white mb-0.5">李华</span>
+              <span class="text-[18px] font-extrabold text-white leading-none mb-2">1280</span>
+              <div class="w-full rounded-t-[12px] flex items-start justify-center pt-2" style="height: 70px; background-color: rgba(255,255,255,0.25);">
+                <span class="text-[20px] font-extrabold text-white leading-none">🥈</span>
+              </div>
+            </div>
+            <!-- 1st place -->
+            <div class="flex flex-col items-center" style="width: 34%;">
+              <span class="text-[22px] leading-none mb-1">👑</span>
+              <div class="flex items-center justify-center rounded-full mb-2" style="width: 66px; height: 66px; background-color: rgba(255,255,255,0.95); font-size: 38px;">🐼</div>
+              <span class="text-[15px] font-extrabold text-white mb-0.5">张明</span>
+              <span class="text-[20px] font-extrabold text-white leading-none mb-2">1560</span>
+              <div class="w-full rounded-t-[12px] flex items-start justify-center pt-2" style="height: 100px; background-color: rgba(255,255,255,0.4);">
+                <span class="text-[22px] font-extrabold text-white leading-none">🥇</span>
+              </div>
+            </div>
+            <!-- 3rd place -->
+            <div class="flex flex-col items-center" style="width: 30%;">
+              <div class="flex items-center justify-center rounded-full mb-2" style="width: 56px; height: 56px; background-color: rgba(255,255,255,0.95); font-size: 32px;">🐰</div>
+              <span class="text-[14px] font-bold text-white mb-0.5">王芳</span>
+              <span class="text-[18px] font-extrabold text-white leading-none mb-2">1180</span>
+              <div class="w-full rounded-t-[12px] flex items-start justify-center pt-2" style="height: 50px; background-color: rgba(255,255,255,0.25);">
+                <span class="text-[20px] font-extrabold text-white leading-none">🥉</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-center text-[11px] text-white/80 mt-3 relative">积分 · 答对一题 +10 · 完成作业 +20</p>
+        </div>
+      </section>
+
+      <!-- 6. Ranking list (4-10) -->
+      <section class="px-4 mb-4">
+        <h2 class="text-[14px] font-bold text-muted-foreground mb-2.5 px-1">全部排名</h2>
+        <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <!-- Row 4 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">4</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #FFF0E5; font-size: 22px;">🐯</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">陈宇</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(151,117,250,0.14); color: #9775FA;">学霸</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">1020</span>
+          </div>
+          <!-- Row 5 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">5</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #E8F4FD; font-size: 22px;">🐸</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">赵琳</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(76,175,80,0.14); color: #4CAF50;">优等</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">980</span>
+          </div>
+          <!-- Row 6 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">6</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #FFE9F1; font-size: 22px;">🐱</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">刘洋</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(76,175,80,0.14); color: #4CAF50;">优等</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">950</span>
+          </div>
+          <!-- Row 7 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">7</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #FFF0E5; font-size: 22px;">🦁</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">孙琪</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(77,171,247,0.14); color: #4DABF7;">进阶</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">900</span>
+          </div>
+          <!-- Row 8 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">8</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #E8F4FD; font-size: 22px;">🐶</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">周宁</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(77,171,247,0.14); color: #4DABF7;">进阶</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">860</span>
+          </div>
+          <!-- Row 9 -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: #F0F2F5;">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">9</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #FFE9F1; font-size: 22px;">🐹</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">吴桐</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(255,107,157,0.14); color: #FF6B9D;">努力</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">820</span>
+          </div>
+          <!-- Row 10 -->
+          <div class="flex items-center gap-3 px-4 py-3">
+            <span class="w-7 text-center text-[15px] font-bold text-muted-foreground shrink-0">10</span>
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 38px; height: 38px; background-color: #FFF0E5; font-size: 22px;">🐵</div>
+            <span class="text-[14px] font-semibold text-foreground flex-1">郑爽</span>
+            <span class="text-[12px] font-medium px-2 py-0.5 rounded-full shrink-0" style="background-color: rgba(255,107,157,0.14); color: #FF6B9D;">努力</span>
+            <span class="text-[15px] font-bold shrink-0" style="color: #FF8A3D;">790</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. My ranking highlight card -->
+      <section class="px-4 mb-6">
+        <div class="rounded-[20px] p-4" style="background-color: #FFF6EE; border: 1.5px solid #FF8A3D; box-shadow: 0 4px 14px rgba(255,138,61,0.15);">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center rounded-full shrink-0" style="width: 44px; height: 44px; background-color: #FF8A3D; font-size: 24px;">🧒</div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[15px] font-bold text-foreground">我</span>
+                <span class="text-[12px] font-semibold px-2 py-0.5 rounded-full" style="background-color: #FF8A3D; color: #FFFFFF;">第15名</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground">积分 <span class="font-bold" style="color: #FF8A3D;">920</span> · 班级排名</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color: #FF8A3D;"></i>
+          </div>
+          <div class="mt-3 pt-3 flex items-center gap-2" style="border-top: 1px dashed rgba(255,138,61,0.4);">
+            <span class="text-[16px] leading-none">🚀</span>
+            <p class="text-[12px] font-medium" style="color: #2D3436;">再答对 <span class="font-bold" style="color: #FF8A3D;">30题</span> 可上升 <span class="font-bold" style="color: #FF8A3D;">3名</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Bottom safe area -->
+      <div style="height: 20px;"></div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

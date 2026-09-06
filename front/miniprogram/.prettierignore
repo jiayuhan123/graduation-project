@@ -1,0 +1,4 @@
+node_modules/
+miniprogram_npm/
+miniprogram/miniprogram_npm/
+package-lock.json

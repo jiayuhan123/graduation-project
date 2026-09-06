@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios'
-import { ElMessage } from 'element-plus'
+import { MessagePlugin } from 'tdesign-vue-next'
 import { appConfig } from '@/config/app'
 import { DEFAULT_TOKEN_NAME, STORAGE_KEYS } from '@/constants/storage'
 import { ApiError, type ApiResult } from '@/types/api'
@@ -105,7 +105,7 @@ async function handleUnauthorized(): Promise<void> {
       .finally(() => {
         unauthorizedTask = null
       })
-    ElMessage.warning('登录已过期，请重新登录')
+    void MessagePlugin.warning('登录已过期，请重新登录')
   }
   await unauthorizedTask
 }
@@ -118,7 +118,7 @@ async function handleRequestError(
     if (!config.skipUnauthorizedHandler) await handleUnauthorized()
     return
   }
-  if (!config.skipErrorMessage) ElMessage.error(error.message)
+  if (!config.skipErrorMessage) void MessagePlugin.error(error.message)
 }
 
 service.interceptors.response.use(

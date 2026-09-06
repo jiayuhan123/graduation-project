@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业作答</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. 状态栏占位 -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. 顶部导航栏 -->
+      <header class="px-4 h-12 flex items-center justify-between">
+        <button class="w-10 h-10 -ml-2 flex items-center justify-center rounded-full" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">两位数加减法</h1>
+        <div class="flex items-center gap-1" style="color: #FF8A3D;">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+          <span class="text-[15px] font-bold tabular-nums">12:35</span>
+        </div>
+      </header>
+
+      <!-- 3. 进度条 -->
+      <section class="px-4 pb-3">
+        <div class="flex items-center justify-between text-[13px] mb-2">
+          <span style="color: #636E72;">第 <span class="font-bold" style="color: #FF8A3D;">3</span> 题 / 共10题</span>
+          <span style="color: #636E72;">30%</span>
+        </div>
+        <div class="w-full rounded-full overflow-hidden" style="height: 8px; background-color: #FFF0E5;">
+          <div class="h-full rounded-full" style="width: 30%; background-color: #FF8A3D;"></div>
+        </div>
+      </section>
+
+      <!-- 4. 题目卡片 -->
+      <section class="px-4 mt-3">
+        <div class="bg-card rounded-[20px] shadow-sm p-6" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="flex items-center gap-2 mb-5">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-[13px] font-medium" style="background-color: #FF8A3D; color: #FFFFFF;">第3题</span>
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-[12px] font-medium" style="background-color: rgba(77,171,247,0.12); color: #4DABF7;">口算</span>
+          </div>
+          <div class="text-center text-[44px] font-bold leading-tight my-6" style="color: #2D3436;">56 + 38 = ?</div>
+          <input type="text" inputmode="numeric" placeholder="输入答案" class="w-full rounded-[16px] text-center font-bold" style="height: 60px; border: 2px solid #FF8A3D; font-size: 28px; color: #2D3436; outline: none; background-color: #FFFFFF;">
+          <div class="mt-4 flex justify-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-md text-[12px]" style="background-color: #F8F9FB; color: #636E72;">知识点 · 两位数加法</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. 底部答题区 -->
+      <section class="px-4 mt-6">
+        <div class="flex items-center gap-3">
+          <button class="flex-1 h-12 rounded-full text-[15px] font-medium" style="background-color: #F0F2F5; color: #636E72;">上一题</button>
+          <button class="flex-1 h-12 rounded-full text-[15px] font-semibold" style="background-color: #FF8A3D; color: #FFFFFF; box-shadow: 0 4px 12px rgba(255,138,61,0.3);">下一题</button>
+        </div>
+        <p class="text-[12px] text-center mt-3" style="color: #636E72;">📝 答完最后一题后可提交作业</p>
+      </section>
+
+      <!-- 6. 底部安全区 -->
+      <div style="height: 24px;"></div>
+    </main>
+
+    <!-- 7. 右下角浮动提示 -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pointer-events-none z-10">
+      <div class="flex justify-end">
+        <div class="bg-card rounded-[16px] shadow-sm px-3 py-2.5 text-[12px] pointer-events-auto leading-snug" style="max-width: 220px; box-shadow: 0 4px 14px rgba(45,52,54,0.12); color: #636E72;">
+          💡 答错也没关系，错题会自动收录到错题本
+        </div>
+      </div>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

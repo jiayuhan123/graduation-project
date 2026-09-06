@@ -53,7 +53,6 @@ public enum ResultCode {
     LOGIN_CREDENTIAL_REQUIRED(1019, "账号必须至少保留一种登录方式", 409),
     STUDENT_PROFILE_REQUIRED(1020, "学生角色必须配置学生资料", 409),
     TEACHER_PROFILE_REQUIRED(1021, "教师角色必须配置教师资料", 409),
-    INVALID_ROLE_COMBINATION(1022, "学生和教师角色不能同时分配", 409),
     STUDENT_NO_EXISTS(1023, "学号已存在", 409),
     TEACHER_NO_EXISTS(1024, "教师工号已存在", 409),
     PASSWORD_NOT_SET(1025, "当前账号尚未设置密码", 409),
@@ -70,6 +69,37 @@ public enum ResultCode {
 
     // =================== 审计模块（4xxx） ===================
     AUDIT_LOG_NOT_FOUND(4000, "审计记录不存在", 404),
+
+    // =================== 内容题库（5xxx） ===================
+    CONTENT_MODULE_NOT_FOUND(5000, "内容模块不存在", 404),
+    KNOWLEDGE_POINT_NOT_FOUND(5001, "知识点不存在", 404),
+    QUESTION_NOT_FOUND(5002, "题目不存在", 404),
+    ERROR_TYPE_NOT_FOUND(5003, "错因类型不存在", 404),
+    CONTENT_CODE_EXISTS(5004, "内容编码已存在", 409),
+    CONTENT_IN_USE(5005, "内容正在被引用，不能执行当前操作", 409),
+    CONTENT_VERSION_CONFLICT(5006, "内容已被其他人修改，请刷新后重试", 409),
+    CONTENT_RELATION_INVALID(5007, "内容关联关系不正确", 409),
+    QUESTION_STATE_INVALID(5008, "题目当前状态不允许执行该操作", 409),
+
+    // =================== 学习闭环（6xxx） ===================
+    PRACTICE_TASK_NOT_FOUND(6000, "练习任务不存在", 404),
+    PHOTO_MARKING_TASK_NOT_FOUND(6001, "拍照批改任务不存在", 404),
+
+    // =================== 教学（7xxx） ===================
+    TEACHING_CLASS_NOT_FOUND(7000, "班级不存在", 404),
+    ASSIGNMENT_NOT_FOUND(7001, "作业不存在", 404),
+    TEACHING_CLASS_CODE_EXISTS(7002, "班级码已存在", 409),
+    TEACHING_CLASS_INACTIVE(7003, "班级已归档，不能执行当前操作", 409),
+    TEACHING_MEMBERSHIP_NOT_FOUND(7004, "班级成员关系不存在", 404),
+    TEACHING_ALREADY_JOINED(7005, "已经加入该班级", 409),
+    TEACHING_VERSION_CONFLICT(7006, "教学数据已被其他人修改，请刷新后重试", 409),
+    ASSIGNMENT_STATE_INVALID(7007, "作业当前状态不允许执行该操作", 409),
+    ASSIGNMENT_CONTENT_INVALID(7008, "作业题目或分层配置不正确", 409),
+    ASSIGNMENT_SUBMISSION_NOT_FOUND(7009, "作业提交记录不存在", 404),
+
+    // =================== 游戏（8xxx） ===================
+    GAME_LEVEL_NOT_FOUND(8000, "游戏关卡不存在", 404),
+    GAME_SESSION_NOT_FOUND(8001, "游戏对局不存在", 404),
     ;
 
     /**

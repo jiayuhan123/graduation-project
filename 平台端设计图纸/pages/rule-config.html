@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>规则配置</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top header -->
+      <header class="px-4 h-12 flex items-center justify-between">
+        <button class="w-9 h-9 -ml-1 flex items-center justify-center shrink-0" aria-label="返回">
+          <i data-lucide="arrow-left" class="w-5 h-5" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">规则配置</h1>
+        <button class="text-[15px] font-medium shrink-0" style="color: #FF8A3D;">保存</button>
+      </header>
+
+      <!-- 3. 闯关规则 -->
+      <section class="px-4 mt-4">
+        <h2 class="text-[15px] font-semibold text-foreground mb-2.5 px-1">游戏闯关规则</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06); border-radius: 12px;">
+          <!-- 每关题量 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);">
+              <i data-lucide="list-ordered" class="w-[18px] h-[18px]" style="color: #FF8A3D;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">每关题量</span>
+            <span class="text-[14px] text-muted-foreground">10题</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 答题时限 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(77,171,247,0.10);">
+              <i data-lucide="timer" class="w-[18px] h-[18px]" style="color: #4DABF7;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">答题时限</span>
+            <span class="text-[14px] text-muted-foreground">15分钟</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 通关正确率 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(76,175,80,0.10);">
+              <i data-lucide="target" class="w-[18px] h-[18px]" style="color: #4CAF50;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">通关正确率</span>
+            <span class="text-[14px] text-muted-foreground">80%</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 连击加分 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);">
+              <i data-lucide="zap" class="w-[18px] h-[18px]" style="color: #FF8A3D;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">连击加分</span>
+            <div class="toggle-switch is-on" role="switch" aria-checked="true"></div>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 失败巩固 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,59,48,0.10);">
+              <i data-lucide="rotate-ccw" class="w-[18px] h-[18px]" style="color: #FF3B30;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">失败巩固</span>
+            <div class="toggle-switch is-on" role="switch" aria-checked="true"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. 积分规则 -->
+      <section class="px-4 mt-5">
+        <h2 class="text-[15px] font-semibold text-foreground mb-2.5 px-1">积分与经验</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06); border-radius: 12px;">
+          <!-- 答对一题 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);">
+              <i data-lucide="check" class="w-[18px] h-[18px]" style="color: #FF8A3D;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">答对一题</span>
+            <span class="text-[14px] font-medium" style="color: #FF8A3D;">+5积分</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 闯关成功 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(76,175,80,0.10);">
+              <i data-lucide="trophy" class="w-[18px] h-[18px]" style="color: #4CAF50;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">闯关成功</span>
+            <span class="text-[14px] font-medium" style="color: #FF8A3D;">+50积分</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 连击奖励 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);">
+              <i data-lucide="flame" class="w-[18px] h-[18px]" style="color: #FF8A3D;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">连击奖励</span>
+            <span class="text-[14px] font-medium" style="color: #FF8A3D;">+10/次</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 每日上限 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(77,171,247,0.10);">
+              <i data-lucide="trending-up" class="w-[18px] h-[18px]" style="color: #4DABF7;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">每日上限</span>
+            <span class="text-[14px] font-medium" style="color: #FF8A3D;">200积分</span>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 升级经验 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(151,117,250,0.10);">
+              <i data-lucide="star" class="w-[18px] h-[18px]" style="color: #9775FA;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">升级经验</span>
+            <span class="text-[14px] font-medium" style="color: #FF8A3D;">1000/Lv</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. 推荐规则 -->
+      <section class="px-4 mt-5">
+        <h2 class="text-[15px] font-semibold text-foreground mb-2.5 px-1">个性化推荐</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06); border-radius: 12px;">
+          <!-- 推荐算法 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(151,117,250,0.10);">
+              <i data-lucide="cpu" class="w-[18px] h-[18px]" style="color: #9775FA;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">推荐算法</span>
+            <span class="text-[14px] text-muted-foreground">自适应</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 薄弱知识点权重 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,59,48,0.10);">
+              <i data-lucide="alert-triangle" class="w-[18px] h-[18px]" style="color: #FF3B30;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">薄弱知识点权重</span>
+            <span class="text-[14px] text-muted-foreground">70%</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 复习频率 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(77,171,247,0.10);">
+              <i data-lucide="repeat" class="w-[18px] h-[18px]" style="color: #4DABF7;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">复习频率</span>
+            <span class="text-[14px] text-muted-foreground">3天/次</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 掌握度阈值 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(76,175,80,0.10);">
+              <i data-lucide="gauge" class="w-[18px] h-[18px]" style="color: #4CAF50;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">掌握度阈值</span>
+            <span class="text-[14px] text-muted-foreground">85%</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. 批改规则 -->
+      <section class="px-4 mt-5">
+        <h2 class="text-[15px] font-semibold text-foreground mb-2.5 px-1">拍照批改</h2>
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 1px 4px rgba(45,52,54,0.06); border-radius: 12px;">
+          <!-- 可信度阈值 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(77,171,247,0.10);">
+              <i data-lucide="shield-check" class="w-[18px] h-[18px]" style="color: #4DABF7;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">可信度阈值</span>
+            <span class="text-[14px] text-muted-foreground">80%</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: #B2BAC2;"></i>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 低可信转复核 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(255,138,61,0.10);">
+              <i data-lucide="user-check" class="w-[18px] h-[18px]" style="color: #FF8A3D;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">低可信转复核</span>
+            <div class="toggle-switch is-on" role="switch" aria-checked="true"></div>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 竖式步骤分析 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(151,117,250,0.10);">
+              <i data-lucide="align-justify" class="w-[18px] h-[18px]" style="color: #9775FA;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">竖式步骤分析</span>
+            <div class="toggle-switch is-on" role="switch" aria-checked="true"></div>
+          </div>
+          <div class="h-px bg-border mx-4"></div>
+          <!-- 自动安排变式题 -->
+          <div class="flex items-center gap-3 px-4 py-3.5">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: rgba(76,175,80,0.10);">
+              <i data-lucide="sparkles" class="w-[18px] h-[18px]" style="color: #4CAF50;"></i>
+            </div>
+            <span class="text-[15px] text-foreground flex-1">自动安排变式题</span>
+            <div class="toggle-switch is-on" role="switch" aria-checked="true"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. 恢复默认 -->
+      <section class="px-4 mt-6 mb-2">
+        <div class="flex justify-center">
+          <button class="text-[14px] text-muted-foreground py-2 px-4" style="color: #8E9196;">恢复默认</button>
+        </div>
+      </section>
+
+      <!-- 8. Bottom safe area -->
+      <div style="height: env(safe-area-inset-bottom, 16px);"></div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+nav[data-mobile-nav] a[data-active="true"] { color: #FF8A3D; }
+nav[data-mobile-nav] a[data-active="true"] svg { color: #FF8A3D; stroke: #FF8A3D; }
+nav[data-mobile-nav] a:not([data-active="true"]) { color: #636E72; }
+nav[data-mobile-nav] a:not([data-active="true"]) svg { color: #636E72; stroke: #636E72; }
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+  background-color: #E0E4E8;
+}
+.toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+.toggle-switch.is-on {
+  background-color: #FF8A3D;
+}
+.toggle-switch.is-on::after {
+  transform: translateX(20px);
+}
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+nav[data-mobile-nav] { flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #ECEFF2; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

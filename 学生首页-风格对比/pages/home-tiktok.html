@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生首页-抖音风格</title>
+    <style id="theme-vars">
+/* Neutral base theme - each page overrides variables per style */
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <!-- Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- Container -->
+      <div class="max-w-md mx-auto">
+
+        <!-- 1. Header section -->
+        <section class="px-4 mb-6">
+          <div class="flex items-center justify-between"
+               style="background: linear-gradient(135deg, var(--brand-card) 0%, var(--brand-background) 100%); border-radius: var(--brand-radius-lg); padding: 16px;">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                   style="background: linear-gradient(135deg, #FE2C55 0%, #25F4EE 100%);">
+                <span class="text-white font-bold text-lg">明</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-foreground font-bold text-base leading-tight">小明</p>
+                <p class="text-muted-foreground text-xs leading-tight mt-0.5">三年级 · 上册</p>
+              </div>
+            </div>
+            <div class="relative shrink-0">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                   style="background: var(--brand-muted);">
+                <i data-lucide="bell" class="w-5 h-5" style="color: var(--brand-muted-foreground);"></i>
+              </div>
+              <span class="absolute top-1 right-1 w-2 h-2 rounded-full" style="background: var(--brand-primary);"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Today's learning summary card -->
+        <section class="px-4 mb-6">
+          <div class="rounded-2xl p-4"
+               style="background: var(--brand-card); border-top: 2px solid rgba(254, 44, 85, 0.4);">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-foreground font-bold text-base">今日学习</h2>
+              <span class="text-muted-foreground text-xs" style="font-variant-numeric: tabular-nums;">9月3日 周三</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <div class="text-center">
+                <p class="text-foreground font-bold text-xl" style="font-variant-numeric: tabular-nums;">24<span class="text-xs font-normal text-muted-foreground ml-0.5">题</span></p>
+                <p class="text-muted-foreground text-[11px] mt-0.5">答题</p>
+              </div>
+              <div class="text-center" style="border-left: 1px solid var(--brand-border); border-right: 1px solid var(--brand-border);">
+                <p class="font-bold text-xl" style="color: var(--brand-primary); font-variant-numeric: tabular-nums;">85<span class="text-xs font-normal text-muted-foreground ml-0.5">%</span></p>
+                <p class="text-muted-foreground text-[11px] mt-0.5">正确率</p>
+              </div>
+              <div class="text-center">
+                <p class="text-foreground font-bold text-xl" style="font-variant-numeric: tabular-nums;">7<span class="text-xs font-normal text-muted-foreground ml-0.5">天</span></p>
+                <p class="text-muted-foreground text-[11px] mt-0.5">连续</p>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-muted-foreground text-xs">每日目标进度</span>
+                <span class="text-foreground text-xs font-semibold" style="font-variant-numeric: tabular-nums;">60%</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full overflow-hidden" style="background: var(--brand-muted);">
+                <div class="h-full rounded-full" style="width: 60%; background: linear-gradient(90deg, #FE2C55 0%, #25F4EE 100%);"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Core function entries -->
+        <section class="mb-6">
+          <div class="px-4 mb-3 flex items-center justify-between">
+            <h2 class="text-foreground font-bold text-base">核心功能</h2>
+            <span class="text-muted-foreground text-xs">更多</span>
+          </div>
+          <div class="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-2"
+               style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+
+            <!-- Card 1: 拍照批改 -->
+            <div class="shrink-0 rounded-2xl p-4 relative overflow-hidden"
+                 style="width: 140px; background: var(--brand-card); scroll-snap-align: start;">
+              <div class="absolute left-0 top-0 bottom-0 w-1" style="background: linear-gradient(180deg, #FE2C55 0%, #FE2C55 100%);"></div>
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                   style="background: rgba(254, 44, 85, 0.15);">
+                <i data-lucide="camera" class="w-5 h-5" style="color: #FE2C55;"></i>
+              </div>
+              <h3 class="text-foreground font-bold text-sm leading-tight">拍照批改</h3>
+              <p class="text-muted-foreground text-[11px] mt-1 leading-tight">拍下作业·智能批改</p>
+            </div>
+
+            <!-- Card 2: 口算练习 -->
+            <div class="shrink-0 rounded-2xl p-4 relative overflow-hidden"
+                 style="width: 140px; background: var(--brand-card); scroll-snap-align: start;">
+              <div class="absolute left-0 top-0 bottom-0 w-1" style="background: linear-gradient(180deg, #25F4EE 0%, #25F4EE 100%);"></div>
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                   style="background: rgba(37, 244, 238, 0.15);">
+                <i data-lucide="pencil" class="w-5 h-5" style="color: #25F4EE;"></i>
+              </div>
+              <h3 class="text-foreground font-bold text-sm leading-tight">口算练习</h3>
+              <p class="text-muted-foreground text-[11px] mt-1 leading-tight">个性化·智能推荐</p>
+            </div>
+
+            <!-- Card 3: 闯关挑战 -->
+            <div class="shrink-0 rounded-2xl p-4 relative overflow-hidden"
+                 style="width: 140px; background: var(--brand-card); scroll-snap-align: start;">
+              <div class="absolute left-0 top-0 bottom-0 w-1" style="background: linear-gradient(180deg, #FE2C55 0%, #8B5CF6 100%);"></div>
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                   style="background: rgba(254, 44, 85, 0.15);">
+                <i data-lucide="gamepad-2" class="w-5 h-5" style="color: #FE2C55;"></i>
+              </div>
+              <h3 class="text-foreground font-bold text-sm leading-tight">闯关挑战</h3>
+              <p class="text-muted-foreground text-[11px] mt-1 leading-tight">单人/团队闯关</p>
+            </div>
+
+            <!-- Peek spacer for 2.5 card effect -->
+            <div class="shrink-0" style="width: 8px;"></div>
+          </div>
+        </section>
+
+        <!-- 4. Learning progress section -->
+        <section class="px-4 mb-6">
+          <h2 class="text-foreground font-bold text-base mb-3">学习动态</h2>
+          <div class="rounded-2xl overflow-hidden" style="background: var(--brand-card);">
+
+            <!-- Item 1 -->
+            <div class="flex items-start gap-3 p-4" style="border-bottom: 1px solid var(--brand-border);">
+              <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                   style="background: rgba(254, 44, 85, 0.15);">
+                <i data-lucide="pencil" class="w-4 h-4" style="color: #FE2C55;"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-foreground font-semibold text-sm leading-tight">完成 口算练习 · 两位数加减法</p>
+                  <span class="text-muted-foreground text-[11px] whitespace-nowrap shrink-0" style="font-variant-numeric: tabular-nums;">今天 14:30</span>
+                </div>
+                <p class="text-muted-foreground text-xs mt-1">正确 20/24</p>
+              </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="flex items-start gap-3 p-4" style="border-bottom: 1px solid var(--brand-border);">
+              <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                   style="background: rgba(37, 244, 238, 0.15);">
+                <i data-lucide="gamepad-2" class="w-4 h-4" style="color: #25F4EE;"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-foreground font-semibold text-sm leading-tight">闯关成功 · 乘法入门 第3关</p>
+                  <span class="text-muted-foreground text-[11px] whitespace-nowrap shrink-0" style="font-variant-numeric: tabular-nums;">今天 13:15</span>
+                </div>
+                <p class="text-xs mt-1" style="color: #FE2C55;">获得 50 积分</p>
+              </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="flex items-start gap-3 p-4">
+              <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                   style="background: rgba(254, 44, 85, 0.15);">
+                <i data-lucide="camera" class="w-4 h-4" style="color: #FE2C55;"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-foreground font-semibold text-sm leading-tight">拍照批改 · 作业本第12页</p>
+                  <span class="text-muted-foreground text-[11px] whitespace-nowrap shrink-0" style="font-variant-numeric: tabular-nums;">昨天 19:00</span>
+                </div>
+                <p class="text-muted-foreground text-xs mt-1">5题已批改</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 5. Achievement strip -->
+        <section class="px-4 mb-6">
+          <div class="grid grid-cols-3 gap-3">
+            <div class="rounded-full flex items-center justify-center gap-2 py-3 px-2"
+                 style="background: var(--brand-muted);">
+              <i data-lucide="star" class="w-4 h-4 shrink-0" style="color: #FE2C55;"></i>
+              <span class="text-foreground font-bold text-sm" style="font-variant-numeric: tabular-nums;">1280</span>
+              <span class="text-muted-foreground text-[11px]">积分</span>
+            </div>
+            <div class="rounded-full flex items-center justify-center gap-2 py-3 px-2"
+                 style="background: var(--brand-muted);">
+              <i data-lucide="zap" class="w-4 h-4 shrink-0" style="color: #25F4EE;"></i>
+              <span class="text-foreground font-bold text-sm">Lv.5</span>
+            </div>
+            <div class="rounded-full flex items-center justify-center gap-2 py-3 px-2"
+                 style="background: var(--brand-muted);">
+              <i data-lucide="medal" class="w-4 h-4 shrink-0" style="color: #FE2C55;"></i>
+              <span class="text-foreground font-bold text-sm">白银</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- 7. Bottom navigation -->
+      <nav data-mobile-nav="global" class="w-full h-[64px]"><div class="w-full max-w-md mx-auto grid grid-cols-4 h-full"><a data-nav-key="home" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="home" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span></a><a data-nav-key="practice" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="pencil" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">练习</span></a><a data-nav-key="games" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="gamepad-2" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">闯关</span></a><a data-nav-key="profile" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="user" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span></a></div></nav>
+    </main>
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #0F0F0F;
+  --brand-foreground: #FFFFFF;
+  --brand-card: #1C1C1E;
+  --brand-card-foreground: #FFFFFF;
+  --brand-popover: #2C2C2E;
+  --brand-popover-foreground: #FFFFFF;
+  --brand-primary: #FE2C55;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #2C2C2E;
+  --brand-muted-foreground: #98989F;
+  --brand-border: #38383A;
+  --brand-input: #48484A;
+  --brand-ring: #FE2C55;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+    </style>
+    <style id="critical-layout">
+      html, body { overflow-x: hidden; }
+      main { max-width: 100%; overflow-x: hidden; }
+      @media (max-width: 375px) {
+        .max-w-md { max-width: 100%; }
+      }
+    </style>
+</body>
+</html>

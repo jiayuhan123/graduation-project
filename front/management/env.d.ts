@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
   /** 请求超时时间，单位毫秒 */
   readonly VITE_REQUEST_TIMEOUT?: string
+  /** 是否在统一登录入口开放微信网站应用扫码登录 */
+  readonly VITE_WECHAT_WEB_LOGIN_ENABLED?: string
 }
 
 interface ImportMeta {

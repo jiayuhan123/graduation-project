@@ -1,0 +1,61 @@
+.teacher-banner {
+  display: flex;
+  padding: 30rpx;
+  align-items: center;
+  background: linear-gradient(135deg, #eef7ff, #ffffff);
+  border: 1rpx solid #d9eeff;
+  border-radius: 30rpx;
+  gap: 22rpx;
+}
+
+.teacher-banner__icon {
+  display: flex;
+  width: 84rpx;
+  height: 84rpx;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 20rpx rgba(77, 171, 247, 0.14);
+  font-size: 40rpx;
+}
+
+.teacher-banner__title,
+.teacher-banner__text,
+.readonly-value,
+.field-hint,
+.character-count {
+  display: block;
+}
+
+.teacher-banner__title {
+  font-size: 30rpx;
+  font-weight: 750;
+}
+
+.teacher-banner__text {
+  margin-top: 8rpx;
+  color: #7b8289;
+  font-size: 22rpx;
+}
+
+.readonly-value {
+  color: #2d3436;
+  font-size: 30rpx;
+}
+
+.field-hint,
+.character-count {
+  color: #a0a6ad;
+  font-size: 21rpx;
+}
+
+.field-hint {
+  margin-top: 8rpx;
+}
+
+.character-count {
+  margin-top: 10rpx;
+  text-align: right;
+}

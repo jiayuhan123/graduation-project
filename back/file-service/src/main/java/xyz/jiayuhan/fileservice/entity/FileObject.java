@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /** 私有文件元数据；真实文件内容保存在阿里云 OSS 私有 Bucket。 */
@@ -39,9 +39,10 @@ public class FileObject {
     private String sha256;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /** 逻辑删除标记，常规查询自动排除已删除元数据。 */
+    @TableField("is_deleted")
     @TableLogic(value = "false", delval = "true")
     private Boolean deleted;
 }

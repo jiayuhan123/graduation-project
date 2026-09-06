@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preflight TikTok</title>
+    <style id="theme-vars">
+/* TikTok Style Theme - Dark, vibrant, bold */
+:root {
+  /* Brand primary - vibrant pink-red */
+  --tk-background: #0F0F0F;
+  --tk-foreground: #FFFFFF;
+  --tk-card: #1C1C1E;
+  --tk-card-foreground: #FFFFFF;
+  --tk-popover: #2C2C2E;
+  --tk-popover-foreground: #FFFFFF;
+  --tk-primary: #FE2C55;
+  --tk-primary-foreground: #FFFFFF;
+  --tk-muted: #2C2C2E;
+  --tk-muted-foreground: #98989F;
+  --tk-border: #38383A;
+  --tk-input: #48484A;
+  --tk-ring: #FE2C55;
+
+  /* Secondary accent - cyan */
+  --tk-accent-cyan: #25F4EE;
+
+  /* State colors */
+  --state-success: #30D158;
+  --state-warning: #FFD60A;
+  --state-error: #FE2C55;
+  --state-info: #25F4EE;
+
+  /* Radius scale */
+  --tk-radius-sm: 8px;
+  --tk-radius-md: 12px;
+  --tk-radius-lg: 16px;
+
+  /* Typography */
+  --tk-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tk-background);
+    --color-foreground: var(--tk-foreground);
+    --color-card: var(--tk-card);
+    --color-card-foreground: var(--tk-card-foreground);
+    --color-popover: var(--tk-popover);
+    --color-popover-foreground: var(--tk-popover-foreground);
+    --color-primary: var(--tk-primary);
+    --color-primary-foreground: var(--tk-primary-foreground);
+    --color-muted: var(--tk-muted);
+    --color-muted-foreground: var(--tk-muted-foreground);
+    --color-border: var(--tk-border);
+    --color-input: var(--tk-input);
+    --color-ring: var(--tk-ring);
+    --radius-sm: var(--tk-radius-sm);
+    --radius-md: var(--tk-radius-md);
+    --radius-lg: var(--tk-radius-lg);
+  }
+  @layer base {
+    body { background: var(--tk-background); color: var(--tk-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tk-background); }
+      .text-background { color: var(--tk-background); }
+      .border-background { border-color: var(--tk-background); }
+      .ring-background { --tw-ring-color: var(--tk-background); }
+      .bg-foreground { background-color: var(--tk-foreground); }
+      .text-foreground { color: var(--tk-foreground); }
+      .border-foreground { border-color: var(--tk-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tk-foreground); }
+      .bg-card { background-color: var(--tk-card); }
+      .text-card { color: var(--tk-card); }
+      .border-card { border-color: var(--tk-card); }
+      .ring-card { --tw-ring-color: var(--tk-card); }
+      .bg-card-foreground { background-color: var(--tk-card-foreground); }
+      .text-card-foreground { color: var(--tk-card-foreground); }
+      .border-card-foreground { border-color: var(--tk-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tk-card-foreground); }
+      .bg-popover { background-color: var(--tk-popover); }
+      .text-popover { color: var(--tk-popover); }
+      .border-popover { border-color: var(--tk-popover); }
+      .ring-popover { --tw-ring-color: var(--tk-popover); }
+      .bg-popover-foreground { background-color: var(--tk-popover-foreground); }
+      .text-popover-foreground { color: var(--tk-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tk-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tk-popover-foreground); }
+      .bg-primary { background-color: var(--tk-primary); }
+      .text-primary { color: var(--tk-primary); }
+      .border-primary { border-color: var(--tk-primary); }
+      .ring-primary { --tw-ring-color: var(--tk-primary); }
+      .bg-primary-foreground { background-color: var(--tk-primary-foreground); }
+      .text-primary-foreground { color: var(--tk-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tk-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tk-primary-foreground); }
+      .bg-muted { background-color: var(--tk-muted); }
+      .text-muted { color: var(--tk-muted); }
+      .border-muted { border-color: var(--tk-muted); }
+      .ring-muted { --tw-ring-color: var(--tk-muted); }
+      .bg-muted-foreground { background-color: var(--tk-muted-foreground); }
+      .text-muted-foreground { color: var(--tk-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tk-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tk-muted-foreground); }
+      .bg-border { background-color: var(--tk-border); }
+      .text-border { color: var(--tk-border); }
+      .border-border { border-color: var(--tk-border); }
+      .ring-border { --tw-ring-color: var(--tk-border); }
+      .bg-input { background-color: var(--tk-input); }
+      .text-input { color: var(--tk-input); }
+      .border-input { border-color: var(--tk-input); }
+      .ring-input { --tw-ring-color: var(--tk-input); }
+      .bg-ring { background-color: var(--tk-ring); }
+      .text-ring { color: var(--tk-ring); }
+      .border-ring { border-color: var(--tk-ring); }
+      .ring-ring { --tw-ring-color: var(--tk-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

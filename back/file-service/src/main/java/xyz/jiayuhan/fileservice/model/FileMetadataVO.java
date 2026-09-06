@@ -1,6 +1,6 @@
 package xyz.jiayuhan.fileservice.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -19,6 +19,6 @@ public record FileMetadataVO(
         String contentType,
         long sizeBytes,
         String sha256,
-        LocalDateTime createdAt
+        OffsetDateTime createdAt
 ) {
 }

@@ -1,0 +1,107 @@
+.role-banner {
+  display: flex;
+  padding: 30rpx;
+  align-items: center;
+  background: linear-gradient(135deg, #f2f7ff, #ffffff);
+  border: 1rpx solid #dfeaff;
+  border-radius: 30rpx;
+  gap: 22rpx;
+}
+
+.role-banner__icon {
+  display: flex;
+  width: 82rpx;
+  height: 82rpx;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 24rpx;
+  font-size: 38rpx;
+}
+
+.role-banner__title,
+.role-banner__text,
+.role-card__code,
+.role-card__description,
+.role-card__empty {
+  display: block;
+}
+
+.role-banner__title {
+  font-size: 32rpx;
+  font-weight: 750;
+}
+
+.role-banner__text {
+  margin-top: 8rpx;
+  color: #7b8289;
+  font-size: 22rpx;
+}
+
+.role-list {
+  margin-top: 26rpx;
+}
+
+.role-card {
+  margin-bottom: 20rpx;
+  padding: 28rpx;
+}
+
+.role-card__heading,
+.role-card__name-row {
+  display: flex;
+  align-items: center;
+}
+
+.role-card__heading {
+  justify-content: space-between;
+}
+
+.role-card__name-row {
+  gap: 10rpx;
+}
+
+.role-card__name {
+  font-size: 30rpx;
+  font-weight: 750;
+}
+
+.role-card__code {
+  margin-top: 6rpx;
+  color: #9aa0a6;
+  font-size: 21rpx;
+}
+
+.role-card__count {
+  color: #ff8a3d;
+  font-size: 22rpx;
+  font-weight: 650;
+}
+
+.role-card__description {
+  margin-top: 20rpx;
+  color: #636e72;
+  font-size: 23rpx;
+  line-height: 1.55;
+}
+
+.permission-list {
+  display: flex;
+  margin-top: 20rpx;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.permission-pill {
+  padding: 10rpx 16rpx;
+  background: #f6f7f9;
+  border-radius: 999rpx;
+  color: #596168;
+  font-size: 21rpx;
+}
+
+.role-card__empty {
+  color: #a0a6ad;
+  font-size: 22rpx;
+}

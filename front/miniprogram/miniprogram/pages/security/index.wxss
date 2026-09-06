@@ -1,0 +1,139 @@
+.security-banner {
+  display: flex;
+  padding: 34rpx 28rpx;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(145deg, #fff3eb, #ffffff);
+  border: 1rpx solid #ffe3d0;
+  border-radius: 30rpx;
+  text-align: center;
+}
+
+.security-banner__icon {
+  display: flex;
+  width: 88rpx;
+  height: 88rpx;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 26rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 138, 61, 0.13);
+  font-size: 42rpx;
+}
+
+.security-banner__title,
+.security-banner__description {
+  display: block;
+}
+
+.security-banner__title {
+  margin-top: 18rpx;
+  font-size: 31rpx;
+  font-weight: 750;
+}
+
+.security-banner__description {
+  max-width: 540rpx;
+  margin-top: 10rpx;
+  color: #7b8289;
+  font-size: 23rpx;
+  line-height: 1.6;
+}
+
+.password-state {
+  display: flex;
+  margin: 34rpx 0 22rpx;
+  padding: 22rpx 24rpx;
+  align-items: center;
+  background: #ffffff;
+  border: 1rpx solid #f0f1f2;
+  border-radius: 22rpx;
+  gap: 18rpx;
+}
+
+.password-state__icon {
+  display: flex;
+  width: 58rpx;
+  height: 58rpx;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: #fff1e8;
+  border-radius: 18rpx;
+  color: #e96f24;
+  font-size: 28rpx;
+  font-weight: 750;
+}
+
+.password-state__title,
+.password-state__description {
+  display: block;
+}
+
+.password-state__title {
+  color: #34383c;
+  font-size: 26rpx;
+  font-weight: 650;
+}
+
+.password-state__description {
+  margin-top: 5rpx;
+  color: #8a8f98;
+  font-size: 21rpx;
+}
+
+.security-tip {
+  display: flex;
+  margin-top: 24rpx;
+  padding: 22rpx 24rpx;
+  align-items: flex-start;
+  background: #fff8f2;
+  border-radius: 22rpx;
+  color: #7b6b60;
+  font-size: 22rpx;
+  line-height: 1.6;
+  gap: 14rpx;
+}
+
+.wechat-card {
+  display: flex;
+  padding: 26rpx;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.wechat-card__icon {
+  display: flex;
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: #07c160;
+  border-radius: 22rpx;
+  color: #ffffff;
+  font-size: 27rpx;
+  font-weight: 700;
+}
+
+.wechat-card__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.wechat-card__title,
+.wechat-card__description {
+  display: block;
+}
+
+.wechat-card__title {
+  font-size: 27rpx;
+  font-weight: 650;
+}
+
+.wechat-card__description {
+  margin-top: 6rpx;
+  color: #8a8f98;
+  font-size: 21rpx;
+  line-height: 1.45;
+}

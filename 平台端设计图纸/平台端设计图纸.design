@@ -1,0 +1,278 @@
+{
+  "data": [
+    {
+      "id": "page-platform-home",
+      "title": "平台首页-运营概览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1319,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-c6205cf2",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-schools",
+      "title": "学校管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 169,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 919,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-7c51bad8",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/schools.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-teachers",
+      "title": "教师管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 338,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 967,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-042abf0c",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/teachers.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-students",
+      "title": "学生管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 507,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1200,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-2db7745d",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/students.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-questionbank",
+      "title": "题库管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 676,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1291,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-5d0537b3",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/questionbank.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-review",
+      "title": "内容审核",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 845,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1084,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-052fc557",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/review.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-profile",
+      "title": "个人中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456000000,
+      "canvasData": {
+        "x": 1014,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1146,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-1dcf392a",
+          "measuredAt": 1788530974540
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-platform-school-detail",
+      "title": "学校详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/school-detail.html", "interactions": [] },
+      "canvasData": { "x": 1183, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-question-detail",
+      "title": "题目详情/编辑",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/question-detail.html", "interactions": [] },
+      "canvasData": { "x": 1352, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-knowledge-points",
+      "title": "知识点管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/knowledge-points.html", "interactions": [] },
+      "canvasData": { "x": 1521, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-content-modules",
+      "title": "内容模块管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/content-modules.html", "interactions": [] },
+      "canvasData": { "x": 1690, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-rule-config",
+      "title": "规则配置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/rule-config.html", "interactions": [] },
+      "canvasData": { "x": 1859, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-operations-report",
+      "title": "运营报告",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/operations-report.html", "interactions": [] },
+      "canvasData": { "x": 2028, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-notifications",
+      "title": "系统通知",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456100000,
+      "devMetadata": { "htmlSrc": "pages/notifications.html", "interactions": [] },
+      "canvasData": { "x": 2197, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-teacher-detail",
+      "title": "教师详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456200000,
+      "devMetadata": { "htmlSrc": "pages/teacher-detail.html", "interactions": [] },
+      "canvasData": { "x": 2366, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-student-detail",
+      "title": "学生详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456200000,
+      "devMetadata": { "htmlSrc": "pages/student-detail.html", "interactions": [] },
+      "canvasData": { "x": 2535, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-error-categories",
+      "title": "错因分类管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456200000,
+      "devMetadata": { "htmlSrc": "pages/error-categories.html", "interactions": [] },
+      "canvasData": { "x": 2704, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-level-config",
+      "title": "关卡配置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456200000,
+      "devMetadata": { "htmlSrc": "pages/level-config.html", "interactions": [] },
+      "canvasData": { "x": 2873, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-platform-points-rules",
+      "title": "积分规则",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788456200000,
+      "devMetadata": { "htmlSrc": "pages/points-rules.html", "interactions": [] },
+      "canvasData": { "x": 3042, "y": 0, "group": 0 }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "mobile",
+    "projectName": "平台端设计图纸"
+  }
+}

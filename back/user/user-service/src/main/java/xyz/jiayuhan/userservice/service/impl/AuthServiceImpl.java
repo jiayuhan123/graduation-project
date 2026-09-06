@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.mq.MqTopology;
@@ -16,13 +17,21 @@ import xyz.jiayuhan.userservice.entity.User;
 import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.event.UserAuditActions;
 import xyz.jiayuhan.userservice.integration.wechat.WechatIdentityClient;
+import xyz.jiayuhan.userservice.integration.wechat.WechatIdentity;
+import xyz.jiayuhan.userservice.integration.wechat.WechatWebClient;
+import xyz.jiayuhan.userservice.integration.wechat.WechatWebLoginContext;
+import xyz.jiayuhan.userservice.integration.wechat.WechatWebLoginStateService;
+import xyz.jiayuhan.userservice.integration.wechat.WechatWebProperties;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.request.auth.LoginRequest;
 import xyz.jiayuhan.userservice.model.request.auth.RegisterRequest;
 import xyz.jiayuhan.userservice.model.request.auth.WechatLoginRequest;
+import xyz.jiayuhan.userservice.model.request.auth.WechatWebAuthorizeRequest;
+import xyz.jiayuhan.userservice.model.request.auth.WechatWebCallbackRequest;
 import xyz.jiayuhan.userservice.model.response.auth.LoginResponse;
 import xyz.jiayuhan.userservice.model.response.auth.RegisterResponse;
 import xyz.jiayuhan.userservice.model.response.auth.SessionResponse;
+import xyz.jiayuhan.userservice.model.response.auth.WechatWebAuthorizeResponse;
 import xyz.jiayuhan.userservice.security.RoleCodes;
 import xyz.jiayuhan.userservice.service.AuthService;
 import xyz.jiayuhan.userservice.service.LoginAttemptService;
@@ -49,6 +58,9 @@ public class AuthServiceImpl implements AuthService {
     private final LoginAttemptService loginAttemptService;
     private final UserEventOutboxService eventOutboxService;
     private final WechatIdentityClient wechatIdentityClient;
+    private final WechatWebClient wechatWebClient;
+    private final WechatWebLoginStateService wechatWebLoginStateService;
+    private final WechatWebProperties wechatWebProperties;
 
     @Override
     public LoginResponse login(LoginRequest request, String clientIp) {
@@ -73,14 +85,47 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public LoginResponse loginWithWechat(WechatLoginRequest request, String clientIp) {
-        String openId = wechatIdentityClient.exchangeOpenId(request.code());
-        User user = userMapper.selectOne(
-                new LambdaQueryWrapper<User>().eq(User::getWechatOpenid, openId));
+        WechatIdentity identity = wechatIdentityClient.exchangeIdentity(request.code());
+        User user = findWechatUser(identity, User::getWechatOpenid);
         if (user == null) {
             if (request.gradeLevel() == null || request.semester() == null) {
                 throw new BusinessException(ResultCode.BAD_REQUEST, "首次微信登录必须填写年级和学期");
             }
-            user = createWechatStudent(openId, request);
+            user = createWechatStudent(identity, request);
+        } else {
+            synchronizeWechatIdentity(user, identity, true);
+        }
+        ensureActive(user);
+        return createSession(user, clientIp);
+    }
+
+    @Override
+    public WechatWebAuthorizeResponse beginWechatWebLogin(WechatWebAuthorizeRequest request) {
+        WechatWebLoginContext context = new WechatWebLoginContext(
+                userDataSupport.trimToNull(request.nickname()),
+                userDataSupport.trimToNull(request.realName()),
+                request.gradeLevel(),
+                request.semester());
+        String state = wechatWebLoginStateService.create(context);
+        return new WechatWebAuthorizeResponse(
+                wechatWebClient.authorizationUrl(state),
+                state,
+                wechatWebProperties.getStateTtl().toSeconds());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LoginResponse loginWithWechatWeb(
+            WechatWebCallbackRequest request,
+            String cookieState,
+            String clientIp) {
+        WechatWebLoginContext context = wechatWebLoginStateService.consume(request.state(), cookieState);
+        WechatIdentity identity = wechatWebClient.exchangeIdentity(request.code());
+        User user = findWechatUser(identity, User::getWechatWebOpenid);
+        if (user == null) {
+            user = createWechatWebStudent(identity, context);
+        } else {
+            synchronizeWechatIdentity(user, identity, false);
         }
         ensureActive(user);
         return createSession(user, clientIp);
@@ -130,15 +175,16 @@ public class AuthServiceImpl implements AuthService {
     public void bindWechat(String code) {
         Long userId = StpUtil.getLoginIdAsLong();
         User current = requireUser(userId);
-        String openId = wechatIdentityClient.exchangeOpenId(code);
-        User occupied = userMapper.selectOne(
-                new LambdaQueryWrapper<User>().eq(User::getWechatOpenid, openId));
+        WechatIdentity identity = wechatIdentityClient.exchangeIdentity(code);
+        User occupied = findWechatUser(identity, User::getWechatOpenid);
         if (occupied != null && !occupied.getId().equals(userId)) {
             throw new BusinessException(ResultCode.WECHAT_ALREADY_BOUND);
         }
+        ensureIdentityCompatible(current, identity);
         userMapper.update(null, new LambdaUpdateWrapper<User>()
                 .eq(User::getId, userId)
-                .set(User::getWechatOpenid, openId)
+                .set(User::getWechatOpenid, identity.openId())
+                .set(StringUtils.hasText(identity.unionId()), User::getWechatUnionid, identity.unionId())
                 .set(User::getUpdatedAt, now()));
         eventOutboxService.appendLifecycle(
                 userId, "WECHAT_BOUND", current.getStatus(), rbacService.roleCodes(userId));
@@ -156,6 +202,7 @@ public class AuthServiceImpl implements AuthService {
         userMapper.update(null, new LambdaUpdateWrapper<User>()
                 .eq(User::getId, userId)
                 .set(User::getWechatOpenid, null)
+                .set(user.getWechatWebOpenid() == null, User::getWechatUnionid, null)
                 .set(User::getUpdatedAt, now()));
         eventOutboxService.appendLifecycle(
                 userId, "WECHAT_UNBOUND", user.getStatus(), rbacService.roleCodes(userId));
@@ -195,10 +242,11 @@ public class AuthServiceImpl implements AuthService {
                 expireAt(timeout));
     }
 
-    private User createWechatStudent(String openId, WechatLoginRequest request) {
+    private User createWechatStudent(WechatIdentity identity, WechatLoginRequest request) {
         User user = new User();
         user.setUsername(generateWechatUsername());
-        user.setWechatOpenid(openId);
+        user.setWechatOpenid(identity.openId());
+        user.setWechatUnionid(identity.unionId());
         user.setNickname(userDataSupport.trimToNull(request.nickname()));
         user.setRealName(userDataSupport.trimToNull(request.realName()));
         user.setStatus(1);
@@ -210,6 +258,67 @@ public class AuthServiceImpl implements AuthService {
         rbacService.assignDefaultRole(user.getId());
         appendRegistered(user);
         return user;
+    }
+
+    private User createWechatWebStudent(WechatIdentity identity, WechatWebLoginContext context) {
+        User user = new User();
+        user.setUsername(generateWechatUsername());
+        user.setWechatWebOpenid(identity.openId());
+        user.setWechatUnionid(identity.unionId());
+        user.setNickname(context.nickname());
+        user.setRealName(context.realName());
+        user.setStatus(1);
+        user.setDeleted(false);
+        user.setVersion(0);
+        userMapper.insert(user);
+        profileService.upsertStudentProfile(
+                user.getId(), null, context.gradeLevel(), context.semester());
+        rbacService.assignDefaultRole(user.getId());
+        appendRegistered(user);
+        return user;
+    }
+
+    private User findWechatUser(
+            WechatIdentity identity,
+            com.baomidou.mybatisplus.core.toolkit.support.SFunction<User, ?> channelOpenId) {
+        User channelUser = userMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(channelOpenId, identity.openId()));
+        if (!StringUtils.hasText(identity.unionId())) {
+            return channelUser;
+        }
+        User unionUser = userMapper.selectOne(
+                new LambdaQueryWrapper<User>().eq(User::getWechatUnionid, identity.unionId()));
+        if (channelUser != null && unionUser != null && !channelUser.getId().equals(unionUser.getId())) {
+            throw new BusinessException(ResultCode.WECHAT_ALREADY_BOUND, "微信跨端身份存在冲突，请联系管理员");
+        }
+        return unionUser != null ? unionUser : channelUser;
+    }
+
+    private void synchronizeWechatIdentity(User user, WechatIdentity identity, boolean miniProgram) {
+        ensureIdentityCompatible(user, identity);
+        LambdaUpdateWrapper<User> update = new LambdaUpdateWrapper<User>()
+                .eq(User::getId, user.getId())
+                .set(miniProgram, User::getWechatOpenid, identity.openId())
+                .set(!miniProgram, User::getWechatWebOpenid, identity.openId())
+                .set(StringUtils.hasText(identity.unionId()), User::getWechatUnionid, identity.unionId())
+                .set(User::getUpdatedAt, now());
+        userMapper.update(null, update);
+        if (miniProgram) {
+            user.setWechatOpenid(identity.openId());
+        } else {
+            user.setWechatWebOpenid(identity.openId());
+        }
+        if (StringUtils.hasText(identity.unionId())) {
+            user.setWechatUnionid(identity.unionId());
+        }
+    }
+
+    private void ensureIdentityCompatible(User user, WechatIdentity identity) {
+        if (StringUtils.hasText(user.getWechatUnionid())
+                && StringUtils.hasText(identity.unionId())
+                && !user.getWechatUnionid().equals(identity.unionId())) {
+            throw new BusinessException(ResultCode.WECHAT_ALREADY_BOUND);
+        }
     }
 
     private String generateWechatUsername() {

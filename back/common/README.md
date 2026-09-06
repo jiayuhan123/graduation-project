@@ -6,8 +6,8 @@
 | --- | --- | --- |
 | `common-core` | `Result`、`PageResult`、错误码、业务异常 | 全部模块 |
 | `common-web` | Spring MVC、Jakarta Validation、统一异常处理 | Servlet 服务 |
-| `common-security` | `X-User-ID` 解析与 `UserContext` | 受网关保护的 Servlet 服务 |
-| `common-data` | PostgreSQL 分页、100 条上限、乐观锁、审计时间填充 | MyBatis-Plus 服务 |
+| `common-security` | `X-User-ID` 解析、`UserContext` 与 `/internal/**` 共享令牌校验 | 受网关保护的 Servlet 服务 |
+| `common-data` | PostgreSQL 分页、JSONB、实体审计基类、乐观锁和 UTC 时间填充 | MyBatis-Plus 服务 |
 | `common-redis` | Redis JSON 序列化 | 需要 Redis 的服务 |
 | `common-openapi` | 每个服务的 OpenAPI 元数据自动配置 | HTTP 业务服务 |
 | `common-observability` | `X-Trace-ID` 校验、MDC 与响应头 | Servlet 服务 |

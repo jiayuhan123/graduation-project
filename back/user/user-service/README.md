@@ -6,13 +6,15 @@
 
 - 用户名、手机号或邮箱 + BCrypt 密码登录；
 - 微信小程序 `code2session` 登录、首次自动创建学生账号、绑定与安全解绑；
+- 微信开放平台网站应用扫码登录，使用 Redis 一次性 state + HttpOnly Cookie 防止登录 CSRF；
+- 小程序和网站分别保存 OpenID，并优先通过 UnionID 关联同一平台账号；
 - 纯微信账号首次设置密码；
 - Sa-Token + Redis 多端可撤销会话，退出当前会话或全部会话；
 - Redis 登录失败计数和临时锁定；
 - 学生注册时同事务创建账号、学生资料、`student` 角色和注册事件；
 - 当前用户公共资料、学生资料、教师资料和密码维护；
 - 管理员用户分页、角色筛选、创建、修改、启禁用、软删除、角色分配和密码重置；
-- 学生与教师角色互斥，分配角色前校验对应 Profile；
+- 一个账号可同时拥有学生、教师、管理员等多个角色，分配角色前校验对应 Profile；
 - 数据库存储的 RBAC 角色/权限，并接入 Sa-Token 注解鉴权；
 - 受内部 Token 保护的用户摘要、批量目录和用户/角色有效性校验；
 - 独立 `user-api` 契约模块，提供 Nacos + OpenFeign + LoadBalancer 调用客户端；
@@ -39,6 +41,8 @@
 | POST | `/api/user/register` | 学生密码注册 |
 | POST | `/api/user/login` | 用户名、手机号或邮箱登录 |
 | POST | `/api/user/login/wechat` | 微信登录；首次登录需提交年级和学期 |
+| POST | `/api/user/login/wechat/web/authorize` | 创建网站扫码授权会话并返回微信二维码页地址 |
+| POST | `/api/user/login/wechat/web/callback` | 校验 state 并用微信授权 code 完成登录 |
 
 ### 当前用户
 
@@ -99,6 +103,11 @@ HTTP 入参统一以 `Request` 结尾，HTTP 出参统一以 `Response` 结尾�
 | `WECHAT_ENABLED` | 是否启用微信登录 |
 | `WECHAT_APP_ID` | 微信小程序 AppID |
 | `WECHAT_APP_SECRET` | 微信小程序 Secret |
+| `WECHAT_WEB_ENABLED` | 是否启用微信开放平台网站应用扫码登录 |
+| `WECHAT_WEB_APP_ID` | 微信开放平台网站应用 AppID |
+| `WECHAT_WEB_APP_SECRET` | 微信开放平台网站应用 AppSecret |
+| `WECHAT_WEB_REDIRECT_URI` | 网站应用审核域名下的 Web 回调地址 |
+| `WECHAT_WEB_STATE_TTL` | 一次性扫码 state 的有效期，默认 `10m` |
 | `INTERNAL_API_ENABLED` | 是否启用内部用户目录 |
 | `INTERNAL_API_TOKEN` | 服务间共享的内部接口 Token |
 | `BOOTSTRAP_ADMIN_ENABLED` | 是否准备初始管理员 |
@@ -109,12 +118,14 @@ HTTP 入参统一以 `Request` 结尾，HTTP 出参统一以 `Response` 结尾�
 
 ## 当前数据库说明
 
-Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。服务当前不执行自动数据库迁移，正式启动前必须按项目建表文档手工创建并核对 `user_db` 结构。
+Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。服务当前不执行自动数据库迁移，正式启动前必须按项目建表文档手工创建并核对 `user_db` 结构。已有数据库可执行 `src/main/resources/db/seed.sql` 中幂等的 `ALTER TABLE` 与索引语句，新增 `wechat_web_openid` 和 `wechat_unionid`。
+
+历史小程序账号的 UnionID 无法仅凭已有 OpenID 离线推导。上线后应先让这些用户通过新版小程序登录一次完成 UnionID 回填，再开放 Web 扫码登录。
 
 ## 验证
 
 在 `back` 目录执行：
 
 ```powershell
-.\mvnw.cmd -pl user-service -am test
+.\mvnw.cmd -pl user/user-service -am test
 ```

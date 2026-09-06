@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加入班级</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top navigation bar -->
+      <header class="px-4 h-[48px] flex items-center justify-between">
+        <button class="w-9 h-9 flex items-center justify-center -ml-1.5 shrink-0" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">加入班级</h1>
+        <span class="w-9 shrink-0"></span>
+      </header>
+
+      <!-- 3. Guide card -->
+      <section class="px-4 mt-2 mb-5">
+        <div class="rounded-[24px] p-6 text-center relative overflow-hidden" style="background: linear-gradient(160deg, #FFF1E2 0%, #FFFFFF 100%); box-shadow: 0 4px 14px rgba(255,138,61,0.10);">
+          <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full" style="background: rgba(255,138,61,0.10);"></div>
+          <div class="flex items-center justify-center rounded-full mx-auto mb-3 relative" style="width: 88px; height: 88px; background: linear-gradient(135deg, #FFB37A 0%, #FF8A3D 100%); box-shadow: 0 6px 16px rgba(255,138,61,0.30);">
+            <span style="font-size: 46px; line-height: 1;">🏫</span>
+          </div>
+          <h2 class="text-[20px] font-extrabold text-foreground mb-1.5">输入班级码加入班级</h2>
+          <p class="text-[13px] text-muted-foreground leading-relaxed px-2">向老师获取6位班级码<br>加入后可接收作业和训练任务</p>
+        </div>
+      </section>
+
+      <!-- 4. Class code input -->
+      <section class="px-4 mb-5">
+        <div class="flex items-center justify-between gap-2">
+          <!-- filled: 2 -->
+          <div class="flex items-center justify-center rounded-[14px]" style="width: 44px; height: 56px; background-color: #FFF6EE; border-bottom: 3px solid #FF8A3D;">
+            <span class="text-[24px] font-extrabold" style="color: #FF8A3D;">2</span>
+          </div>
+          <!-- filled: A -->
+          <div class="flex items-center justify-center rounded-[14px]" style="width: 44px; height: 56px; background-color: #FFF6EE; border-bottom: 3px solid #FF8A3D;">
+            <span class="text-[24px] font-extrabold" style="color: #FF8A3D;">A</span>
+          </div>
+          <!-- filled: 3 -->
+          <div class="flex items-center justify-center rounded-[14px]" style="width: 44px; height: 56px; background-color: #FFF6EE; border-bottom: 3px solid #FF8A3D;">
+            <span class="text-[24px] font-extrabold" style="color: #FF8A3D;">3</span>
+          </div>
+          <!-- active: cursor -->
+          <div class="flex items-center justify-center rounded-[14px]" style="width: 44px; height: 56px; background-color: #FFFFFF; border: 1.5px solid #FF8A3D; border-bottom: 3px solid #FF8A3D;">
+            <span style="display: inline-block; width: 2px; height: 24px; background-color: #FF8A3D; animation: blink 1s steps(2) infinite;"></span>
+          </div>
+          <!-- empty -->
+          <div class="rounded-[14px]" style="width: 44px; height: 56px; background-color: #F8F9FB; border-bottom: 3px solid #E0E4E8;"></div>
+          <!-- empty -->
+          <div class="rounded-[14px]" style="width: 44px; height: 56px; background-color: #F8F9FB; border-bottom: 3px solid #E0E4E8;"></div>
+        </div>
+        <style>@keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }</style>
+      </section>
+
+      <!-- 5. Join button -->
+      <section class="px-4 mb-5">
+        <button class="w-full text-[16px] font-bold py-4 rounded-[20px] flex items-center justify-center gap-2" style="background-color: #FF8A3D; color: #FFFFFF; box-shadow: 0 6px 16px rgba(255,138,61,0.35);">
+          <i data-lucide="log-in" class="w-5 h-5"></i>
+          加入班级
+        </button>
+      </section>
+
+      <!-- 6. Divider -->
+      <section class="px-4 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="flex-1 h-px" style="background-color: #F0F2F5;"></div>
+          <span class="text-[12px] text-muted-foreground">或</span>
+          <div class="flex-1 h-px" style="background-color: #F0F2F5;"></div>
+        </div>
+      </section>
+
+      <!-- 7. Scan button -->
+      <section class="px-4 mb-6">
+        <button class="w-full text-[15px] font-semibold py-3.5 rounded-[20px] flex items-center justify-center gap-2" style="background-color: #FFFFFF; color: #FF8A3D; border: 1.5px solid #FF8A3D;">
+          <i data-lucide="scan-line" class="w-5 h-5"></i>
+          扫一扫
+        </button>
+        <p class="text-center text-[12px] text-muted-foreground mt-2">扫描老师二维码快速加入</p>
+      </section>
+
+      <!-- 8. My class -->
+      <section class="px-4 mb-6">
+        <h2 class="text-[16px] font-bold text-foreground mb-3 flex items-center gap-1.5 px-1">📚 我的班级</h2>
+        <div class="bg-card rounded-[20px] p-4 shadow-sm" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="flex items-center justify-center rounded-[14px] shrink-0" style="width: 52px; height: 52px; background: linear-gradient(135deg, #FFB37A 0%, #FF8A3D 100%); font-size: 26px;">🏫</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[17px] font-extrabold text-foreground">三年级2班</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground">阳光小学 · 王老师</p>
+            </div>
+            <span class="text-[12px] font-semibold px-2.5 py-1 rounded-full shrink-0" style="background-color: rgba(76,175,80,0.14); color: #4CAF50;">已加入</span>
+          </div>
+          <div class="flex items-center justify-between pt-3" style="border-top: 1px solid #F0F2F5;">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4" style="color: #636E72;"></i>
+              <span class="text-[13px] text-muted-foreground">班级人数</span>
+              <span class="text-[14px] font-bold text-foreground">42人</span>
+            </div>
+            <button class="text-[13px] font-semibold flex items-center gap-0.5" style="color: #FF8A3D;">
+              查看班级详情
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Bottom safe area -->
+      <div style="height: 20px;"></div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

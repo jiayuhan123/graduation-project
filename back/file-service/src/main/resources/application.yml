@@ -3,6 +3,10 @@ server:
   shutdown: graceful
 
 spring:
+  config:
+    import: optional:file:./.env[.properties]
+  profiles:
+    default: local
   application:
     name: file-service
   servlet:

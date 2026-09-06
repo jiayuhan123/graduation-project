@@ -1,0 +1,251 @@
+{
+  "data": [
+    {
+      "id": "page-teacher-home",
+      "title": "教师首页-班级概览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1080,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-eb642c34",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-classes",
+      "title": "班级管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 169,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-a0292ee2",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/classes.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-assign",
+      "title": "布置作业",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 338,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-5dc4fc13",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/assign.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-grade",
+      "title": "作业批改",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 507,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-d4054254",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/grade.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-analytics",
+      "title": "学情分析",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 676,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1343,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-cdcba30d",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/analytics.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-student",
+      "title": "学生详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 845,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1295,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-a850c40a",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/student.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-profile",
+      "title": "个人中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455000000,
+      "canvasData": {
+        "x": 1014,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1126,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-db30a398",
+          "measuredAt": 1788520894285
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-teacher-login",
+      "title": "教师登录",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/login.html", "interactions": [] },
+      "canvasData": { "x": 1183, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-assignment-detail",
+      "title": "作业详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/assignment-detail.html", "interactions": [] },
+      "canvasData": { "x": 1352, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-review-grading",
+      "title": "低可信批改复核",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/review-grading.html", "interactions": [] },
+      "canvasData": { "x": 1521, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-class-detail",
+      "title": "班级详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/class-detail.html", "interactions": [] },
+      "canvasData": { "x": 1690, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-training-task",
+      "title": "训练任务发布",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/training-task.html", "interactions": [] },
+      "canvasData": { "x": 1859, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-notifications",
+      "title": "消息通知",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455100000,
+      "devMetadata": { "htmlSrc": "pages/notifications.html", "interactions": [] },
+      "canvasData": { "x": 2028, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-assignment-list",
+      "title": "作业列表",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455200000,
+      "devMetadata": { "htmlSrc": "pages/assignment-list.html", "interactions": [] },
+      "canvasData": { "x": 2197, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-assign-select",
+      "title": "选题页面",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455200000,
+      "devMetadata": { "htmlSrc": "pages/assign-select.html", "interactions": [] },
+      "canvasData": { "x": 2366, "y": 0, "group": 0 }
+    },
+    {
+      "id": "page-teacher-grading-detail",
+      "title": "批改详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788455200000,
+      "devMetadata": { "htmlSrc": "pages/grading-detail.html", "interactions": [] },
+      "canvasData": { "x": 2535, "y": 0, "group": 0 }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "mobile",
+    "projectName": "教师端设计图纸"
+  }
+}

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识点掌握</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex; align-items: center; justify-content: center;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Top navigation bar -->
+      <header class="px-4 h-[48px] flex items-center justify-between">
+        <button class="w-9 h-9 flex items-center justify-center -ml-1.5 shrink-0" aria-label="返回">
+          <i data-lucide="chevron-left" class="w-6 h-6" style="color: #2D3436;"></i>
+        </button>
+        <h1 class="text-[17px] font-semibold text-foreground">知识点掌握</h1>
+        <span class="w-9 shrink-0"></span>
+      </header>
+
+      <!-- 3. Knowledge info card -->
+      <section class="px-4 mt-2 mb-4">
+        <div class="bg-card rounded-[20px] p-5 shadow-sm" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06); background: linear-gradient(135deg, #FFF6EE 0%, #FFFFFF 100%);">
+          <div class="flex items-start justify-between mb-1">
+            <h2 class="text-[24px] font-extrabold text-foreground leading-tight">两位数加法</h2>
+            <span class="text-[12px] font-semibold px-3 py-1 rounded-full shrink-0 mt-1.5" style="background-color: rgba(76,175,80,0.14); color: #4CAF50;">良好</span>
+          </div>
+          <p class="text-[13px] text-muted-foreground mb-4">三年级上册 · 100以内加减法</p>
+          <!-- mastery progress -->
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[13px] font-medium text-muted-foreground">掌握度</span>
+            <span class="text-[20px] font-extrabold leading-none" style="color: #FF8A3D;">75%</span>
+          </div>
+          <div class="w-full rounded-full overflow-hidden" style="height: 12px; background-color: #FFF0E5;">
+            <div class="h-full rounded-full" style="width: 75%; background: linear-gradient(90deg, #FFB37A 0%, #FF8A3D 100%);"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Statistics (3 columns) -->
+      <section class="px-4 mb-5">
+        <div class="bg-card rounded-[20px] p-4 shadow-sm flex items-center justify-between" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <div class="flex flex-col items-center flex-1">
+            <span class="text-[22px] leading-none">📝</span>
+            <span class="text-[19px] font-bold text-foreground mt-1.5 leading-none">18<span class="text-[12px] font-medium text-muted-foreground">次</span></span>
+            <span class="text-[11px] text-muted-foreground mt-1.5">练习次数</span>
+          </div>
+          <div class="w-px h-11 bg-border"></div>
+          <div class="flex flex-col items-center flex-1">
+            <span class="text-[22px] leading-none">✅</span>
+            <span class="text-[19px] font-bold mt-1.5 leading-none" style="color: #4CAF50;">85%</span>
+            <span class="text-[11px] text-muted-foreground mt-1.5">正确率</span>
+          </div>
+          <div class="w-px h-11 bg-border"></div>
+          <div class="flex flex-col items-center flex-1">
+            <span class="text-[22px] leading-none">⏰</span>
+            <span class="text-[19px] font-bold text-foreground mt-1.5 leading-none">2<span class="text-[12px] font-medium text-muted-foreground">天前</span></span>
+            <span class="text-[11px] text-muted-foreground mt-1.5">最近练习</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Error type distribution -->
+      <section class="px-4 mb-5">
+        <div class="bg-card rounded-[20px] p-5 shadow-sm" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06);">
+          <h2 class="text-[16px] font-bold text-card-foreground mb-4 flex items-center gap-1.5">📊 错误类型分布</h2>
+          <div class="space-y-3.5">
+            <!-- 进位遗漏 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[13px] font-medium text-foreground">进位遗漏</span>
+                <span class="text-[12px] text-muted-foreground">5次 · 55.6%</span>
+              </div>
+              <div class="w-full rounded-full overflow-hidden" style="height: 10px; background-color: #F8F9FB;">
+                <div class="h-full rounded-full" style="width: 100%; background-color: #FF3B30;"></div>
+              </div>
+            </div>
+            <!-- 计算粗心 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[13px] font-medium text-foreground">计算粗心</span>
+                <span class="text-[12px] text-muted-foreground">3次 · 33.3%</span>
+              </div>
+              <div class="w-full rounded-full overflow-hidden" style="height: 10px; background-color: #F8F9FB;">
+                <div class="h-full rounded-full" style="width: 60%; background-color: #FF8A3D;"></div>
+              </div>
+            </div>
+            <!-- 符号看错 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[13px] font-medium text-foreground">符号看错</span>
+                <span class="text-[12px] text-muted-foreground">1次 · 11.1%</span>
+              </div>
+              <div class="w-full rounded-full overflow-hidden" style="height: 10px; background-color: #F8F9FB;">
+                <div class="h-full rounded-full" style="width: 20%; background-color: #4DABF7;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Related wrong questions -->
+      <section class="px-4 mb-5">
+        <h2 class="text-[16px] font-bold text-foreground mb-3 flex items-center gap-1.5 px-1">🔗 相关错题</h2>
+        <div class="space-y-3">
+          <!-- Card 1 -->
+          <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06); border-left: 4px solid #FF3B30;">
+            <div class="p-4">
+              <div class="flex items-center gap-2.5 mb-3">
+                <span class="text-[16px] font-bold text-foreground flex-1">46 + 28 = ?</span>
+                <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0" style="background-color: rgba(255,59,48,0.12); color: #FF3B30;">进位遗漏</span>
+              </div>
+              <div class="flex items-center gap-2 mb-2 px-1">
+                <span class="text-[13px] text-muted-foreground">你的答案</span>
+                <span class="text-[16px] font-bold" style="color: #FF3B30;">64</span>
+                <span class="text-[14px] text-muted-foreground mx-1">→</span>
+                <span class="text-[13px] text-muted-foreground">正确答案</span>
+                <span class="text-[16px] font-bold" style="color: #4CAF50;">74</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground px-1">十位相加时遗漏了进位的1</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06); border-left: 4px solid #FF8A3D;">
+            <div class="p-4">
+              <div class="flex items-center gap-2.5 mb-3">
+                <span class="text-[16px] font-bold text-foreground flex-1">57 + 36 = ?</span>
+                <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0" style="background-color: rgba(255,138,61,0.14); color: #FF8A3D;">计算粗心</span>
+              </div>
+              <div class="flex items-center gap-2 mb-2 px-1">
+                <span class="text-[13px] text-muted-foreground">你的答案</span>
+                <span class="text-[16px] font-bold" style="color: #FF3B30;">83</span>
+                <span class="text-[14px] text-muted-foreground mx-1">→</span>
+                <span class="text-[13px] text-muted-foreground">正确答案</span>
+                <span class="text-[16px] font-bold" style="color: #4CAF50;">93</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground px-1">个位7+6=13，忘记进位到十位</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-card rounded-[20px] shadow-sm overflow-hidden" style="box-shadow: 0 4px 14px rgba(45,52,54,0.06); border-left: 4px solid #4DABF7;">
+            <div class="p-4">
+              <div class="flex items-center gap-2.5 mb-3">
+                <span class="text-[16px] font-bold text-foreground flex-1">38 + 25 = ?</span>
+                <span class="text-[12px] font-medium px-2.5 py-1 rounded-full shrink-0" style="background-color: rgba(77,171,247,0.14); color: #4DABF7;">符号看错</span>
+              </div>
+              <div class="flex items-center gap-2 mb-2 px-1">
+                <span class="text-[13px] text-muted-foreground">你的答案</span>
+                <span class="text-[16px] font-bold" style="color: #FF3B30;">13</span>
+                <span class="text-[14px] text-muted-foreground mx-1">→</span>
+                <span class="text-[13px] text-muted-foreground">正确答案</span>
+                <span class="text-[16px] font-bold" style="color: #4CAF50;">63</span>
+              </div>
+              <p class="text-[12px] text-muted-foreground px-1">把加号看成减号，按减法计算</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Bottom action button -->
+      <section class="px-4 mb-6 flex justify-center">
+        <button class="w-full text-[16px] font-bold py-4 rounded-[20px] flex items-center justify-center gap-2" style="background-color: #FF8A3D; color: #FFFFFF; box-shadow: 0 6px 16px rgba(255,138,61,0.35);">
+          <i data-lucide="target" class="w-5 h-5"></i>
+          开始针对性练习
+        </button>
+      </section>
+
+      <!-- 8. Bottom safe area -->
+      <div style="height: 20px;"></div>
+    </main>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F8F9FB;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #F0F2F5;
+  --brand-input: #E0E4E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 10px;
+  --brand-radius-md: 16px;
+  --brand-radius-lg: 20px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

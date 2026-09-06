@@ -1,4 +1,4 @@
-import { ElMessage } from 'element-plus'
+import { MessagePlugin } from 'tdesign-vue-next'
 import type { Router } from 'vue-router'
 import { hasAccess } from '@/auth/permission'
 import { appConfig } from '@/config/app'
@@ -37,18 +37,24 @@ export function setupRouterGuards(router: Router): void {
     } catch (error) {
       if (isApiError(error) && (error.code === 401 || error.status === 401)) {
         userStore.clearSession()
-        ElMessage.warning('登录已过期，请重新登录')
+        void MessagePlugin.warning('登录已过期，请重新登录')
         return loginLocation(to.fullPath)
       }
-      ElMessage.error('会话校验失败，请检查网络后重试')
+      void MessagePlugin.error('会话校验失败，请检查网络后重试')
       return false
     }
 
     if (
-      !hasAccess(userStore, {
-        roles: to.meta.roles,
-        permissions: to.meta.permissions,
-      })
+      !hasAccess(
+        {
+          roles: userStore.activeRole ? [userStore.activeRole] : userStore.roles,
+          permissions: userStore.permissions,
+        },
+        {
+          roles: to.meta.roles,
+          permissions: to.meta.permissions,
+        },
+      )
     ) {
       return { name: 'forbidden', query: { from: to.fullPath } }
     }

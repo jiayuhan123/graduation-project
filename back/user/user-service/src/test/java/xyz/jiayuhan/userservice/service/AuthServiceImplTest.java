@@ -12,6 +12,7 @@ import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.userservice.entity.User;
 import xyz.jiayuhan.userservice.event.UserEventOutboxService;
 import xyz.jiayuhan.userservice.integration.wechat.WechatIdentityClient;
+import xyz.jiayuhan.userservice.integration.wechat.WechatIdentity;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.request.auth.LoginRequest;
 import xyz.jiayuhan.userservice.model.request.auth.RegisterRequest;
@@ -108,7 +109,8 @@ class AuthServiceImplTest {
 
     @Test
     void firstWechatLoginRequiresStudentContext() {
-        when(wechatIdentityClient.exchangeOpenId("temporary-code")).thenReturn("openid-1");
+        when(wechatIdentityClient.exchangeIdentity("temporary-code"))
+                .thenReturn(new WechatIdentity("openid-1", null));
         when(userMapper.selectOne(any())).thenReturn(null);
 
         assertThatThrownBy(() -> authService.loginWithWechat(

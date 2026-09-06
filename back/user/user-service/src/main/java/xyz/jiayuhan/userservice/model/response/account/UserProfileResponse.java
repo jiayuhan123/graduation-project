@@ -17,6 +17,7 @@ import java.util.List;
  * @param roles 当前已启用角色编码
  * @param permissions 当前权限编码
  * @param wechatBound 是否已经绑定微信身份
+ * @param passwordSet 是否已经设置账号密码
  * @param studentProfile 学生资料；非学生或尚未建立时为空
  * @param teacherProfile 教师资料；非教师或尚未建立时为空
  * @param lastLoginAt 最近登录时间
@@ -35,6 +36,7 @@ public record UserProfileResponse(
         List<String> roles,
         List<String> permissions,
         boolean wechatBound,
+        boolean passwordSet,
         StudentProfileResponse studentProfile,
         TeacherProfileResponse teacherProfile,
         OffsetDateTime lastLoginAt,

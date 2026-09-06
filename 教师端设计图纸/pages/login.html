@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师登录</title>
+    <style id="theme-vars">
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-md mx-auto w-full">
+      <!-- 1. Status bar spacer -->
+      <div style="height: 44px;"></div>
+
+      <!-- 2. Logo area -->
+      <section class="flex flex-col items-center pt-12 pb-8 px-4">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center mb-5" style="background: linear-gradient(135deg, #FF8A3D 0%, #FF6B1A 100%); box-shadow: 0 8px 20px rgba(255,138,61,0.30);">
+          <i data-lucide="graduation-cap" class="w-10 h-10" style="color: #FFFFFF;"></i>
+        </div>
+        <h1 class="text-[22px] font-bold text-foreground leading-tight">数学练习平台</h1>
+        <p class="text-[14px] text-muted-foreground mt-1.5">教师端</p>
+      </section>
+
+      <!-- 3. Login form -->
+      <section class="px-5 mt-2">
+        <div class="bg-white rounded-xl p-5" style="box-shadow: 0 2px 12px rgba(45,52,54,0.06);">
+          <!-- Phone input -->
+          <div class="flex items-center gap-2.5 px-3.5 mb-3" style="height: 48px; border: 2px solid #ECEFF2; border-radius: 8px; background-color: #FAFBFC;">
+            <i data-lucide="phone" class="w-5 h-5 shrink-0" style="color: #9AA0A6;"></i>
+            <input type="tel" placeholder="请输入手机号" class="flex-1 min-w-0 bg-transparent outline-none text-[15px] text-foreground placeholder:text-[#9AA0A6]" maxlength="11" />
+          </div>
+          <!-- Password input -->
+          <div class="flex items-center gap-2.5 px-3.5 mb-3" style="height: 48px; border: 2px solid #ECEFF2; border-radius: 8px; background-color: #FAFBFC;">
+            <i data-lucide="lock" class="w-5 h-5 shrink-0" style="color: #9AA0A6;"></i>
+            <input type="password" placeholder="请输入密码" class="flex-1 min-w-0 bg-transparent outline-none text-[15px] text-foreground placeholder:text-[#9AA0A6]" />
+            <button type="button" aria-label="显示密码" class="shrink-0 flex items-center justify-center">
+              <i data-lucide="eye-off" class="w-5 h-5" style="color: #9AA0A6;"></i>
+            </button>
+          </div>
+          <!-- Captcha input -->
+          <div class="flex items-center gap-2.5 px-3.5 mb-3" style="height: 48px; border: 2px solid #ECEFF2; border-radius: 8px; background-color: #FAFBFC;">
+            <i data-lucide="shield" class="w-5 h-5 shrink-0" style="color: #9AA0A6;"></i>
+            <input type="text" placeholder="验证码" class="flex-1 min-w-0 bg-transparent outline-none text-[15px] text-foreground placeholder:text-[#9AA0A6]" maxlength="6" />
+            <button type="button" class="shrink-0 text-[14px] font-medium" style="color: #FF8A3D;">获取验证码</button>
+          </div>
+          <!-- Remember + Forgot -->
+          <div class="flex items-center justify-between mt-1">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <span class="w-[18px] h-[18px] rounded flex items-center justify-center" style="border: 1.5px solid #DFE3E8; background-color: #FFFFFF;">
+                <i data-lucide="check" class="w-3 h-3" style="color: #FFFFFF;"></i>
+              </span>
+              <span class="text-[13px] text-muted-foreground">记住密码</span>
+            </label>
+            <a class="text-[13px] font-medium" style="color: #FF8A3D;">忘记密码?</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Login button -->
+      <section class="px-5 mt-6">
+        <button type="button" class="w-[80%] mx-auto flex items-center justify-center text-white text-[16px] font-semibold" style="height: 48px; background-color: #FF8A3D; border-radius: 24px; box-shadow: 0 6px 16px rgba(255,138,61,0.35);">
+          登录
+        </button>
+      </section>
+
+      <!-- 5. Other login -->
+      <section class="px-5 mt-8">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="flex-1 h-px" style="background-color: #ECEFF2;"></div>
+          <span class="text-[13px] text-muted-foreground">或</span>
+          <div class="flex-1 h-px" style="background-color: #ECEFF2;"></div>
+        </div>
+        <button type="button" class="w-full flex items-center justify-center gap-2 text-[15px] font-medium" style="height: 48px; background-color: #FFFFFF; border: 1.5px solid #34C759; border-radius: 24px; color: #2D3436;">
+          <i data-lucide="message-circle" class="w-5 h-5" style="color: #34C759;"></i>
+          <span>微信登录</span>
+        </button>
+      </section>
+
+      <!-- 6. Register link -->
+      <section class="px-5 mt-8 flex items-center justify-center">
+        <span class="text-[13px] text-muted-foreground">还没有账号？</span>
+        <a class="text-[13px] font-medium ml-1" style="color: #FF8A3D;">立即注册</a>
+      </section>
+    </main>
+
+    <!-- 7. Bottom safe area -->
+    <div style="height: 34px;"></div>
+
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #F8F9FB;
+  --brand-foreground: #2D3436;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #2D3436;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #2D3436;
+  --brand-primary: #FF8A3D;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F2F5;
+  --brand-muted-foreground: #636E72;
+  --brand-border: #ECEFF2;
+  --brand-input: #DFE3E8;
+  --brand-ring: #FF8A3D;
+  --brand-radius-sm: 6px;
+  --brand-radius-md: 8px;
+  --brand-radius-lg: 12px;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+nav[data-mobile-nav] a[data-active="true"] { color: #FF8A3D; }
+nav[data-mobile-nav] a[data-active="true"] svg { color: #FF8A3D; stroke: #FF8A3D; }
+nav[data-mobile-nav] a:not([data-active="true"]) { color: #636E72; }
+nav[data-mobile-nav] a:not([data-active="true"]) svg { color: #636E72; stroke: #636E72; }
+</style>
+    <style id="critical-layout">
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+nav[data-mobile-nav] { flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #ECEFF2; }
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; }
+</style>
+</body>
+</html>

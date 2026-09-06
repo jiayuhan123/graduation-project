@@ -33,3 +33,19 @@ scrape_configs:
           - host.docker.internal:8004
         labels:
           service: audit-service
+      - targets:
+          - host.docker.internal:8005
+        labels:
+          service: content-service
+      - targets:
+          - host.docker.internal:8006
+        labels:
+          service: learning-service
+      - targets:
+          - host.docker.internal:8007
+        labels:
+          service: teaching-service
+      - targets:
+          - host.docker.internal:8008
+        labels:
+          service: game-service

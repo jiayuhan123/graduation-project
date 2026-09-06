@@ -1,0 +1,354 @@
+{
+  "data": [
+    {
+      "id": "page-home-tiktok",
+      "title": "学生首页-抖音风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788449520000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 923,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-f06aca67",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-tiktok.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-apple",
+      "title": "学生首页-苹果风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788449520000,
+      "canvasData": {
+        "x": 169,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1109,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-911747dd",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-apple.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-google",
+      "title": "学生首页-谷歌风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788449520000,
+      "canvasData": {
+        "x": 338,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1032,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-77b76c72",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-google.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-claude",
+      "title": "学生首页-Claude风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788449520000,
+      "canvasData": {
+        "x": 507,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1123,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-01c65823",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-claude.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-duolingo",
+      "title": "学生首页-Duolingo风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 676,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1239,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-fa9cf418",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-duolingo.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-weread",
+      "title": "学生首页-微信读书风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 845,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1057,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-1648abac",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-weread.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-bilibili",
+      "title": "学生首页-哔哩哔哩风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1014,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-27264064",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-bilibili.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-xiaohongshu",
+      "title": "学生首页-小红书风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1183,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1109,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-6cc9f0e8",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-xiaohongshu.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-spotify",
+      "title": "学生首页-Spotify风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1352,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1008,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-89fec2b9",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-spotify.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-notion",
+      "title": "学生首页-Notion风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1521,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 948,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-96364aa8",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-notion.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-linear",
+      "title": "学生首页-Linear风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1690,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1021,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-6044a548",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-linear.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-stripe",
+      "title": "学生首页-Stripe风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 1859,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1117,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-1a61b68c",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-stripe.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-wechat",
+      "title": "学生首页-微信风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 2028,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-019d9ccf",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-wechat.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-alipay",
+      "title": "学生首页-支付宝风格",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788451068000,
+      "canvasData": {
+        "x": 2197,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-0d5cebe8",
+          "measuredAt": 1788452207335
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-alipay.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-home-edu-fusion",
+      "title": "学生首页-少儿趣味版（小猿AI×作业帮融合）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788453400000,
+      "canvasData": {
+        "x": 2366,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1034,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-39ca6a5e",
+          "measuredAt": 1788519237947
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home-edu-fusion.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "mobile",
+    "projectName": "学生首页-风格对比"
+  }
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生首页-谷歌风格</title>
+    <style id="theme-vars">
+/* Neutral base theme - each page overrides variables per style */
+:root {
+  --brand-background: #FFFFFF;
+  --brand-foreground: #1C1C1E;
+  --brand-card: #F7F7FA;
+  --brand-card-foreground: #1C1C1E;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1C1C1E;
+  --brand-primary: #4A6CF7;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #F0F0F5;
+  --brand-muted-foreground: #8E8E93;
+  --brand-border: #E5E5EA;
+  --brand-input: #D1D1D6;
+  --brand-ring: #4A6CF7;
+
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+
+  --brand-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--brand-background);
+    --color-foreground: var(--brand-foreground);
+    --color-card: var(--brand-card);
+    --color-card-foreground: var(--brand-card-foreground);
+    --color-popover: var(--brand-popover);
+    --color-popover-foreground: var(--brand-popover-foreground);
+    --color-primary: var(--brand-primary);
+    --color-primary-foreground: var(--brand-primary-foreground);
+    --color-muted: var(--brand-muted);
+    --color-muted-foreground: var(--brand-muted-foreground);
+    --color-border: var(--brand-border);
+    --color-input: var(--brand-input);
+    --color-ring: var(--brand-ring);
+    --radius-sm: var(--brand-radius-sm);
+    --radius-md: var(--brand-radius-md);
+    --radius-lg: var(--brand-radius-lg);
+  }
+  @layer base {
+    body { background: var(--brand-background); color: var(--brand-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--brand-background); }
+      .text-background { color: var(--brand-background); }
+      .border-background { border-color: var(--brand-background); }
+      .ring-background { --tw-ring-color: var(--brand-background); }
+      .bg-foreground { background-color: var(--brand-foreground); }
+      .text-foreground { color: var(--brand-foreground); }
+      .border-foreground { border-color: var(--brand-foreground); }
+      .ring-foreground { --tw-ring-color: var(--brand-foreground); }
+      .bg-card { background-color: var(--brand-card); }
+      .text-card { color: var(--brand-card); }
+      .border-card { border-color: var(--brand-card); }
+      .ring-card { --tw-ring-color: var(--brand-card); }
+      .bg-card-foreground { background-color: var(--brand-card-foreground); }
+      .text-card-foreground { color: var(--brand-card-foreground); }
+      .border-card-foreground { border-color: var(--brand-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--brand-card-foreground); }
+      .bg-popover { background-color: var(--brand-popover); }
+      .text-popover { color: var(--brand-popover); }
+      .border-popover { border-color: var(--brand-popover); }
+      .ring-popover { --tw-ring-color: var(--brand-popover); }
+      .bg-popover-foreground { background-color: var(--brand-popover-foreground); }
+      .text-popover-foreground { color: var(--brand-popover-foreground); }
+      .border-popover-foreground { border-color: var(--brand-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--brand-popover-foreground); }
+      .bg-primary { background-color: var(--brand-primary); }
+      .text-primary { color: var(--brand-primary); }
+      .border-primary { border-color: var(--brand-primary); }
+      .ring-primary { --tw-ring-color: var(--brand-primary); }
+      .bg-primary-foreground { background-color: var(--brand-primary-foreground); }
+      .text-primary-foreground { color: var(--brand-primary-foreground); }
+      .border-primary-foreground { border-color: var(--brand-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--brand-primary-foreground); }
+      .bg-muted { background-color: var(--brand-muted); }
+      .text-muted { color: var(--brand-muted); }
+      .border-muted { border-color: var(--brand-muted); }
+      .ring-muted { --tw-ring-color: var(--brand-muted); }
+      .bg-muted-foreground { background-color: var(--brand-muted-foreground); }
+      .text-muted-foreground { color: var(--brand-muted-foreground); }
+      .border-muted-foreground { border-color: var(--brand-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--brand-muted-foreground); }
+      .bg-border { background-color: var(--brand-border); }
+      .text-border { color: var(--brand-border); }
+      .border-border { border-color: var(--brand-border); }
+      .ring-border { --tw-ring-color: var(--brand-border); }
+      .bg-input { background-color: var(--brand-input); }
+      .text-input { color: var(--brand-input); }
+      .border-input { border-color: var(--brand-input); }
+      .ring-input { --tw-ring-color: var(--brand-input); }
+      .bg-ring { background-color: var(--brand-ring); }
+      .text-ring { color: var(--brand-ring); }
+      .border-ring { border-color: var(--brand-ring); }
+      .ring-ring { --tw-ring-color: var(--brand-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="relative">
+    <style id="critical-layout">
+      * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+      .m3-ripple { position: relative; overflow: hidden; transition: background-color 0.18s ease; cursor: pointer; }
+      .m3-ripple:hover { background-color: rgba(103, 80, 164, 0.08); }
+      .m3-ripple:active { background-color: rgba(103, 80, 164, 0.12); }
+      .m3-nav-item { transition: background-color 0.18s ease; }
+      .m3-nav-item:active { background-color: rgba(103, 80, 164, 0.08); border-radius: 16px; }
+      .m3-state-layer { position: relative; }
+      .m3-state-layer::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; transition: opacity 0.18s ease; pointer-events: none; }
+      .m3-state-layer:hover::after { opacity: 0.08; }
+      .m3-state-layer:active::after { opacity: 0.12; }
+      body { padding-bottom: 80px; }
+      @media (max-width: 374px) {
+        .m3-content { padding-left: 12px; padding-right: 12px; }
+      }
+    </style>
+
+    <!-- 1. Top App Bar (Material 3) -->
+    <header class="sticky top-0 z-30 flex items-center justify-between h-14 px-4" style="background: var(--brand-card); border-bottom: 1px solid var(--brand-border);">
+      <h1 class="text-[20px] font-medium" style="color: var(--brand-foreground);">数学练习</h1>
+      <div class="flex items-center gap-1">
+        <button class="m3-state-layer relative w-10 h-10 flex items-center justify-center rounded-full" style="color: var(--brand-foreground);">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute top-2 right-2 w-2 h-2 rounded-full" style="background: var(--state-error);"></span>
+        </button>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-medium ml-1" style="background: var(--brand-primary); color: var(--brand-primary-foreground);">小</div>
+      </div>
+    </header>
+
+    <!-- Content sections -->
+    <div class="max-w-md mx-auto px-4 pt-4 pb-32 space-y-4 m3-content">
+
+      <!-- 2. Today's summary card (M3 filled card, tonal primary-container) -->
+      <section class="rounded-xl p-4" style="background: var(--m3-primary-container);">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar-days" class="w-4 h-4" style="color: var(--m3-on-primary-container);"></i>
+            <span class="text-[14px] font-medium" style="color: var(--m3-on-primary-container);">今日学习</span>
+          </div>
+          <span class="text-[12px]" style="color: var(--m3-on-surface-variant);">9月3日 周三</span>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="flex-1 text-center">
+            <div class="text-[24px] font-medium leading-tight" style="color: var(--m3-on-primary-container);">24</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--m3-on-surface-variant);">答题</div>
+          </div>
+          <div class="w-px h-10 mx-1" style="background: var(--m3-outline-variant);"></div>
+          <div class="flex-1 text-center">
+            <div class="text-[24px] font-medium leading-tight" style="color: var(--m3-on-primary-container);">85%</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--m3-on-surface-variant);">正确率</div>
+          </div>
+          <div class="w-px h-10 mx-1" style="background: var(--m3-outline-variant);"></div>
+          <div class="flex-1 text-center">
+            <div class="text-[24px] font-medium leading-tight" style="color: var(--m3-on-primary-container);">7天</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--m3-on-surface-variant);">连续</div>
+          </div>
+        </div>
+        <!-- M3 Linear progress indicator -->
+        <div class="w-full h-1 rounded-full overflow-hidden" style="background: rgba(103, 80, 164, 0.22);">
+          <div class="h-full rounded-full" style="width: 60%; background: var(--brand-primary);"></div>
+        </div>
+      </section>
+
+      <!-- 3. Core function entries (M3 filled cards, 1-column list) -->
+      <section class="space-y-3">
+        <!-- Card 1: 拍照批改 -->
+        <a href="#" class="m3-ripple m3-state-layer flex items-center gap-3 h-16 px-4 rounded-xl" style="background: var(--brand-card); border: 1px solid var(--brand-border); color: var(--brand-foreground);">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-primary-container);">
+            <i data-lucide="camera" class="w-5 h-5" style="color: var(--m3-on-primary-container);"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[15px] font-medium" style="color: var(--brand-foreground);">拍照批改</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--brand-muted-foreground);">拍下作业·智能批改</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color: var(--brand-muted-foreground);"></i>
+        </a>
+        <!-- Card 2: 口算练习 -->
+        <a href="#" class="m3-ripple m3-state-layer flex items-center gap-3 h-16 px-4 rounded-xl" style="background: var(--brand-card); border: 1px solid var(--brand-border); color: var(--brand-foreground);">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-tertiary-container);">
+            <i data-lucide="pencil" class="w-5 h-5" style="color: var(--m3-on-tertiary-container);"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[15px] font-medium" style="color: var(--brand-foreground);">口算练习</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--brand-muted-foreground);">个性化·智能推荐</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color: var(--brand-muted-foreground);"></i>
+        </a>
+        <!-- Card 3: 闯关挑战 -->
+        <a href="#" class="m3-ripple m3-state-layer flex items-center gap-3 h-16 px-4 rounded-xl" style="background: var(--brand-card); border: 1px solid var(--brand-border); color: var(--brand-foreground);">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-primary-container);">
+            <i data-lucide="gamepad-2" class="w-5 h-5" style="color: var(--m3-on-primary-container);"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[15px] font-medium" style="color: var(--brand-foreground);">闯关挑战</div>
+            <div class="text-[12px] mt-0.5" style="color: var(--brand-muted-foreground);">单人/团队闯关</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 shrink-0" style="color: var(--brand-muted-foreground);"></i>
+        </a>
+      </section>
+
+      <!-- 4. Learning progress section (M3 list with leading icons) -->
+      <section>
+        <h2 class="text-[14px] font-medium uppercase mb-3 px-1" style="color: var(--m3-on-surface-variant); letter-spacing: 0.08em;">学习动态</h2>
+        <div class="rounded-xl overflow-hidden" style="background: var(--brand-card); border: 1px solid var(--brand-border);">
+          <!-- Item 1 -->
+          <div class="m3-ripple flex items-center gap-3 h-[72px] px-4">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-primary-container);">
+              <i data-lucide="check" class="w-5 h-5" style="color: var(--m3-on-primary-container);"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[14px] font-medium truncate" style="color: var(--brand-foreground);">完成 口算练习 · 两位数加减法</div>
+              <div class="text-[12px] mt-0.5 truncate" style="color: var(--brand-muted-foreground);">今天 14:30 · 正确 20/24</div>
+            </div>
+          </div>
+          <div class="h-px mx-4" style="background: var(--brand-border);"></div>
+          <!-- Item 2 -->
+          <div class="m3-ripple flex items-center gap-3 h-[72px] px-4">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-tertiary-container);">
+              <i data-lucide="trophy" class="w-5 h-5" style="color: var(--m3-on-tertiary-container);"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[14px] font-medium truncate" style="color: var(--brand-foreground);">闯关成功 · 乘法入门 第3关</div>
+              <div class="text-[12px] mt-0.5 truncate" style="color: var(--brand-muted-foreground);">今天 13:15 · +50积分</div>
+            </div>
+          </div>
+          <div class="h-px mx-4" style="background: var(--brand-border);"></div>
+          <!-- Item 3 -->
+          <div class="m3-ripple flex items-center gap-3 h-[72px] px-4">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--m3-secondary-container);">
+              <i data-lucide="scan" class="w-5 h-5" style="color: var(--m3-on-secondary-container);"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[14px] font-medium truncate" style="color: var(--brand-foreground);">拍照批改 · 作业本第12页</div>
+              <div class="text-[12px] mt-0.5 truncate" style="color: var(--brand-muted-foreground);">昨天 19:00 · 5题已批改</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Achievement chips (M3 chip-style cards) -->
+      <section class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 px-4 h-9 rounded-full shrink-0" style="background: var(--m3-secondary-container);">
+          <i data-lucide="star" class="w-4 h-4" style="color: var(--m3-on-secondary-container);"></i>
+          <span class="text-[13px] font-medium whitespace-nowrap" style="color: var(--m3-on-secondary-container);">1280 积分</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-4 h-9 rounded-full shrink-0" style="background: var(--m3-secondary-container);">
+          <i data-lucide="zap" class="w-4 h-4" style="color: var(--m3-on-secondary-container);"></i>
+          <span class="text-[13px] font-medium whitespace-nowrap" style="color: var(--m3-on-secondary-container);">Lv.5</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-4 h-9 rounded-full shrink-0" style="background: var(--m3-secondary-container);">
+          <i data-lucide="medal" class="w-4 h-4" style="color: var(--m3-on-secondary-container);"></i>
+          <span class="text-[13px] font-medium whitespace-nowrap" style="color: var(--m3-on-secondary-container);">白银</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 6. Floating Action Button (M3 Extended FAB) -->
+    <button class="absolute bottom-[96px] right-4 z-20 flex items-center gap-2 h-14 px-5 rounded-lg transition-all active:scale-95" style="background: var(--brand-primary); color: var(--brand-primary-foreground); box-shadow: 0 4px 12px rgba(103, 80, 164, 0.3), 0 1px 3px rgba(0,0,0,0.12);">
+      <i data-lucide="pencil" class="w-5 h-5"></i>
+      <span class="text-[14px] font-medium">开始练习</span>
+    </button>
+
+    <!-- 7. Bottom Navigation Bar (M3 Navigation Bar) -->
+    <nav data-mobile-nav="global" class="w-full h-[64px]"><div class="w-full max-w-md mx-auto grid grid-cols-4 h-full"><a data-nav-key="home" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="home" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span></a><a data-nav-key="practice" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="pencil" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">练习</span></a><a data-nav-key="games" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="gamepad-2" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">闯关</span></a><a data-nav-key="profile" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full"><i data-lucide="user" class="w-5 h-5 shrink-0"></i><span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span></a></div></nav>
+    </main>
+    <script>lucide.createIcons();</script>
+    <style id="style-override">
+:root {
+  --brand-background: #FEF7FF;
+  --brand-foreground: #1D1B20;
+  --brand-card: #FFFFFF;
+  --brand-card-foreground: #1D1B20;
+  --brand-popover: #FFFFFF;
+  --brand-popover-foreground: #1D1B20;
+  --brand-primary: #6750A4;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-muted: #E7E0EC;
+  --brand-muted-foreground: #625B71;
+  --brand-border: #CAC4D0;
+  --brand-input: #CAC4D0;
+  --brand-ring: #6750A4;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  /* Material 3 tonal surfaces */
+  --m3-primary-container: #EADDFF;
+  --m3-on-primary-container: #21005D;
+  --m3-secondary-container: #E8DEF8;
+  --m3-on-secondary-container: #1D1924;
+  --m3-tertiary-container: #FFD8E4;
+  --m3-on-tertiary-container: #31111D;
+  --m3-surface-variant: #E7E0EC;
+  --m3-on-surface-variant: #49454F;
+  --m3-outline: #79747E;
+  --m3-outline-variant: #CAC4D0;
+}
+body { background: var(--brand-background); color: var(--brand-foreground); }
+    </style>
+</body>
+</html>

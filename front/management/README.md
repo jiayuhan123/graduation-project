@@ -1,6 +1,22 @@
-# Vue 管理端
+# 数学成长空间 Web 端
 
-基于 Vue 3、TypeScript、Vite、Vue Router、Pinia、Axios 和 Element Plus 的管理端基础工程。
+学生、教师和管理员共用的单一 Vue 3 Web 应用。视觉语言与微信小程序保持一致，登录后根据当前激活角色和服务端 RBAC 权限展示对应模块，不再拆分三个前端项目。
+
+## 当前能力
+
+- 统一账号密码登录；未注册用户引导至小程序注册并设置密码；
+- 微信开放平台网站应用扫码登录代码已预留，当前默认显示“功能暂未开放”；
+- 服务端会话恢复、退出登录、401 统一处理；
+- 多角色切换，导航和路由同时校验当前角色与权限；
+- 个人资料、学生资料、教师资料和账号密码维护；
+- 管理员用户目录、角色列表与权限字典；
+- 具备 `content:manage` 权限的账号可维护内容模块、知识点、题目和错因字典；
+- 题目支持草稿创建、审核启用、退回草稿和停用，写操作带乐观锁版本号；
+- 所有后端雪花 ID 均按字符串接收和传递，避免 JavaScript 整数精度丢失；
+- 桌面侧栏与移动端底部导航响应式布局；
+- 教学模块已接通班级、统一/分层作业和提交评语完整流程；学习与游戏模块仍为待接入页面。
+
+前端 RBAC 只负责界面和导航，不能替代网关与服务端鉴权。
 
 ## 环境要求
 
@@ -10,36 +26,33 @@
 
 ## 启动
 
-```bash
-cp .env.example .env.local
+```powershell
+Copy-Item .env.example .env.local
 npm ci
 npm run dev
 ```
 
-`.env.local` 不提交到 Git。所有 `VITE_` 变量都会进入浏览器构建产物，禁止写入密码、Token 或 AccessKey。
+`.env.local` 不提交到 Git。所有 `VITE_` 变量都会进入浏览器构建产物，禁止写入密码、Token、微信 AppSecret 或 AccessKey。
 
-## 常用命令
+开发环境通过 Vite 把 `/api` 代理到 Gateway。生产环境建议让 Web 静态资源和 `/api` 使用同一站点，这样微信扫码登录的 HttpOnly state Cookie 可以稳定工作。
 
-```bash
-npm run lint
-npm run lint:style
-npm run format
-npm run type-check
-npm run test:unit
-npm run build
+## 微信扫码登录前置条件
+
+当前 `VITE_WECHAT_WEB_LOGIN_ENABLED=false`，统一登录页默认使用账号密码。完成以下准备后，将该开关改为 `true` 即可恢复扫码入口：
+
+1. 在微信开放平台创建并审核“网站应用”，开通 `snsapi_login`；
+2. 把 `WECHAT_WEB_REDIRECT_URI` 的域名配置为网站应用授权回调域；
+3. 后端环境注入 `WECHAT_WEB_APP_ID` 和 `WECHAT_WEB_APP_SECRET`，前端不得保存 Secret；
+4. 执行用户库迁移，增加网站 OpenID 和 UnionID 字段；
+5. Gateway/Nacos 的匿名白名单包含 `/api/user/login/wechat/web/**`。
+
+Web 与小程序必须绑定到同一微信开放平台账号，后端才能通过 UnionID 识别同一用户。
+升级前已经存在、但尚未保存 UnionID 的小程序账号，应先在新版小程序完成一次登录以回填 UnionID，再使用 Web 扫码，避免首次跨端识别不到原账号。
+
+## 质量检查
+
+```powershell
 npm run check
 ```
 
-`npm run check` 是提交前的完整质量门禁。
-
-## 基础能力
-
-- `src/utils/request.ts`：Result 解包、统一异常、401 单次处理、TraceId、上传和下载；
-- `src/stores/user.ts`：登录、服务端退出、会话恢复、角色与权限；
-- `src/router`：模块化路由、登录守卫、RBAC、403/404 和安全回跳；
-- `src/directives/permission.ts`：按钮权限指令 `v-permission`；
-- `src/utils/error-reporter.ts`：统一异常上报入口；
-- `src/config`、`src/constants`：运行配置和公共常量；
-- `*.spec.ts`：Vitest 单元测试。
-
-前端权限只用于界面展示和导航控制，不能替代后端鉴权。
+该命令依次执行 ESLint、Stylelint、Prettier、TypeScript、Vitest 和生产构建。

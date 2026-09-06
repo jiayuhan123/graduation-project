@@ -1,0 +1,31 @@
+/* Google Material 3 Style Theme - Tonal, colorful, structured */
+:root {
+  /* Brand primary - Google blue */
+  --gg-background: #FEF7FF;
+  --gg-foreground: #1D1B20;
+  --gg-card: #FFFFFF;
+  --gg-card-foreground: #1D1B20;
+  --gg-popover: #FFFFFF;
+  --gg-popover-foreground: #1D1B20;
+  --gg-primary: #6750A4;
+  --gg-primary-foreground: #FFFFFF;
+  --gg-muted: #E7E0EC;
+  --gg-muted-foreground: #625B71;
+  --gg-border: #CAC4D0;
+  --gg-input: #CAC4D0;
+  --gg-ring: #6750A4;
+
+  /* State colors */
+  --state-success: #386A20;
+  --state-warning: #7D5700;
+  --state-error: #B3261E;
+  --state-info: #00639B;
+
+  /* Radius scale - Material 3 shapes */
+  --gg-radius-sm: 8px;
+  --gg-radius-md: 12px;
+  --gg-radius-lg: 16px;
+
+  /* Typography */
+  --gg-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}

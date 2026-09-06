@@ -3,9 +3,12 @@ package xyz.jiayuhan.userservice.service;
 import xyz.jiayuhan.userservice.model.request.auth.LoginRequest;
 import xyz.jiayuhan.userservice.model.request.auth.RegisterRequest;
 import xyz.jiayuhan.userservice.model.request.auth.WechatLoginRequest;
+import xyz.jiayuhan.userservice.model.request.auth.WechatWebAuthorizeRequest;
+import xyz.jiayuhan.userservice.model.request.auth.WechatWebCallbackRequest;
 import xyz.jiayuhan.userservice.model.response.auth.LoginResponse;
 import xyz.jiayuhan.userservice.model.response.auth.RegisterResponse;
 import xyz.jiayuhan.userservice.model.response.auth.SessionResponse;
+import xyz.jiayuhan.userservice.model.response.auth.WechatWebAuthorizeResponse;
 
 /** 注册、登录与会话查询服务。 */
 public interface AuthService {
@@ -21,6 +24,12 @@ public interface AuthService {
 
     /** 使用微信小程序临时 code 登录；首次登录时自动创建学生账号。 */
     LoginResponse loginWithWechat(WechatLoginRequest request, String clientIp);
+
+    /** 创建一次性网页微信扫码授权会话。 */
+    WechatWebAuthorizeResponse beginWechatWebLogin(WechatWebAuthorizeRequest request);
+
+    /** 校验网页微信扫码回调并创建平台会话。 */
+    LoginResponse loginWithWechatWeb(WechatWebCallbackRequest request, String cookieState, String clientIp);
 
     /**
      * 创建普通用户账号并授予默认角色。

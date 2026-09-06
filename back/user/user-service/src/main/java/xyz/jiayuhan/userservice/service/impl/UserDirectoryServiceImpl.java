@@ -8,6 +8,7 @@ import xyz.jiayuhan.userservice.entity.User;
 import xyz.jiayuhan.userservice.mapper.UserMapper;
 import xyz.jiayuhan.userservice.model.response.account.StudentProfileResponse;
 import xyz.jiayuhan.userapi.model.response.UserSummaryResponse;
+import xyz.jiayuhan.userapi.model.response.UserPermissionResponse;
 import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 import xyz.jiayuhan.userservice.service.ProfileService;
 import xyz.jiayuhan.userservice.service.RbacService;
@@ -57,6 +58,17 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         boolean active = Integer.valueOf(1).equals(user.getStatus());
         boolean roleMatched = roleCode == null || rbacService.roleCodes(userId).contains(roleCode);
         return new UserValidationResponse(userId, true, active, roleMatched);
+    }
+
+    @Override
+    public UserPermissionResponse authorize(Long userId, String permissionCode) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return new UserPermissionResponse(userId, permissionCode, false, false, false);
+        }
+        boolean active = Integer.valueOf(1).equals(user.getStatus());
+        boolean granted = active && rbacService.permissionCodes(userId).contains(permissionCode);
+        return new UserPermissionResponse(userId, permissionCode, true, active, granted);
     }
 
     private UserSummaryResponse toSummary(User user) {

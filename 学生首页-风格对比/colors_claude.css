@@ -1,0 +1,37 @@
+/* Claude Style Theme - Warm, paper-like, editorial, scholarly */
+:root {
+  /* Warm paper background */
+  --cl-background: #FAF9F7;
+  --cl-foreground: #3D3929;
+  --cl-card: #FFFFFF;
+  --cl-card-foreground: #3D3929;
+  --cl-popover: #FFFFFF;
+  --cl-popover-foreground: #3D3929;
+  --cl-primary: #D97757;
+  --cl-primary-foreground: #FFFFFF;
+  --cl-muted: #F0EDE6;
+  --cl-muted-foreground: #8B8275;
+  --cl-border: #E8E4DA;
+  --cl-input: #D5CFC2;
+  --cl-ring: #D97757;
+
+  /* Secondary warm accents */
+  --cl-accent-sage: #7C8B6A;
+  --cl-accent-amber: #E8A552;
+  --cl-accent-clay: #C68B6B;
+
+  /* State colors - warm tones */
+  --state-success: #7C8B6A;
+  --state-warning: #E8A552;
+  --state-error: #D4644A;
+  --state-info: #D97757;
+
+  /* Radius scale - moderate, scholarly */
+  --cl-radius-sm: 6px;
+  --cl-radius-md: 10px;
+  --cl-radius-lg: 14px;
+
+  /* Typography - serif headings, clean sans body */
+  --cl-font-serif: "Georgia", "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --cl-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}

@@ -1,0 +1,31 @@
+/* Apple Style Theme - Clean, minimal, frosted */
+:root {
+  /* Brand primary - Apple blue */
+  --ap-background: #F2F2F7;
+  --ap-foreground: #1C1C1E;
+  --ap-card: #FFFFFF;
+  --ap-card-foreground: #1C1C1E;
+  --ap-popover: #F2F2F7;
+  --ap-popover-foreground: #1C1C1E;
+  --ap-primary: #007AFF;
+  --ap-primary-foreground: #FFFFFF;
+  --ap-muted: #E5E5EA;
+  --ap-muted-foreground: #8E8E93;
+  --ap-border: #E5E5EA;
+  --ap-input: #C7C7CC;
+  --ap-ring: #007AFF;
+
+  /* State colors */
+  --state-success: #34C759;
+  --state-warning: #FF9500;
+  --state-error: #FF3B30;
+  --state-info: #5AC8FA;
+
+  /* Radius scale - Apple continuous corners */
+  --ap-radius-sm: 8px;
+  --ap-radius-md: 12px;
+  --ap-radius-lg: 20px;
+
+  /* Typography */
+  --ap-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}

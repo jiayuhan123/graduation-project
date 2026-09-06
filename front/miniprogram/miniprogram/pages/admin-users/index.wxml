@@ -1,0 +1,67 @@
+<view class="page-shell">
+  <view class="directory-summary">
+    <view>
+      <text class="directory-summary__title">用户目录</text>
+      <text class="directory-summary__text">共 {{total}} 个账号</text>
+    </view>
+    <view class="directory-summary__icon">👥</view>
+  </view>
+
+  <view class="search-row">
+    <view class="search-box">
+      <t-icon name="search" size="36rpx" color="#9aa0a6" />
+      <input
+        class="search-box__input"
+        placeholder="搜索用户名、姓名、手机或邮箱"
+        confirm-type="search"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        bindconfirm="onSearch"
+      />
+    </view>
+    <picker mode="selector" range="{{roleFilters}}" range-key="label" value="{{roleIndex}}" bindchange="onRoleChange">
+      <view class="filter-button">
+        <text>{{roleFilters[roleIndex].label}}</text>
+        <t-icon name="chevron-down" size="30rpx" />
+      </view>
+    </picker>
+  </view>
+
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在加载用户" />
+  </view>
+
+  <view wx:elif="{{users.length}}" class="user-list">
+    <view wx:for="{{users}}" wx:key="username" class="surface-card user-card">
+      <view class="user-card__avatar">
+        <image
+          wx:if="{{item.avatarDisplayUrl}}"
+          class="user-card__avatar-image"
+          src="{{item.avatarDisplayUrl}}"
+          mode="aspectFill"
+        />
+        <text wx:else>{{item.avatarText}}</text>
+      </view>
+      <view class="user-card__content">
+        <view class="user-card__name-row">
+          <text class="user-card__name">{{item.displayName}}</text>
+          <t-tag theme="{{item.status === 1 ? 'success' : 'danger'}}" variant="light" shape="round" size="small">
+            {{item.status === 1 ? '正常' : '已禁用'}}
+          </t-tag>
+        </view>
+        <text class="user-card__username">{{item.username}}</text>
+        <text class="user-card__roles">{{item.roleText}}</text>
+      </view>
+      <view wx:if="{{item.wechatBound}}" class="wechat-dot">微</view>
+    </view>
+
+    <view wx:if="{{page < pages}}" class="load-more">
+      <t-button theme="light" shape="round" loading="{{loadingMore}}" bind:tap="loadMore">加载更多</t-button>
+    </view>
+    <text wx:else class="list-end">已加载全部用户</text>
+  </view>
+
+  <view wx:else class="empty-state">
+    <t-empty description="没有找到符合条件的用户" />
+  </view>
+</view>
