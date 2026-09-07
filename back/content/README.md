@@ -32,6 +32,17 @@ psql -d content_db -f content-service/src/main/resources/db/upgrade-outbox.sql
 
 脚本只新增 `content_outbox_event`，不添加物理外键，也不会导入业务内容数据。
 
+### 一年级人教版种子数据
+
+首次准备一年级人教版基础计算内容时，在已经执行 `schema.sql` 的 `content_db` 中手工运行：
+
+```powershell
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade1-pep.sql
+```
+
+该脚本会导入 9 个内容模块、65 个知识点、14 个基础错因、27 道联调固定题及对应的主知识点绑定。脚本按稳定编码判重，可以重复执行；当前不会导入模板题、图形、数学游戏、综合实践和复习单元。
+
 ```powershell
 .\mvnw.cmd -pl content/content-service -am test
 ```
+
