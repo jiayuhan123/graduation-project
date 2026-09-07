@@ -42,7 +42,16 @@ psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/s
 
 该脚本会导入 9 个内容模块、65 个知识点、14 个基础错因、27 道联调固定题及对应的主知识点绑定。脚本按稳定编码判重，可以重复执行；当前不会导入模板题、图形、数学游戏、综合实践和复习单元。
 
+### 二年级人教版种子数据
+
+完成一年级种子数据导入后，在同一个 `content_db` 中手工运行：
+
+```powershell
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade2-pep.sql
+```
+
+该脚本会导入二年级上下册 7 个基础计算内容模块、61 个知识点、10 个二年级专项错因、38 道联调固定题及对应的主知识点绑定。脚本按稳定编码判重，可以重复执行；当前范围不包含分类、长度、时间实践、数学游戏、综合实践和复习单元。一年级脚本中的通用错因会由二年级内容继续复用，因此推荐按年级顺序导入。
+
 ```powershell
 .\mvnw.cmd -pl content/content-service -am test
 ```
-
