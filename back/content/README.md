@@ -52,6 +52,26 @@ psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/s
 
 该脚本会导入二年级上下册 7 个基础计算内容模块、61 个知识点、10 个二年级专项错因、38 道联调固定题及对应的主知识点绑定。脚本按稳定编码判重，可以重复执行；当前范围不包含分类、长度、时间实践、数学游戏、综合实践和复习单元。一年级脚本中的通用错因会由二年级内容继续复用，因此推荐按年级顺序导入。
 
+### 三至六年级人教版种子数据
+
+继续按年级顺序运行：
+
+```powershell
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade3-pep.sql
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade4-pep.sql
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade5-pep.sql
+psql -v ON_ERROR_STOP=1 -d content_db -f content-service/src/main/resources/db/seed-grade6-pep.sql
+```
+
+| 年级 | 计算模块 | 知识点 | 新增专项错因 | 固定题 |
+| --- | ---: | ---: | ---: | ---: |
+| 三年级 | 5 | 34 | 8 | 20 |
+| 四年级 | 6 | 44 | 9 | 24 |
+| 五年级 | 6 | 41 | 10 | 24 |
+| 六年级 | 6 | 39 | 10 | 24 |
+
+上述脚本只保留整数、小数、分数、四则运算、运算律、方程、比、比例和百分数等计算主线。观察物体、图形与测量、位置、统计、概率、数学广角、综合实践及复习单元不导入。所有脚本按稳定编码判重，可以安全重复执行。
+
 ```powershell
 .\mvnw.cmd -pl content/content-service -am test
 ```
