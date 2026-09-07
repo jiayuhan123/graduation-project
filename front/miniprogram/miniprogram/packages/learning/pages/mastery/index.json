@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "知识点掌握度"
+  "navigationBarTitleText": "知识点掌握度",
+  "enablePullDownRefresh": true
 }

@@ -182,6 +182,6 @@ class TeachingCommandServiceImplTest {
     private QuestionResponse question(Long id, String code) {
         return new QuestionResponse(
                 id, code, "FIXED", "ARITHMETIC", "1 + 1 = ?", null,
-                "2", null, null, 1, 20, "ENABLED");
+                "2", null, null, 1, 20, "ENABLED", List.of(101L));
     }
 }

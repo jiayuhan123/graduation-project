@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.core.model.PageResult;
@@ -29,7 +31,10 @@ import xyz.jiayuhan.learningservice.mapper.PracticeTaskMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskQuestionMapper;
 import xyz.jiayuhan.learningservice.mapper.RecommendationMapper;
 import xyz.jiayuhan.learningservice.model.response.LearningView;
+import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /** 所有面向学生的查询都强制带学生 ID 条件，避免横向越权。 */
@@ -47,6 +52,7 @@ public class LearningQueryServiceImpl implements LearningQueryService {
     private final RecommendationMapper recommendationMapper;
     private final PhotoMarkingTaskMapper photoMarkingTaskMapper;
     private final PhotoMarkingItemMapper photoMarkingItemMapper;
+    private final ObjectMapper objectMapper;
 
     @Override
     public PageResult<PracticeTaskSummaryResponse> pagePracticeTasks(
@@ -75,7 +81,7 @@ public class LearningQueryServiceImpl implements LearningQueryService {
                                 .eq(PracticeTaskQuestion::getTaskId, taskId)
                                 .orderByAsc(PracticeTaskQuestion::getSequenceNo))
                 .stream()
-                .map(this::toView)
+                .map(question -> toView(task, question))
                 .toList();
         return new LearningView.PracticeDetail(toSummary(task), knowledgePointIds, questions);
     }
@@ -150,7 +156,7 @@ public class LearningQueryServiceImpl implements LearningQueryService {
                 new LambdaQueryWrapper<Recommendation>()
                         .eq(Recommendation::getStudentId, studentId)
                         .eq(status != null, Recommendation::getStatus, status)
-                        .orderByAsc(Recommendation::getPriority)
+                        .orderByDesc(Recommendation::getPriority)
                         .orderByDesc(Recommendation::getGeneratedAt));
         return pageResult(result, result.getRecords().stream().map(this::toView).toList());
     }
@@ -187,6 +193,39 @@ public class LearningQueryServiceImpl implements LearningQueryService {
         return new LearningView.PhotoDetail(toView(task), items);
     }
 
+    @Override
+    public LearningView.Overview getOverview(Long studentId) {
+        long taskCount = practiceTaskMapper.selectCount(new LambdaQueryWrapper<PracticeTask>()
+                .eq(PracticeTask::getStudentId, studentId));
+        long completedTaskCount = practiceTaskMapper.selectCount(new LambdaQueryWrapper<PracticeTask>()
+                .eq(PracticeTask::getStudentId, studentId)
+                .eq(PracticeTask::getStatus, "COMPLETED"));
+        long answerCount = answerRecordMapper.selectCount(new LambdaQueryWrapper<AnswerRecord>()
+                .eq(AnswerRecord::getStudentId, studentId)
+                .eq(AnswerRecord::getGradingStatus, "GRADED"));
+        long correctAnswerCount = answerRecordMapper.selectCount(new LambdaQueryWrapper<AnswerRecord>()
+                .eq(AnswerRecord::getStudentId, studentId)
+                .eq(AnswerRecord::getGradingStatus, "GRADED")
+                .eq(AnswerRecord::getCorrect, true));
+        BigDecimal accuracy = answerCount == 0
+                ? BigDecimal.ZERO.setScale(4)
+                : BigDecimal.valueOf(correctAnswerCount)
+                        .divide(BigDecimal.valueOf(answerCount), 4, RoundingMode.HALF_UP);
+        long openErrorCount = errorRecordMapper.selectCount(new LambdaQueryWrapper<ErrorRecord>()
+                .eq(ErrorRecord::getStudentId, studentId)
+                .ne(ErrorRecord::getStatus, "RESOLVED"));
+        long weakPointCount = masteryRecordMapper.selectCount(new LambdaQueryWrapper<MasteryRecord>()
+                .eq(MasteryRecord::getStudentId, studentId)
+                .lt(MasteryRecord::getMasteryScore, new BigDecimal("0.6000")));
+        long recommendationCount = recommendationMapper.selectCount(
+                new LambdaQueryWrapper<Recommendation>()
+                        .eq(Recommendation::getStudentId, studentId)
+                        .eq(Recommendation::getStatus, "PENDING"));
+        return new LearningView.Overview(
+                studentId, taskCount, completedTaskCount, answerCount, correctAnswerCount,
+                accuracy, openErrorCount, weakPointCount, recommendationCount);
+    }
+
     private PracticeTask requireTask(Long taskId, Long studentId) {
         PracticeTask task = practiceTaskMapper.selectOne(new LambdaQueryWrapper<PracticeTask>()
                 .eq(PracticeTask::getId, taskId)
@@ -205,10 +244,29 @@ public class LearningQueryServiceImpl implements LearningQueryService {
                 task.getCompletedAt());
     }
 
-    private LearningView.PracticeQuestion toView(PracticeTaskQuestion question) {
+    private LearningView.PracticeQuestion toView(
+            PracticeTask task, PracticeTaskQuestion question) {
+        QuestionResponse snapshot;
+        try {
+            snapshot = objectMapper.readValue(question.getQuestionSnapshot(), QuestionResponse.class);
+        } catch (JacksonException exception) {
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "练习题目快照损坏");
+        }
+        AnswerRecord latest = answerRecordMapper.selectOne(new LambdaQueryWrapper<AnswerRecord>()
+                .eq(AnswerRecord::getTaskQuestionId, question.getId())
+                .eq(AnswerRecord::getStudentId, task.getStudentId())
+                .orderByDesc(AnswerRecord::getAttemptNo)
+                .last("LIMIT 1"));
+        boolean solutionVisible = "COMPLETED".equals(task.getStatus())
+                || (!"ASSIGNMENT".equals(task.getSourceType())
+                && latest != null && "GRADED".equals(latest.getGradingStatus()));
         return new LearningView.PracticeQuestion(
                 question.getId(), question.getQuestionId(), question.getSequenceNo(),
-                question.getMaxScore());
+                snapshot.questionType(), snapshot.stem(), snapshot.options(), snapshot.difficulty(),
+                snapshot.estimatedSeconds(), question.getMaxScore(),
+                latest == null ? null : toView(latest), solutionVisible,
+                solutionVisible ? snapshot.standardAnswer() : null,
+                solutionVisible ? snapshot.analysis() : null);
     }
 
     private LearningView.Answer toView(AnswerRecord answer) {

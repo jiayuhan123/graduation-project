@@ -1,0 +1,48 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="state">正在准备题目…</view>
+  <block wx:elif="{{detail && currentQuestion}}">
+    <view class="task-header">
+      <view>
+        <text class="task-title">{{detail.task.title}}</text>
+        <text class="task-meta">{{isAssignment ? '教师作业' : '自主练习'}} · 难度 {{currentQuestion.difficulty}}</text>
+      </view>
+      <text class="progress">{{progressText}}</text>
+    </view>
+
+    <view class="question-card">
+      <text class="question-number">第 {{currentQuestion.sequenceNo}} 题</text>
+      <text class="question-stem">{{currentQuestion.stem}}</text>
+      <text wx:if="{{currentQuestion.options}}" class="question-options">{{currentQuestion.options}}</text>
+      <input
+        class="answer-input"
+        value="{{answerValue}}"
+        disabled="{{isCompleted}}"
+        maxlength="200"
+        placeholder="请输入答案"
+        bindinput="onAnswerInput"
+      />
+
+      <view wx:if="{{feedback && feedback.solutionVisible}}" class="feedback {{feedback.answer.correct ? 'feedback--correct' : 'feedback--wrong'}}">
+        <text class="feedback-title">{{feedback.answer.correct ? '回答正确' : '再检查一下'}}</text>
+        <text wx:if="{{!feedback.answer.correct}}">标准答案：{{feedbackAnswer}}</text>
+        <text wx:if="{{feedback.analysis}}" class="analysis">解析：{{feedback.analysis}}</text>
+      </view>
+      <view wx:elif="{{isCompleted && currentQuestion.solutionVisible}}" class="feedback {{currentQuestion.latestAnswer.correct ? 'feedback--correct' : 'feedback--wrong'}}">
+        <text class="feedback-title">{{currentQuestion.latestAnswer.correct ? '回答正确' : '回答错误'}}</text>
+        <text>你的答案：{{currentQuestion.savedAnswer}}</text>
+        <text>标准答案：{{currentQuestion.standardAnswerText}}</text>
+        <text wx:if="{{currentQuestion.analysis}}" class="analysis">解析：{{currentQuestion.analysis}}</text>
+      </view>
+
+      <button wx:if="{{!isCompleted && !feedback}}" class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitAnswer">{{isAssignment ? '保存本题答案' : '提交答案'}}</button>
+      <button wx:if="{{!isCompleted && feedback && feedback.solutionVisible && !feedback.answer.correct}}" class="secondary-button" bindtap="retryQuestion">再答一次</button>
+    </view>
+
+    <view class="navigation">
+      <button class="nav-button" disabled="{{currentIndex === 0}}" bindtap="previousQuestion">上一题</button>
+      <button wx:if="{{currentIndex < questions.length - 1}}" class="nav-button nav-button--next" bindtap="nextQuestion">下一题</button>
+      <button wx:else-if="{{!isCompleted}}" class="finish-button" loading="{{completing}}" disabled="{{completing}}" bindtap="completePractice">{{isAssignment ? '提交作业' : '完成练习'}}</button>
+    </view>
+  </block>
+  <view wx:else class="state">当前任务没有可答题目</view>
+</view>

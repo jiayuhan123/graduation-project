@@ -18,6 +18,17 @@ import type {
 } from '@/types/content'
 
 const ADMIN_CONTENT_URL = '/api/content/admin'
+const CONTENT_URL = '/api/content'
+
+export const pageLearningModulesApi = (params: ContentModuleQuery) =>
+  request<PageResult<ContentModule>>({ url: `${CONTENT_URL}/modules`, method: 'GET', params })
+
+export const listLearningKnowledgePointsApi = (params: KnowledgePointQuery) =>
+  request<KnowledgePoint[]>({
+    url: `${CONTENT_URL}/knowledge-points`,
+    method: 'GET',
+    params,
+  })
 
 export const pageContentModulesApi = (params: ContentModuleQuery) =>
   request<PageResult<ContentModule>>({ url: `${ADMIN_CONTENT_URL}/modules`, method: 'GET', params })

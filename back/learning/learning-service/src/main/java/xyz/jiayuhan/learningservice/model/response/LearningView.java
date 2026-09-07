@@ -17,7 +17,16 @@ public final class LearningView {
             Long id,
             Long questionId,
             Integer sequenceNo,
-            BigDecimal maxScore
+            String questionType,
+            String stem,
+            String options,
+            Integer difficulty,
+            Integer estimatedSeconds,
+            BigDecimal maxScore,
+            Answer latestAnswer,
+            boolean solutionVisible,
+            String standardAnswer,
+            String analysis
     ) {
     }
 
@@ -133,5 +142,41 @@ public final class LearningView {
     }
 
     public record PhotoDetail(PhotoTask task, List<PhotoItem> items) {
+    }
+
+    public record AnswerFeedback(
+            Long taskId,
+            Long taskQuestionId,
+            Answer answer,
+            boolean solutionVisible,
+            String standardAnswer,
+            String analysis
+    ) {
+    }
+
+    public record Overview(
+            Long studentId,
+            long taskCount,
+            long completedTaskCount,
+            long answerCount,
+            long correctAnswerCount,
+            BigDecimal accuracyRate,
+            long openErrorCount,
+            long weakKnowledgePointCount,
+            long pendingRecommendationCount
+    ) {
+    }
+
+    public record StudentReport(
+            Long studentId,
+            String username,
+            String displayName,
+            String avatarUrl,
+            Overview overview,
+            List<PracticeTaskSummaryResponse> recentTasks,
+            List<Mastery> weakKnowledgePoints,
+            List<Error> recentErrors,
+            List<RecommendationItem> recommendations
+    ) {
     }
 }

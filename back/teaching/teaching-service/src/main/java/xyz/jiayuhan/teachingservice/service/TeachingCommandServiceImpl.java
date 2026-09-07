@@ -18,6 +18,7 @@ import xyz.jiayuhan.contentapi.client.ContentFeignClient;
 import xyz.jiayuhan.contentapi.model.request.BatchQuestionQueryRequest;
 import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentSummaryResponse;
+import xyz.jiayuhan.teachingapi.model.request.AssignmentProgressRequest;
 import xyz.jiayuhan.teachingservice.entity.Assignment;
 import xyz.jiayuhan.teachingservice.entity.AssignmentQuestion;
 import xyz.jiayuhan.teachingservice.entity.AssignmentSubmission;
@@ -387,6 +388,55 @@ public class TeachingCommandServiceImpl implements TeachingCommandService {
                 teacherId, TeachingAuditActions.SUBMISSION_COMMENTED, "ASSIGNMENT_SUBMISSION",
                 submissionId, "assignmentId=" + submission.getAssignmentId());
         return toSubmissionDetail(submission, userById(submission.getStudentId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncAssignmentProgress(
+            Long assignmentId, Long studentId, AssignmentProgressRequest request) {
+        AssignmentSubmission submission = assignmentSubmissionMapper.selectOne(
+                new LambdaQueryWrapper<AssignmentSubmission>()
+                        .eq(AssignmentSubmission::getAssignmentId, assignmentId)
+                        .eq(AssignmentSubmission::getStudentId, studentId));
+        if (submission == null) {
+            throw new BusinessException(ResultCode.ASSIGNMENT_SUBMISSION_NOT_FOUND);
+        }
+        if (submission.getPracticeTaskId() != null
+                && !submission.getPracticeTaskId().equals(request.practiceTaskId())) {
+            throw new BusinessException(ResultCode.CONFLICT, "作业已经关联其他练习任务");
+        }
+        if ("GRADED".equals(submission.getStatus())) {
+            if ("GRADED".equals(request.status())
+                    && request.practiceTaskId().equals(submission.getPracticeTaskId())) {
+                return;
+            }
+            throw new BusinessException(ResultCode.ASSIGNMENT_STATE_INVALID, "已批改作业不能回退状态");
+        }
+
+        submission.setPracticeTaskId(request.practiceTaskId());
+        submission.setStartedAt(submission.getStartedAt() == null
+                ? (request.startedAt() == null ? now() : request.startedAt())
+                : submission.getStartedAt());
+        if ("GRADED".equals(request.status())) {
+            if (request.score() == null || request.correctCount() == null
+                    || request.totalCount() == null || request.submittedAt() == null
+                    || request.gradedAt() == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "作业结算数据不完整");
+            }
+            submission.setStatus("GRADED");
+            submission.setScore(request.score());
+            submission.setCorrectCount(request.correctCount());
+            submission.setTotalCount(request.totalCount());
+            submission.setSubmittedAt(request.submittedAt());
+            submission.setGradedAt(request.gradedAt());
+        } else {
+            submission.setStatus("IN_PROGRESS");
+        }
+        assertUpdated(assignmentSubmissionMapper.updateById(submission));
+        outboxService.appendAudit(
+                studentId, TeachingAuditActions.SUBMISSION_PROGRESS_SYNCED,
+                "ASSIGNMENT_SUBMISSION", submission.getId(),
+                "status=" + submission.getStatus() + ",taskId=" + request.practiceTaskId());
     }
 
     private void applyClass(

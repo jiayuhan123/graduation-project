@@ -2,6 +2,12 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const learningRoutes: RouteRecordRaw[] = [
   {
+    path: 'learning/practice',
+    name: 'learning-practice',
+    component: () => import('@/views/learning/LearningPracticeView.vue'),
+    meta: { title: '个性练习', requiresAuth: true, roles: ['student'] },
+  },
+  {
     path: 'learning/records',
     name: 'learning-records',
     component: () => import('@/views/learning/LearningRecordListView.vue'),

@@ -16,6 +16,7 @@
       "root": "packages/learning",
       "pages": [
         "pages/practice/index",
+        "pages/practice-session/index",
         "pages/errors/index",
         "pages/mastery/index",
         "pages/recommendations/index",

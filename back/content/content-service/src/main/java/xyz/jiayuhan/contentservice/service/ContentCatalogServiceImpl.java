@@ -233,7 +233,15 @@ public class ContentCatalogServiceImpl implements ContentCatalogService {
                 question.getId(), question.getCode(), question.getQuestionMode(),
                 question.getQuestionType(), question.getStem(), question.getOptions(),
                 question.getStandardAnswer(), question.getAnalysis(), question.getGenerationRule(),
-                question.getDifficulty(), question.getEstimatedSeconds(), question.getStatus());
+                question.getDifficulty(), question.getEstimatedSeconds(), question.getStatus(),
+                questionKnowledgePointMapper.selectList(
+                                new LambdaQueryWrapper<QuestionKnowledgePoint>()
+                                        .eq(QuestionKnowledgePoint::getQuestionId, question.getId())
+                                        .orderByDesc(QuestionKnowledgePoint::getPrimary)
+                                        .orderByAsc(QuestionKnowledgePoint::getKnowledgePointId))
+                        .stream()
+                        .map(QuestionKnowledgePoint::getKnowledgePointId)
+                        .toList());
     }
 
     private PublishedQuestionResponse toPublishedResponse(Question question) {

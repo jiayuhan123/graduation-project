@@ -1,79 +1,75 @@
-<view class="page-shell practice-page">
-  <view wx:if="{{loading}}" class="page-loading">
-    <t-loading theme="circular" size="52rpx" text="正在加载学习内容" />
+<view class="page">
+  <view class="hero">
+    <text class="eyebrow">自主练习</text>
+    <text class="title">今天练什么？</text>
+    <text class="description">从人教版计算知识点中选择内容，系统会从固定题库中组合练习。</text>
   </view>
 
+  <view wx:if="{{loading}}" class="state">正在加载你的教材目录…</view>
   <block wx:else>
-    <view class="practice-hero">
-      <text class="practice-hero__eyebrow">自主练习</text>
-      <text class="practice-hero__title">今天想巩固什么？</text>
-      <text class="practice-hero__description">已按你的学生资料筛选 {{gradeLevel}} 年级{{semester === 1 ? '上学期' : '下学期'}}内容</text>
+    <view class="card">
+      <text class="section-title">{{gradeLevel}} 年级 · {{semester === 1 ? '上册' : '下册'}}</text>
+      <scroll-view scroll-x class="chips">
+        <view class="chip-row">
+          <button
+            wx:for="{{modules}}"
+            wx:key="id"
+            class="chip {{selectedModuleId === item.id ? 'chip--active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="selectModule"
+          >{{item.name}}</button>
+        </view>
+      </scroll-view>
     </view>
 
-    <text class="section-heading">1. 选择内容模块</text>
-    <scroll-view wx:if="{{modules.length}}" class="module-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-      <view
-        wx:for="{{modules}}"
-        wx:key="id"
-        class="module-card {{item.id === selectedModuleId ? 'module-card--active' : ''}}"
-        data-id="{{item.id}}"
-        bindtap="selectModule"
-      >
-        <text class="module-card__code">{{item.code}}</text>
-        <text class="module-card__name">{{item.name}}</text>
-        <text class="module-card__theme">{{item.learningTheme || item.editionDescription || '数学基础能力'}}</text>
-      </view>
-    </scroll-view>
-    <view wx:else class="surface-card empty-state">
-      <t-empty description="当前年级和学期暂无已发布内容" />
-    </view>
-
-    <block wx:if="{{selectedModuleId}}">
-      <text class="section-heading">2. 选择知识点</text>
-      <view wx:if="{{loadingPoints}}" class="surface-card points-loading">
-        <t-loading theme="circular" size="44rpx" text="正在加载知识点" />
-      </view>
-      <view wx:elif="{{knowledgePoints.length}}" class="surface-card point-list">
-        <view
+    <view class="card">
+      <text class="section-title">选择知识点</text>
+      <view wx:if="{{loadingPoints}}" class="inline-state">正在加载…</view>
+      <view wx:elif="{{knowledgePoints.length}}" class="point-list">
+        <button
           wx:for="{{knowledgePoints}}"
           wx:key="id"
-          class="point-row {{item.id === selectedKnowledgePointId ? 'point-row--active' : ''}}"
+          class="point {{selectedKnowledgePointId === item.id ? 'point--active' : ''}}"
           style="padding-left: {{28 + item.indent}}rpx"
           data-id="{{item.id}}"
           bindtap="selectKnowledgePoint"
         >
-          <view class="point-row__main">
-            <text class="point-row__name">{{item.name}}</text>
-            <text class="point-row__description">{{item.description || item.code}}</text>
-          </view>
-          <view class="point-row__mark">{{item.id === selectedKnowledgePointId ? '✓' : ''}}</view>
-        </view>
+          <text>{{item.name}}</text>
+          <text class="point-mark">{{selectedKnowledgePointId === item.id ? '✓' : ''}}</text>
+        </button>
       </view>
-      <view wx:else class="surface-card empty-state">
-        <t-empty description="该模块暂无已发布知识点" />
-      </view>
-    </block>
+      <view wx:else class="inline-state">该模块暂无可练知识点</view>
+    </view>
 
-    <block wx:if="{{knowledgePoints.length}}">
-      <text class="section-heading">3. 选择练习难度</text>
-      <view class="surface-card difficulty-card">
-        <view
+    <view class="card option-card">
+      <text class="section-title">练习设置</text>
+      <text class="option-label">难度</text>
+      <view class="chip-row">
+        <button
           wx:for="{{difficultyOptions}}"
           wx:key="*this"
-          class="difficulty-chip {{item === difficulty ? 'difficulty-chip--active' : ''}}"
+          class="number-chip {{difficulty === item ? 'chip--active' : ''}}"
           data-value="{{item}}"
           bindtap="selectDifficulty"
-        >
-          {{item}}
-        </view>
+        >{{item}}</button>
       </view>
-    </block>
-
-    <view wx:if="{{modules.length}}" class="practice-action">
-      <t-button block theme="primary" disabled="{{!selectedKnowledgePointId}}" bind:tap="savePreference">
-        保存练习选择
-      </t-button>
-      <text class="practice-action__hint">当前阶段只验证内容服务；组题与答题会在学习服务开发时启用。</text>
+      <text class="option-label">题量</text>
+      <view class="chip-row">
+        <button
+          wx:for="{{questionCountOptions}}"
+          wx:key="*this"
+          class="number-chip {{questionCount === item ? 'chip--active' : ''}}"
+          data-value="{{item}}"
+          bindtap="selectQuestionCount"
+        >{{item}} 题</button>
+      </view>
+      <text class="option-label">模式</text>
+      <view class="chip-row">
+        <button class="mode-chip {{mode === 'NORMAL' ? 'chip--active' : ''}}" data-value="NORMAL" bindtap="selectMode">普通练习</button>
+        <button class="mode-chip {{mode === 'TIMED' ? 'chip--active' : ''}}" data-value="TIMED" bindtap="selectMode">限时练习</button>
+      </view>
     </view>
+
+    <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="startPractice">开始练习</button>
   </block>
 </view>

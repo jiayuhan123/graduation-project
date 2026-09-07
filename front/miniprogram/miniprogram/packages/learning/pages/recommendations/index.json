@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "个性化推荐"
+  "navigationBarTitleText": "个性化推荐",
+  "enablePullDownRefresh": true
 }

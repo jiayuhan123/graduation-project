@@ -1,5 +1,7 @@
 package xyz.jiayuhan.contentapi.model.response;
 
+import java.util.List;
+
 /** 供练习、作业和游戏服务使用的不可变题目快照来源。 */
 public record QuestionResponse(
         Long id,
@@ -13,6 +15,7 @@ public record QuestionResponse(
         String generationRule,
         Integer difficulty,
         Integer estimatedSeconds,
-        String status
+        String status,
+        List<Long> knowledgePointIds
 ) {
 }

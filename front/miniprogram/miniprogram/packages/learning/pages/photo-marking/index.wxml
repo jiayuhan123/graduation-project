@@ -1,1 +1,13 @@
-<t-empty description="拍照批改页面样板已就绪" />
+<view class="page">
+  <view class="notice">
+    <text class="badge">后续能力</text>
+    <text class="title">拍照批改暂未开放</text>
+    <text class="description">本轮先完成在线练习、即时判题、错题归档和教师学情闭环。OCR 识别与人工复核将在后续版本接入。</text>
+  </view>
+  <text class="section-title">历史任务</text>
+  <view wx:if="{{loading}}" class="state">正在加载…</view>
+  <view wx:elif="{{records.length}}" class="list">
+    <view wx:for="{{records}}" wx:key="id" class="card"><text>任务 #{{item.id}}</text><text>{{item.status}} · 识别 {{item.recognizedItemCount}} 项</text></view>
+  </view>
+  <view wx:else class="state state--small">暂无拍照批改任务</view>
+</view>

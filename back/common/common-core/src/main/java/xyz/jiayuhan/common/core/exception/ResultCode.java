@@ -84,6 +84,11 @@ public enum ResultCode {
     // =================== 学习闭环（6xxx） ===================
     PRACTICE_TASK_NOT_FOUND(6000, "练习任务不存在", 404),
     PHOTO_MARKING_TASK_NOT_FOUND(6001, "拍照批改任务不存在", 404),
+    PRACTICE_TASK_STATE_INVALID(6002, "练习任务当前状态不允许执行该操作", 409),
+    PRACTICE_QUESTION_NOT_FOUND(6003, "练习题目不存在", 404),
+    PRACTICE_QUESTION_POOL_EMPTY(6004, "当前条件下没有可用题目", 409),
+    PRACTICE_ANSWER_INVALID(6005, "答案格式不正确", 400),
+    LEARNING_REPORT_FORBIDDEN(6006, "无权查看该学生的学情", 403),
 
     // =================== 教学（7xxx） ===================
     TEACHING_CLASS_NOT_FOUND(7000, "班级不存在", 404),

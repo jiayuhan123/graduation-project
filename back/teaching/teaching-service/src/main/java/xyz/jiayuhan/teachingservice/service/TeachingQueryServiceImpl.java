@@ -10,6 +10,8 @@ import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentSummaryResponse;
+import xyz.jiayuhan.teachingapi.model.response.AssignmentLearningResponse;
+import xyz.jiayuhan.teachingapi.model.response.StudentAccessResponse;
 import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 import xyz.jiayuhan.teachingservice.entity.Assignment;
 import xyz.jiayuhan.teachingservice.entity.AssignmentQuestion;
@@ -142,6 +144,50 @@ public class TeachingQueryServiceImpl implements TeachingQueryService {
     @Override
     public AssignmentSummaryResponse getAssignmentInternal(Long assignmentId) {
         return toSummary(requireAssignment(assignmentId));
+    }
+
+    @Override
+    public AssignmentLearningResponse getStudentAssignmentInternal(
+            Long assignmentId, Long studentId) {
+        Assignment assignment = requireAssignment(assignmentId);
+        AssignmentSubmission submission = assignmentSubmissionMapper.selectOne(
+                new LambdaQueryWrapper<AssignmentSubmission>()
+                        .eq(AssignmentSubmission::getAssignmentId, assignmentId)
+                        .eq(AssignmentSubmission::getStudentId, studentId));
+        if (submission == null) {
+            throw new BusinessException(ResultCode.ASSIGNMENT_SUBMISSION_NOT_FOUND);
+        }
+        List<AssignmentLearningResponse.Question> questions = assignmentQuestionMapper.selectList(
+                        new LambdaQueryWrapper<AssignmentQuestion>()
+                                .eq(AssignmentQuestion::getAssignmentId, assignmentId)
+                                .eq(AssignmentQuestion::getLayerCode, submission.getLayerCode())
+                                .orderByAsc(AssignmentQuestion::getSequenceNo))
+                .stream()
+                .map(question -> new AssignmentLearningResponse.Question(
+                        question.getQuestionId(), question.getSequenceNo(), question.getScore(),
+                        question.getQuestionSnapshot()))
+                .toList();
+        return new AssignmentLearningResponse(
+                assignmentId, submission.getId(), studentId, assignment.getTitle(),
+                assignment.getStatus(), submission.getStatus(), submission.getLayerCode(),
+                submission.getPracticeTaskId(), assignment.getStartAt(), assignment.getDueAt(),
+                questions);
+    }
+
+    @Override
+    public StudentAccessResponse canTeacherViewStudent(Long teacherId, Long studentId) {
+        List<Long> classIds = classTeacherMapper.selectList(
+                        new LambdaQueryWrapper<ClassTeacher>()
+                                .eq(ClassTeacher::getTeacherId, teacherId))
+                .stream()
+                .map(ClassTeacher::getClassId)
+                .toList();
+        boolean accessible = !classIds.isEmpty()
+                && classStudentMapper.selectCount(new LambdaQueryWrapper<ClassStudent>()
+                        .in(ClassStudent::getClassId, classIds)
+                        .eq(ClassStudent::getStudentId, studentId)
+                        .eq(ClassStudent::getStatus, "ACTIVE")) > 0;
+        return new StudentAccessResponse(teacherId, studentId, accessible);
     }
 
     private TeachingView.AssignmentDetail detail(

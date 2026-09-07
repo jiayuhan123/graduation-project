@@ -1,0 +1,16 @@
+.page { min-height: 100vh; padding: 32rpx; background: #f7f8fa; box-sizing: border-box; }
+.hero { padding: 20rpx 6rpx 28rpx; }
+.title { display: block; color: #2d3436; font-size: 46rpx; font-weight: 800; }
+.description { display: block; margin-top: 12rpx; color: #838b92; font-size: 25rpx; line-height: 1.6; }
+.list { display: grid; gap: 18rpx; }
+.card { padding: 30rpx; background: #fff; border: 1rpx solid #eceef0; border-radius: 26rpx; }
+.head { display: flex; align-items: center; justify-content: space-between; color: #8a9298; font-size: 22rpx; }
+.badge { padding: 7rpx 15rpx; background: #fff0e7; border-radius: 999rpx; color: #df641d; }
+.point { display: block; margin-top: 20rpx; color: #333a3f; font-size: 29rpx; font-weight: 750; }
+.reason { display: block; margin-top: 14rpx; color: #687178; font-size: 25rpx; line-height: 1.65; }
+.actions { display: grid; margin-top: 24rpx; grid-template-columns: 1fr 1.4fr; gap: 14rpx; }
+.quiet, .primary { height: 72rpx; margin: 0; border: 0; border-radius: 18rpx; font-size: 25rpx; line-height: 72rpx; }
+.quiet::after, .primary::after { border: 0; }
+.quiet { background: #f3f4f5; color: #697178; }
+.primary { background: #ff7a2a; color: #fff; font-weight: 700; }
+.state { display: grid; min-height: 55vh; color: #92999e; place-items: center; }

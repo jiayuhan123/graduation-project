@@ -12,6 +12,7 @@ import xyz.jiayuhan.teachingservice.model.request.UpdateSubmissionCommentRequest
 import xyz.jiayuhan.teachingservice.model.request.UpdateTeachingClassRequest;
 import xyz.jiayuhan.teachingservice.model.request.UpdateTeachingClassStatusRequest;
 import xyz.jiayuhan.teachingservice.model.response.TeachingView;
+import xyz.jiayuhan.teachingapi.model.request.AssignmentProgressRequest;
 
 import java.util.List;
 
@@ -61,4 +62,7 @@ public interface TeachingCommandService {
 
     TeachingView.SubmissionDetail updateSubmissionComment(
             Long teacherId, Long submissionId, UpdateSubmissionCommentRequest request);
+
+    void syncAssignmentProgress(
+            Long assignmentId, Long studentId, AssignmentProgressRequest request);
 }

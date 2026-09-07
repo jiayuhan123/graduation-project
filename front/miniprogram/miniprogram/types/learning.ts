@@ -19,13 +19,69 @@ export interface PracticeQuestion {
   id: string
   questionId: string
   sequenceNo: number
+  questionType: string
+  stem: string
+  options: string | null
+  difficulty: number
+  estimatedSeconds: number | null
   maxScore: number
+  latestAnswer: AnswerRecord | null
+  solutionVisible: boolean
+  standardAnswer: string | null
+  analysis: string | null
 }
 
 export interface PracticeDetail {
   task: PracticeTaskSummary
   knowledgePointIds: string[]
   questions: PracticeQuestion[]
+}
+
+export interface CreatePracticeTaskInput {
+  knowledgePointId: string
+  difficulty?: number
+  questionCount?: number
+  mode?: 'NORMAL' | 'TIMED' | 'SPECIAL' | 'REVIEW'
+  timeLimitSeconds?: number
+  targetAccuracy?: number
+}
+
+export interface SubmitAnswerInput {
+  answer: string
+  responseMs?: number
+}
+
+export interface AnswerFeedback {
+  taskId: string
+  taskQuestionId: string
+  answer: AnswerRecord
+  solutionVisible: boolean
+  standardAnswer: string | null
+  analysis: string | null
+}
+
+export interface LearningOverview {
+  studentId: string
+  taskCount: number
+  completedTaskCount: number
+  answerCount: number
+  correctAnswerCount: number
+  accuracyRate: number
+  openErrorCount: number
+  weakKnowledgePointCount: number
+  pendingRecommendationCount: number
+}
+
+export interface StudentLearningReport {
+  studentId: string
+  username: string
+  displayName: string
+  avatarUrl: string | null
+  overview: LearningOverview
+  recentTasks: PracticeTaskSummary[]
+  weakKnowledgePoints: Mastery[]
+  recentErrors: ErrorRecord[]
+  recommendations: RecommendationItem[]
 }
 
 export interface AnswerRecord {

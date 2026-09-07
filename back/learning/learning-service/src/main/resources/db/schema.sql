@@ -38,6 +38,9 @@ CREATE INDEX idx_practice_task_student_status
 ON practice_task (student_id, status, expires_at);
 CREATE INDEX idx_practice_task_source
 ON practice_task (source_type, source_id) WHERE source_id IS NOT NULL;
+CREATE UNIQUE INDEX uk_practice_task_assignment_student
+ON practice_task (student_id, source_type, source_id)
+WHERE source_type = 'ASSIGNMENT' AND source_id IS NOT NULL;
 COMMENT ON TABLE practice_task IS '所有学习入口统一使用的练习任务';
 COMMENT ON COLUMN practice_task.id IS '练习任务编号';
 COMMENT ON COLUMN practice_task.student_id IS '完成练习的学生';

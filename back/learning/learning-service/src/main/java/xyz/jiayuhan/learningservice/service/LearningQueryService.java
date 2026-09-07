@@ -34,4 +34,6 @@ public interface LearningQueryService {
             Long studentId, long page, long size, String status);
 
     LearningView.PhotoDetail getPhotoTask(Long studentId, Long markingTaskId);
+
+    LearningView.Overview getOverview(Long studentId);
 }

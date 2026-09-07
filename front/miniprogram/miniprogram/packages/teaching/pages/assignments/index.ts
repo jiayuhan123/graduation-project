@@ -10,6 +10,7 @@ import {
   pageTeachingClassesApi,
   publishAssignmentApi,
 } from '../../../../api/teaching'
+import { createAssignmentTaskApi } from '../../../../api/learning'
 import { getSession } from '../../../../services/session'
 import type {
   AssignmentDetail,
@@ -279,6 +280,19 @@ Page({
 
   closeDetail() {
     this.setData({ detail: null })
+  },
+
+  async startStudentAssignment(event: WechatMiniprogram.BaseEvent) {
+    const assignmentId = String(event.currentTarget.dataset.id ?? '')
+    if (!assignmentId) return
+    try {
+      const detail = await createAssignmentTaskApi(assignmentId)
+      await wx.navigateTo({
+        url: `/packages/learning/pages/practice-session/index?taskId=${detail.task.id}`,
+      })
+    } catch (error) {
+      await this.showError(error, '作业练习创建失败')
+    }
   },
 
   async publish(event: WechatMiniprogram.BaseEvent) {

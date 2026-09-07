@@ -81,7 +81,7 @@ class TeachingQueryServiceImplTest {
         question.setQuestionSnapshot("{}");
         QuestionResponse snapshot = new QuestionResponse(
                 201L, "Q-A", "FIXED", "ARITHMETIC", "1 + 1 = ?", null,
-                "2", "相加即可", null, 1, 20, "ENABLED");
+                "2", "相加即可", null, 1, 20, "ENABLED", List.of(101L));
         when(assignmentMapper.selectById(300L)).thenReturn(assignment);
         when(assignmentSubmissionMapper.selectOne(any())).thenReturn(submission);
         when(assignmentQuestionMapper.selectList(any())).thenReturn(List.of(question));

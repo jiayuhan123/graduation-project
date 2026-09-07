@@ -13,6 +13,7 @@ public final class TeachingAuditActions {
     public static final String ASSIGNMENT_PUBLISHED = "teaching.assignment.publish";
     public static final String ASSIGNMENT_STATUS_CHANGED = "teaching.assignment.status.change";
     public static final String SUBMISSION_COMMENTED = "teaching.submission.comment";
+    public static final String SUBMISSION_PROGRESS_SYNCED = "teaching.submission.progress.sync";
 
     private TeachingAuditActions() {
     }

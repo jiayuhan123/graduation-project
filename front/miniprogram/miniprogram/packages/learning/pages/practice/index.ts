@@ -1,5 +1,6 @@
 import { getCurrentUserApi } from '../../../../api/account'
 import { listKnowledgePointsApi, pageContentModulesApi } from '../../../../api/content'
+import { createPracticeTaskApi } from '../../../../api/learning'
 import { STORAGE_KEYS } from '../../../../constants/storage'
 import { getStorage, setStorage } from '../../../../services/storage'
 import type { ContentModule, KnowledgePoint } from '../../../../types/content'
@@ -14,6 +15,8 @@ interface PracticePreference {
   moduleId: string
   knowledgePointId: string
   difficulty: number
+  questionCount: number
+  mode: 'NORMAL' | 'TIMED'
 }
 
 function orderKnowledgePoints(points: KnowledgePoint[]): KnowledgePointCard[] {
@@ -58,6 +61,10 @@ Page({
     selectedKnowledgePointId: '',
     difficulty: 3,
     difficultyOptions: [1, 2, 3, 4, 5],
+    questionCount: 10,
+    questionCountOptions: [5, 10, 15, 20],
+    mode: 'NORMAL' as 'NORMAL' | 'TIMED',
+    submitting: false,
   },
 
   onLoad() {
@@ -88,6 +95,8 @@ Page({
         selectedModuleId: preferredModuleId,
         selectedKnowledgePointId: '',
         difficulty: preference?.difficulty ?? 3,
+        questionCount: preference?.questionCount ?? 10,
+        mode: preference?.mode ?? 'NORMAL',
       })
       if (preferredModuleId) await this.loadKnowledgePoints(preferredModuleId, preference)
     } catch (error) {
@@ -139,9 +148,26 @@ Page({
     if (difficulty >= 1 && difficulty <= 5) this.setData({ difficulty })
   },
 
-  async savePreference() {
-    const { gradeLevel, semester, selectedModuleId, selectedKnowledgePointId, difficulty } =
-      this.data
+  selectQuestionCount(event: WechatMiniprogram.BaseEvent) {
+    const questionCount = Number(event.currentTarget.dataset.value)
+    if ([5, 10, 15, 20].includes(questionCount)) this.setData({ questionCount })
+  },
+
+  selectMode(event: WechatMiniprogram.BaseEvent) {
+    const mode = String(event.currentTarget.dataset.value)
+    if (mode === 'NORMAL' || mode === 'TIMED') this.setData({ mode })
+  },
+
+  async startPractice() {
+    const {
+      gradeLevel,
+      semester,
+      selectedModuleId,
+      selectedKnowledgePointId,
+      difficulty,
+      questionCount,
+      mode,
+    } = this.data
     if (!selectedModuleId || !selectedKnowledgePointId) {
       await wx.showToast({ title: '请先选择一个知识点', icon: 'none' })
       return
@@ -153,12 +179,29 @@ Page({
       moduleId: selectedModuleId,
       knowledgePointId: selectedKnowledgePointId,
       difficulty,
+      questionCount,
+      mode,
     })
-    await wx.showModal({
-      title: '练习内容已保存',
-      content: '内容服务链路已接通；自动组题和练习任务将在学习服务阶段接入。',
-      showCancel: false,
-      confirmText: '知道了',
-    })
+    this.setData({ submitting: true })
+    try {
+      const detail = await createPracticeTaskApi({
+        knowledgePointId: selectedKnowledgePointId,
+        difficulty,
+        questionCount,
+        mode,
+        timeLimitSeconds: mode === 'TIMED' ? Math.max(300, questionCount * 60) : undefined,
+        targetAccuracy: 0.8,
+      })
+      await wx.navigateTo({
+        url: `/packages/learning/pages/practice-session/index?taskId=${detail.task.id}`,
+      })
+    } catch (error) {
+      await wx.showToast({
+        title: error instanceof Error ? error.message : '练习创建失败',
+        icon: 'none',
+      })
+    } finally {
+      this.setData({ submitting: false })
+    }
   },
 })
