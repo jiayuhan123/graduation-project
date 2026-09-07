@@ -3,17 +3,18 @@ import {
   startPracticeTaskApi,
   submitPracticeAnswerApi,
 } from '../../../../api/learning'
-import type {
-  AnswerFeedback,
-  PracticeDetail,
-  PracticeQuestion,
-} from '../../../../types/learning'
+import type { AnswerFeedback, PracticeDetail, PracticeQuestion } from '../../../../types/learning'
 
 function jsonValue(value: string | null | undefined): string {
   if (!value) return ''
   try {
     const parsed = JSON.parse(value) as { value?: unknown }
-    return parsed.value === undefined ? value : String(parsed.value)
+    if (parsed.value === undefined) return value
+    if (typeof parsed.value === 'string') return parsed.value
+    if (typeof parsed.value === 'number' || typeof parsed.value === 'boolean') {
+      return String(parsed.value)
+    }
+    return JSON.stringify(parsed.value) ?? ''
   } catch {
     return value
   }
@@ -137,7 +138,12 @@ Page({
   },
 
   retryQuestion() {
-    this.setData({ answerValue: '', feedback: null, feedbackAnswer: '', startedQuestionAt: Date.now() })
+    this.setData({
+      answerValue: '',
+      feedback: null,
+      feedbackAnswer: '',
+      startedQuestionAt: Date.now(),
+    })
   },
 
   previousQuestion() {

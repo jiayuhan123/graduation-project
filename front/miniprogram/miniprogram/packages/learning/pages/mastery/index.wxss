@@ -1,13 +1,71 @@
-.page { min-height: 100vh; padding: 32rpx; background: #f7f8fa; box-sizing: border-box; }
-.hero { padding: 20rpx 6rpx 28rpx; }
-.title { display: block; color: #2d3436; font-size: 46rpx; font-weight: 800; }
-.description { display: block; margin-top: 12rpx; color: #838b92; font-size: 25rpx; }
-.list { display: grid; gap: 18rpx; }
-.card { padding: 30rpx; background: #fff; border: 1rpx solid #eceef0; border-radius: 24rpx; }
-.head { display: flex; align-items: baseline; justify-content: space-between; }
-.point { color: #3b4348; font-size: 27rpx; font-weight: 700; }
-.score { color: #ff7023; font-size: 38rpx; font-weight: 800; }
-.track { height: 15rpx; margin-top: 22rpx; overflow: hidden; background: #f0f1f2; border-radius: 999rpx; }
-.fill { height: 100%; background: linear-gradient(90deg, #ffab70, #ff7023); border-radius: 999rpx; }
-.metrics { display: flex; margin-top: 20rpx; justify-content: space-between; color: #858d93; font-size: 21rpx; }
-.state { display: grid; min-height: 55vh; color: #92999e; place-items: center; }
+.page {
+  min-height: 100vh;
+  padding: 32rpx;
+  background: #f7f8fa;
+  box-sizing: border-box;
+}
+.hero {
+  padding: 20rpx 6rpx 28rpx;
+}
+.title {
+  display: block;
+  color: #2d3436;
+  font-size: 46rpx;
+  font-weight: 800;
+}
+.description {
+  display: block;
+  margin-top: 12rpx;
+  color: #838b92;
+  font-size: 25rpx;
+}
+.list {
+  display: grid;
+  gap: 18rpx;
+}
+.card {
+  padding: 30rpx;
+  background: #fff;
+  border: 1rpx solid #eceef0;
+  border-radius: 24rpx;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.point {
+  color: #3b4348;
+  font-size: 27rpx;
+  font-weight: 700;
+}
+.score {
+  color: #ff7023;
+  font-size: 38rpx;
+  font-weight: 800;
+}
+.track {
+  height: 15rpx;
+  margin-top: 22rpx;
+  overflow: hidden;
+  background: #f0f1f2;
+  border-radius: 999rpx;
+}
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffab70, #ff7023);
+  border-radius: 999rpx;
+}
+.metrics {
+  display: flex;
+  margin-top: 20rpx;
+  justify-content: space-between;
+  color: #858d93;
+  font-size: 21rpx;
+}
+.state {
+  display: grid;
+  min-height: 55vh;
+  color: #92999e;
+  place-items: center;
+}

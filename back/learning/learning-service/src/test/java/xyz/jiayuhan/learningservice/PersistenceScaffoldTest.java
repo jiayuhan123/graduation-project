@@ -3,6 +3,7 @@ package xyz.jiayuhan.learningservice;
 import com.baomidou.mybatisplus.annotation.TableName;
 import org.junit.jupiter.api.Test;
 import xyz.jiayuhan.learningservice.entity.AnswerRecord;
+import xyz.jiayuhan.learningservice.entity.AssignmentSyncEvent;
 import xyz.jiayuhan.learningservice.entity.ErrorRecord;
 import xyz.jiayuhan.learningservice.entity.MasteryChangeLog;
 import xyz.jiayuhan.learningservice.entity.MasteryRecord;
@@ -31,6 +32,7 @@ class PersistenceScaffoldTest {
                 Map.entry(MasteryRecord.class, "mastery_record"),
                 Map.entry(MasteryChangeLog.class, "mastery_change_log"),
                 Map.entry(Recommendation.class, "recommendation"),
+                Map.entry(AssignmentSyncEvent.class, "assignment_sync_event"),
                 Map.entry(PhotoMarkingTask.class, "photo_marking_task"),
                 Map.entry(PhotoMarkingItem.class, "photo_marking_item"),
                 Map.entry(PhotoReviewRecord.class, "photo_review_record"));

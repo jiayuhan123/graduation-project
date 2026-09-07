@@ -41,7 +41,10 @@ Page({
   async dismiss(event: WechatMiniprogram.BaseEvent) {
     const id = String(event.currentTarget.dataset.id ?? '')
     if (!id) return
-    const confirmation = await wx.showModal({ title: '忽略推荐', content: '确定暂时不做这组巩固题吗？' })
+    const confirmation = await wx.showModal({
+      title: '忽略推荐',
+      content: '确定暂时不做这组巩固题吗？',
+    })
     if (!confirmation.confirm) return
     this.setData({ operatingId: id })
     try {

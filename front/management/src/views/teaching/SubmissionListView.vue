@@ -126,7 +126,7 @@ onMounted(load)
             {{ label }}
           </option>
         </select>
-        <span class="muted">练习启动、答题与自动批改将在学习服务接入后更新这里的进度。</span>
+        <span class="muted">学习服务会在练习开始和整份作业提交后同步进度与批改结果。</span>
       </div>
       <div v-if="loading" class="content-loading"><t-loading text="正在加载提交记录" /></div>
       <div v-else-if="isTeacher && submissions.length" class="submission-list">

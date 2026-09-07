@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   Button as TButton,
   Loading as TLoading,
@@ -19,6 +20,7 @@ import {
   publishAssignmentApi,
   updateAssignmentApi,
 } from '@/api/teaching'
+import { createAssignmentTaskApi } from '@/api/learning'
 import ContentEditorPanel from '@/components/ContentEditorPanel.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { useUserStore } from '@/stores/user'
@@ -49,6 +51,7 @@ interface AssignmentForm {
 }
 
 const userStore = useUserStore()
+const router = useRouter()
 const isTeacher = computed(() => userStore.activeRole === 'teacher')
 const loading = ref(true)
 const saving = ref(false)
@@ -308,6 +311,11 @@ async function openDetail(item: AssignmentSummary) {
   detailVisible.value = true
 }
 
+async function startStudentAssignment(item: StudentAssignment) {
+  const practice = await createAssignmentTaskApi(item.assignment.id)
+  await router.push({ path: '/learning/practice', query: { taskId: practice.task.id } })
+}
+
 async function preparePublish(item: AssignmentSummary) {
   publishTarget.value = item
   if (item.assignmentType === 'UNIFIED') {
@@ -493,6 +501,11 @@ onMounted(() => Promise.all([loadAssignments(), loadTeacherData()]))
               >{{ item.submission.status }}</t-tag
             ><t-button size="small" variant="outline" @click="openDetail(item.assignment)"
               >查看题目</t-button
+            ><t-button
+              v-if="item.submission.status !== 'GRADED'"
+              size="small"
+              @click="startStudentAssignment(item)"
+              >{{ item.submission.status === 'IN_PROGRESS' ? '继续作业' : '开始作业' }}</t-button
             >
           </div>
         </article>

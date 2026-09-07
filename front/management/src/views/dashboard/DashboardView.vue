@@ -32,15 +32,42 @@ const roleModules = computed<ModuleCard[]>(() => {
   const modules: Record<string, ModuleCard[]> = {
     student: [
       { title: '学生资料', description: '年级与当前学期', icon: '🎒', path: '/account/student' },
-      { title: '个性练习', description: '学习服务接入后开放', icon: '✎', pending: true },
-      { title: '拍照批改', description: '学习服务接入后开放', icon: '▣', pending: true },
+      {
+        title: '个性练习',
+        description: '固定题库自适应组题',
+        icon: '✎',
+        path: '/learning/practice',
+      },
+      {
+        title: '学习档案',
+        description: '练习、错题与掌握度',
+        icon: '⌁',
+        path: '/learning/records',
+      },
+      {
+        title: '巩固推荐',
+        description: '接受或忽略个性化推荐',
+        icon: '◎',
+        path: '/learning/recommendations',
+      },
+      {
+        title: '拍照批改',
+        description: 'OCR 暂未开放，可查历史',
+        icon: '▣',
+        path: '/learning/photo-reviews',
+      },
       { title: '数学闯关', description: '游戏服务接入后开放', icon: '★', pending: true },
     ],
     teacher: [
       { title: '教师资料', description: '职称与公开简介', icon: '📐', path: '/account/teacher' },
       { title: '班级管理', description: '教学服务接入后开放', icon: '♧', pending: true },
       { title: '作业管理', description: '教学服务接入后开放', icon: '▤', pending: true },
-      { title: '学情反馈', description: '学习服务接入后开放', icon: '⌁', pending: true },
+      {
+        title: '学情反馈',
+        description: '查询本人班级学生学情',
+        icon: '⌁',
+        path: '/learning/records',
+      },
     ],
     admin: [
       {
@@ -63,6 +90,13 @@ const roleModules = computed<ModuleCard[]>(() => {
         icon: '✦',
         path: '/system/permissions',
         permission: 'system:role:manage',
+      },
+      {
+        title: '学生学情',
+        description: '查询全部学生学习档案',
+        icon: '⌁',
+        path: '/learning/records',
+        permission: 'teaching:report:query',
       },
       { title: '内容管理', description: '内容服务接入后开放', icon: '▦', pending: true },
     ],

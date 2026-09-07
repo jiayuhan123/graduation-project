@@ -140,3 +140,22 @@ export interface StudentLearningReport {
 export interface RecommendationQuery extends PageParams {
   status?: string
 }
+
+export interface PhotoTask {
+  id: string
+  originalFileId: string
+  practiceTaskId: string | null
+  status: string
+  pageCount: number
+  overallConfidence: number | null
+  recognizedItemCount: number
+  reviewStatus: string
+  submittedAt: string
+  processedAt: string | null
+  reviewedAt: string | null
+  failureReason: string | null
+}
+
+export interface PhotoTaskQuery extends PageParams {
+  status?: string
+}

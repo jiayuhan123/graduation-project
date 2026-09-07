@@ -19,6 +19,10 @@ interface PracticePreference {
   mode: 'NORMAL' | 'TIMED'
 }
 
+function defaultPracticeMode(): 'NORMAL' | 'TIMED' {
+  return 'NORMAL'
+}
+
 function orderKnowledgePoints(points: KnowledgePoint[]): KnowledgePointCard[] {
   const children = new Map<string | null, KnowledgePoint[]>()
   points.forEach((point) => {
@@ -63,7 +67,7 @@ Page({
     difficultyOptions: [1, 2, 3, 4, 5],
     questionCount: 10,
     questionCountOptions: [5, 10, 15, 20],
-    mode: 'NORMAL' as 'NORMAL' | 'TIMED',
+    mode: defaultPracticeMode(),
     submitting: false,
   },
 

@@ -331,6 +331,41 @@ COMMENT ON COLUMN recommendation.completed_at IS '完成时间';
 COMMENT ON COLUMN recommendation.created_at IS '创建时间';
 COMMENT ON COLUMN recommendation.updated_at IS '更新时间';
 
+CREATE TABLE assignment_sync_event (
+id               BIGINT       CONSTRAINT pk_assignment_sync_event PRIMARY KEY,
+assignment_id    BIGINT       NOT NULL,
+student_id       BIGINT       NOT NULL,
+practice_task_id BIGINT       NOT NULL,
+progress_status  VARCHAR(16)  NOT NULL,
+score            NUMERIC(8,2),
+correct_count    INTEGER,
+total_count      INTEGER,
+started_at       TIMESTAMPTZ,
+submitted_at     TIMESTAMPTZ,
+graded_at        TIMESTAMPTZ,
+delivery_status  VARCHAR(16)  NOT NULL DEFAULT 'PENDING',
+retry_count      INTEGER      NOT NULL DEFAULT 0,
+next_retry_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+synced_at        TIMESTAMPTZ,
+last_error       VARCHAR(1000),
+created_at       TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+updated_at       TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT uk_assignment_sync_event_progress
+UNIQUE (practice_task_id, progress_status),
+CONSTRAINT ck_assignment_sync_event_progress
+CHECK (progress_status IN ('IN_PROGRESS', 'GRADED')),
+CONSTRAINT ck_assignment_sync_event_delivery
+CHECK (delivery_status IN ('PENDING', 'SENT')),
+CONSTRAINT ck_assignment_sync_event_retry CHECK (retry_count >= 0)
+);
+CREATE INDEX idx_assignment_sync_event_pending
+ON assignment_sync_event (next_retry_at, created_at, id)
+WHERE delivery_status = 'PENDING';
+CREATE INDEX idx_assignment_sync_event_sent
+ON assignment_sync_event (synced_at)
+WHERE delivery_status = 'SENT';
+COMMENT ON TABLE assignment_sync_event IS '学习服务回写教学作业进度的事务发件箱';
+
 CREATE TABLE photo_marking_task (
 id                    BIGINT        CONSTRAINT pk_photo_marking_task PRIMARY KEY,
 student_id            BIGINT        NOT NULL,

@@ -13,6 +13,7 @@ import xyz.jiayuhan.userapi.model.response.UserPermissionResponse;
 import xyz.jiayuhan.userapi.model.response.UserSummaryResponse;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /** 使用用户角色和真实师生关系约束跨学生学情访问。 */
 @Service
@@ -28,18 +29,16 @@ public class LearningReportServiceImpl implements LearningReportService {
     @Override
     public LearningView.StudentReport getOwnReport(Long userId) {
         UserSummaryResponse user = requireRemoteData(
-                userFeignClient.getUserSummary(userId), "暂时无法读取当前用户资料");
+                () -> userFeignClient.getUserSummary(userId), "暂时无法读取当前用户资料");
+        requireActiveStudent(user);
         return buildReport(user);
     }
 
     @Override
     public LearningView.StudentReport getStudentReport(Long requesterId, Long studentId) {
         UserSummaryResponse student = requireRemoteData(
-                userFeignClient.getUserSummary(studentId), "暂时无法读取学生资料");
-        if (student.roles() == null || !student.roles().contains("student")
-                || !Integer.valueOf(1).equals(student.status())) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND, "学生账号不存在或不可用");
-        }
+                () -> userFeignClient.getUserSummary(studentId), "暂时无法读取学生资料");
+        requireActiveStudent(student);
         if (!requesterId.equals(studentId)) {
             authorizeCrossStudentAccess(requesterId, studentId);
         }
@@ -48,9 +47,9 @@ public class LearningReportServiceImpl implements LearningReportService {
 
     private void authorizeCrossStudentAccess(Long requesterId, Long studentId) {
         UserSummaryResponse requester = requireRemoteData(
-                userFeignClient.getUserSummary(requesterId), "暂时无法读取当前用户资料");
+                () -> userFeignClient.getUserSummary(requesterId), "暂时无法读取当前用户资料");
         UserPermissionResponse permission = requireRemoteData(
-                userFeignClient.authorizeUser(requesterId, REPORT_PERMISSION),
+                () -> userFeignClient.authorizeUser(requesterId, REPORT_PERMISSION),
                 "暂时无法校验学情查询权限");
         if (!permission.exists() || !permission.active() || !permission.granted()) {
             throw new BusinessException(ResultCode.LEARNING_REPORT_FORBIDDEN);
@@ -59,7 +58,7 @@ public class LearningReportServiceImpl implements LearningReportService {
             return;
         }
         StudentAccessResponse access = requireRemoteData(
-                teachingFeignClient.canViewStudent(requesterId, studentId),
+                () -> teachingFeignClient.canViewStudent(requesterId, studentId),
                 "暂时无法校验师生关系");
         if (!access.accessible()) {
             throw new BusinessException(ResultCode.LEARNING_REPORT_FORBIDDEN);
@@ -92,7 +91,20 @@ public class LearningReportServiceImpl implements LearningReportService {
         return user.username();
     }
 
-    private <T> T requireRemoteData(Result<T> result, String message) {
+    private void requireActiveStudent(UserSummaryResponse user) {
+        if (user.roles() == null || !user.roles().contains("student")
+                || !Integer.valueOf(1).equals(user.status())) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND, "学生账号不存在或不可用");
+        }
+    }
+
+    private <T> T requireRemoteData(Supplier<Result<T>> request, String message) {
+        Result<T> result;
+        try {
+            result = request.get();
+        } catch (RuntimeException exception) {
+            throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, message);
+        }
         if (result == null || !Integer.valueOf(200).equals(result.getCode())
                 || result.getData() == null) {
             throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, message);

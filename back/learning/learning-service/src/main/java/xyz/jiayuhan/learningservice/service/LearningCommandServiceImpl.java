@@ -2,6 +2,7 @@ package xyz.jiayuhan.learningservice.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import xyz.jiayuhan.learningservice.entity.PracticeTask;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskKnowledgePoint;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskQuestion;
 import xyz.jiayuhan.learningservice.entity.Recommendation;
+import xyz.jiayuhan.learningservice.event.AssignmentProgressOutboxService;
 import xyz.jiayuhan.learningservice.mapper.AnswerRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.ErrorRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.MasteryChangeLogMapper;
@@ -35,7 +37,6 @@ import xyz.jiayuhan.learningservice.model.request.SubmitAnswerRequest;
 import xyz.jiayuhan.learningservice.model.response.LearningView;
 import xyz.jiayuhan.learningservice.support.AnswerGrader;
 import xyz.jiayuhan.teachingapi.client.TeachingFeignClient;
-import xyz.jiayuhan.teachingapi.model.request.AssignmentProgressRequest;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentLearningResponse;
 import xyz.jiayuhan.userapi.client.UserFeignClient;
 import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
@@ -52,6 +53,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /** 固定题库上的自适应组题、可信判题及学习信号更新。 */
 @Service
@@ -81,6 +83,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     private final TeachingFeignClient teachingFeignClient;
     private final UserFeignClient userFeignClient;
     private final LearningQueryService learningQueryService;
+    private final AssignmentProgressOutboxService assignmentProgressOutboxService;
     private final ObjectMapper objectMapper;
     private final AnswerGrader answerGrader;
 
@@ -90,7 +93,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
             Long studentId, CreatePracticeTaskRequest request) {
         requireActiveStudent(studentId);
         KnowledgePointResponse knowledgePoint = requireRemoteData(
-                contentFeignClient.getKnowledgePoint(request.knowledgePointId()),
+                () -> contentFeignClient.getKnowledgePoint(request.knowledgePointId()),
                 "暂时无法读取知识点");
         if (!Integer.valueOf(1).equals(knowledgePoint.status())) {
             throw new BusinessException(ResultCode.KNOWLEDGE_POINT_NOT_FOUND);
@@ -122,7 +125,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         }
 
         AssignmentLearningResponse assignment = requireRemoteData(
-                teachingFeignClient.getStudentAssignment(assignmentId, studentId),
+                () -> teachingFeignClient.getStudentAssignment(assignmentId, studentId),
                 "暂时无法读取教师作业");
         OffsetDateTime now = now();
         if (!"PUBLISHED".equals(assignment.assignmentStatus())) {
@@ -159,7 +162,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public LearningView.PracticeDetail startPractice(Long studentId, Long taskId) {
-        PracticeTask task = requireTask(taskId, studentId);
+        PracticeTask task = requireTaskForUpdate(taskId, studentId);
         startTaskIfNecessary(task);
         return learningQueryService.getPracticeTask(studentId, taskId);
     }
@@ -171,7 +174,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
             Long taskId,
             Long taskQuestionId,
             SubmitAnswerRequest request) {
-        PracticeTask task = requireTask(taskId, studentId);
+        PracticeTask task = requireTaskForUpdate(taskId, studentId);
         startTaskIfNecessary(task);
         requireAnswerable(task);
         PracticeTaskQuestion taskQuestion = taskQuestionMapper.selectOne(
@@ -204,7 +207,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public LearningView.PracticeDetail completePractice(Long studentId, Long taskId) {
-        PracticeTask task = requireTask(taskId, studentId);
+        PracticeTask task = requireTaskForUpdate(taskId, studentId);
         startTaskIfNecessary(task);
         if (COMPLETED.equals(task.getStatus())) {
             return learningQueryService.getPracticeTask(studentId, taskId);
@@ -246,7 +249,8 @@ public class LearningCommandServiceImpl implements LearningCommandService {
             BigDecimal score = latestAnswers.stream()
                     .map(AnswerRecord::getScore)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            syncAssignment(task, "GRADED", score, correctCount, questions.size(), completedAt);
+            assignmentProgressOutboxService.append(
+                    task, "GRADED", score, correctCount, questions.size(), completedAt);
         }
         return learningQueryService.getPracticeTask(studentId, taskId);
     }
@@ -256,11 +260,17 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     public LearningView.PracticeDetail acceptRecommendation(
             Long studentId, Long recommendationId) {
         Recommendation recommendation = requireRecommendation(studentId, recommendationId);
+        if (("ACCEPTED".equals(recommendation.getStatus())
+                || COMPLETED.equals(recommendation.getStatus()))
+                && recommendation.getGeneratedTaskId() != null) {
+            return learningQueryService.getPracticeTask(
+                    studentId, recommendation.getGeneratedTaskId());
+        }
         if (!PENDING.equals(recommendation.getStatus())) {
             throw new BusinessException(ResultCode.PRACTICE_TASK_STATE_INVALID, "推荐已经处理");
         }
         KnowledgePointResponse point = requireRemoteData(
-                contentFeignClient.getKnowledgePoint(recommendation.getKnowledgePointId()),
+                () -> contentFeignClient.getKnowledgePoint(recommendation.getKnowledgePointId()),
                 "暂时无法读取推荐知识点");
         List<QuestionResponse> selected = selectQuestions(
                 studentId, point.id(), null, recommendation.getRecommendedQuestionCount());
@@ -269,10 +279,15 @@ public class LearningCommandServiceImpl implements LearningCommandService {
                 point.name() + "巩固练习", "REVIEW", null,
                 new BigDecimal("0.8000"), recommendation.getExpiresAt(), List.of(point.id()),
                 selected.stream().map(question -> new PreparedQuestion(question, BigDecimal.ONE)).toList());
-        recommendation.setStatus("ACCEPTED");
-        recommendation.setGeneratedTaskId(task.getId());
-        recommendation.setAcceptedAt(now());
-        recommendationMapper.updateById(recommendation);
+        OffsetDateTime acceptedAt = now();
+        assertUpdated(recommendationMapper.update(null, new LambdaUpdateWrapper<Recommendation>()
+                .eq(Recommendation::getId, recommendationId)
+                .eq(Recommendation::getStudentId, studentId)
+                .eq(Recommendation::getStatus, PENDING)
+                .set(Recommendation::getStatus, "ACCEPTED")
+                .set(Recommendation::getGeneratedTaskId, task.getId())
+                .set(Recommendation::getAcceptedAt, acceptedAt)
+                .set(Recommendation::getUpdatedAt, acceptedAt)));
         return learningQueryService.getPracticeTask(studentId, task.getId());
     }
 
@@ -280,11 +295,19 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     @Transactional(rollbackFor = Exception.class)
     public void dismissRecommendation(Long studentId, Long recommendationId) {
         Recommendation recommendation = requireRecommendation(studentId, recommendationId);
+        if ("DISMISSED".equals(recommendation.getStatus())) {
+            return;
+        }
         if (!PENDING.equals(recommendation.getStatus())) {
             throw new BusinessException(ResultCode.PRACTICE_TASK_STATE_INVALID, "推荐已经处理");
         }
-        recommendation.setStatus("DISMISSED");
-        recommendationMapper.updateById(recommendation);
+        OffsetDateTime dismissedAt = now();
+        assertUpdated(recommendationMapper.update(null, new LambdaUpdateWrapper<Recommendation>()
+                .eq(Recommendation::getId, recommendationId)
+                .eq(Recommendation::getStudentId, studentId)
+                .eq(Recommendation::getStatus, PENDING)
+                .set(Recommendation::getStatus, "DISMISSED")
+                .set(Recommendation::getUpdatedAt, dismissedAt)));
     }
 
     private List<QuestionResponse> selectQuestions(
@@ -292,17 +315,21 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         Map<Long, QuestionResponse> candidates = new LinkedHashMap<>();
         if (difficulty != null) {
             PageResult<QuestionResponse> exact = requireRemoteData(
-                    contentFeignClient.pageQuestions(
+                    () -> contentFeignClient.pageQuestions(
                             1, 100, null, knowledgePointId, null, difficulty),
                     "暂时无法读取题库");
-            exact.records().forEach(question -> candidates.put(question.id(), question));
+            exact.records().stream()
+                    .filter(this::isFixedQuestion)
+                    .forEach(question -> candidates.put(question.id(), question));
         }
         if (candidates.size() < requestedCount) {
             PageResult<QuestionResponse> fallback = requireRemoteData(
-                    contentFeignClient.pageQuestions(
+                    () -> contentFeignClient.pageQuestions(
                             1, 100, null, knowledgePointId, null, null),
                     "暂时无法读取题库");
-            fallback.records().forEach(question -> candidates.putIfAbsent(question.id(), question));
+            fallback.records().stream()
+                    .filter(this::isFixedQuestion)
+                    .forEach(question -> candidates.putIfAbsent(question.id(), question));
         }
         if (candidates.isEmpty()) {
             throw new BusinessException(ResultCode.PRACTICE_QUESTION_POOL_EMPTY);
@@ -379,7 +406,21 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         task.setTargetAccuracy(targetAccuracy);
         task.setExpiresAt(expiresAt);
         task.setVersion(0);
-        practiceTaskMapper.insert(task);
+        if (ASSIGNMENT.equals(sourceType)) {
+            OffsetDateTime createdAt = now();
+            task.setId(IdWorker.getId());
+            task.setCreatedAt(createdAt);
+            task.setUpdatedAt(createdAt);
+            if (practiceTaskMapper.insertAssignmentIfAbsent(task) == 0) {
+                PracticeTask existing = findSourceTask(studentId, sourceType, sourceId);
+                if (existing == null) {
+                    throw new BusinessException(ResultCode.CONFLICT, "作业练习正在创建，请稍后重试");
+                }
+                return existing;
+            }
+        } else {
+            practiceTaskMapper.insert(task);
+        }
 
         for (Long knowledgePointId : knowledgePointIds.stream().distinct().toList()) {
             PracticeTaskKnowledgePoint relation = new PracticeTaskKnowledgePoint();
@@ -416,7 +457,8 @@ public class LearningCommandServiceImpl implements LearningCommandService {
             task.setStartedAt(startedAt);
             assertUpdated(practiceTaskMapper.updateById(task));
             if (ASSIGNMENT.equals(task.getSourceType())) {
-                syncAssignment(task, IN_PROGRESS, null, null, task.getQuestionCount(), null);
+                assignmentProgressOutboxService.append(
+                        task, IN_PROGRESS, null, null, task.getQuestionCount(), null);
             }
             return;
         }
@@ -462,7 +504,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         answer.setStudentAnswer(answerJson(answerValue));
         answer.setResponseMs(responseMs);
         answer.setSubmittedAt(now());
-        answerRecordMapper.updateById(answer);
+        assertUpdated(answerRecordMapper.updateById(answer));
         return answer;
     }
 
@@ -514,6 +556,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     }
 
     private MasteryRecord updateMastery(Long studentId, Long knowledgePointId, AnswerRecord answer) {
+        masteryRecordMapper.acquireUpdateLock(studentId, knowledgePointId);
         MasteryRecord mastery = masteryRecordMapper.selectOne(new LambdaQueryWrapper<MasteryRecord>()
                 .eq(MasteryRecord::getStudentId, studentId)
                 .eq(MasteryRecord::getKnowledgePointId, knowledgePointId));
@@ -658,26 +701,18 @@ public class LearningCommandServiceImpl implements LearningCommandService {
                 .set(Recommendation::getUpdatedAt, completedAt));
     }
 
-    private void syncAssignment(
-            PracticeTask task,
-            String status,
-            BigDecimal score,
-            Integer correctCount,
-            Integer totalCount,
-            OffsetDateTime completedAt) {
-        Long assignmentId = Long.valueOf(task.getSourceId());
-        AssignmentProgressRequest request = new AssignmentProgressRequest(
-                task.getId(), status, score, correctCount, totalCount,
-                task.getStartedAt(), completedAt, completedAt);
-        Result<Void> result = teachingFeignClient.syncAssignmentProgress(
-                assignmentId, task.getStudentId(), request);
-        requireRemoteSuccess(result, "暂时无法同步教师作业进度");
-    }
-
     private PracticeTask requireTask(Long taskId, Long studentId) {
         PracticeTask task = practiceTaskMapper.selectOne(new LambdaQueryWrapper<PracticeTask>()
                 .eq(PracticeTask::getId, taskId)
                 .eq(PracticeTask::getStudentId, studentId));
+        if (task == null) {
+            throw new BusinessException(ResultCode.PRACTICE_TASK_NOT_FOUND);
+        }
+        return task;
+    }
+
+    private PracticeTask requireTaskForUpdate(Long taskId, Long studentId) {
+        PracticeTask task = practiceTaskMapper.selectForUpdate(taskId, studentId);
         if (task == null) {
             throw new BusinessException(ResultCode.PRACTICE_TASK_NOT_FOUND);
         }
@@ -731,7 +766,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
             return snapshot;
         }
         QuestionResponse latest = requireRemoteData(
-                contentFeignClient.getQuestion(snapshot.id()), "暂时无法补全题目知识点");
+                () -> contentFeignClient.getQuestion(snapshot.id()), "暂时无法补全题目知识点");
         return new QuestionResponse(
                 snapshot.id(), snapshot.code(), snapshot.questionMode(), snapshot.questionType(),
                 snapshot.stem(), snapshot.options(), snapshot.standardAnswer(), snapshot.analysis(),
@@ -757,13 +792,19 @@ public class LearningCommandServiceImpl implements LearningCommandService {
 
     private void requireActiveStudent(Long studentId) {
         UserValidationResponse validation = requireRemoteData(
-                userFeignClient.validateUser(studentId, "student"), "暂时无法校验学生身份");
+                () -> userFeignClient.validateUser(studentId, "student"), "暂时无法校验学生身份");
         if (!validation.exists() || !validation.active() || !validation.roleMatched()) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
     }
 
-    private <T> T requireRemoteData(Result<T> result, String message) {
+    private <T> T requireRemoteData(Supplier<Result<T>> request, String message) {
+        Result<T> result;
+        try {
+            result = request.get();
+        } catch (RuntimeException exception) {
+            throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, message);
+        }
         if (result == null || !Integer.valueOf(200).equals(result.getCode())
                 || result.getData() == null) {
             throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, message);
@@ -771,10 +812,12 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         return result.getData();
     }
 
-    private void requireRemoteSuccess(Result<?> result, String message) {
-        if (result == null || !Integer.valueOf(200).equals(result.getCode())) {
-            throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, message);
-        }
+    private boolean isFixedQuestion(QuestionResponse question) {
+        return question != null
+                && "FIXED".equals(question.questionMode())
+                && "ENABLED".equals(question.status())
+                && question.standardAnswer() != null
+                && !question.standardAnswer().isBlank();
     }
 
     private void assertUpdated(int affectedRows) {

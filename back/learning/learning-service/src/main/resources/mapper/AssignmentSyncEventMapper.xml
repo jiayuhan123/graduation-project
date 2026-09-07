@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.jiayuhan.learningservice.mapper.AssignmentSyncEventMapper">
+    <select id="selectPendingBatchForUpdate"
+            resultType="xyz.jiayuhan.learningservice.entity.AssignmentSyncEvent">
+        SELECT event.id,
+               event.assignment_id,
+               event.student_id,
+               event.practice_task_id,
+               event.progress_status,
+               event.score,
+               event.correct_count,
+               event.total_count,
+               event.started_at,
+               event.submitted_at,
+               event.graded_at,
+               event.delivery_status,
+               event.retry_count,
+               event.next_retry_at,
+               event.synced_at,
+               event.last_error,
+               event.created_at,
+               event.updated_at
+        FROM assignment_sync_event event
+        WHERE event.delivery_status = 'PENDING'
+          AND event.next_retry_at &lt;= CURRENT_TIMESTAMP
+          AND NOT EXISTS (
+              SELECT 1
+              FROM assignment_sync_event earlier
+              WHERE earlier.practice_task_id = event.practice_task_id
+                AND earlier.delivery_status = 'PENDING'
+                AND (
+                    earlier.created_at &lt; event.created_at
+                    OR (earlier.created_at = event.created_at AND earlier.id &lt; event.id)
+                )
+          )
+        ORDER BY event.created_at, event.id
+        LIMIT #{limit}
+        FOR UPDATE OF event SKIP LOCKED
+    </select>
+
+    <delete id="deleteSentBefore">
+        DELETE FROM assignment_sync_event
+        WHERE delivery_status = 'SENT'
+          AND synced_at &lt; #{cutoff}
+    </delete>
+</mapper>

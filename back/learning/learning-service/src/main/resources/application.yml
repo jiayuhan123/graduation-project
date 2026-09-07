@@ -27,6 +27,10 @@ app:
     version: 1.0.0
   mq:
     confirm-timeout: ${MQ_CONFIRM_TIMEOUT:5s}
+  assignment-sync:
+    fixed-delay-ms: ${ASSIGNMENT_SYNC_FIXED_DELAY_MS:3000}
+    batch-size: ${ASSIGNMENT_SYNC_BATCH_SIZE:50}
+    retention-days: ${ASSIGNMENT_SYNC_RETENTION_DAYS:7}
 
 springdoc:
   api-docs:

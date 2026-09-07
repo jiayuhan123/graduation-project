@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   Button as TButton,
   Loading as TLoading,
@@ -19,6 +20,7 @@ import type { ContentModule, KnowledgePoint } from '@/types/content'
 import type { AnswerFeedback, PracticeDetail, PracticeQuestion } from '@/types/learning'
 
 const loading = ref(true)
+const route = useRoute()
 const creating = ref(false)
 const submitting = ref(false)
 const completing = ref(false)
@@ -92,7 +94,8 @@ async function createPractice() {
       difficulty: difficulty.value,
       questionCount: questionCount.value,
       mode: mode.value,
-      timeLimitSeconds: mode.value === 'TIMED' ? Math.max(300, questionCount.value * 60) : undefined,
+      timeLimitSeconds:
+        mode.value === 'TIMED' ? Math.max(300, questionCount.value * 60) : undefined,
       targetAccuracy: 0.8,
     })
     detail.value = await startPracticeTaskApi(created.task.id)
@@ -157,7 +160,19 @@ async function completePractice() {
   }
 }
 
-onMounted(loadCatalog)
+onMounted(async () => {
+  const taskId = typeof route.query.taskId === 'string' ? route.query.taskId : ''
+  if (!taskId) {
+    await loadCatalog()
+    return
+  }
+  try {
+    detail.value = await startPracticeTaskApi(taskId)
+    switchQuestion(detail.value.questions.findIndex((item) => !item.latestAnswer))
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
@@ -173,31 +188,87 @@ onMounted(loadCatalog)
     </div>
 
     <section v-else-if="!detail" class="practice-setup surface-card">
-      <label><span>教材模块</span><select v-model="moduleId" @change="loadKnowledgePoints"><option v-for="item in modules" :key="item.id" :value="item.id">{{ item.name }}</option></select></label>
-      <label><span>知识点</span><select v-model="knowledgePointId"><option v-for="item in knowledgePoints" :key="item.id" :value="item.id">{{ item.name }}</option></select></label>
-      <label><span>难度</span><select v-model="difficulty"><option v-for="item in 5" :key="item" :value="item">难度 {{ item }}</option></select></label>
-      <label><span>题量</span><select v-model="questionCount"><option v-for="item in [5, 10, 15, 20]" :key="item" :value="item">{{ item }} 题</option></select></label>
-      <label><span>模式</span><select v-model="mode"><option value="NORMAL">普通练习</option><option value="TIMED">限时练习</option></select></label>
-      <t-button :loading="creating" :disabled="!knowledgePointId" @click="createPractice">开始练习</t-button>
+      <label
+        ><span>教材模块</span
+        ><select v-model="moduleId" @change="loadKnowledgePoints">
+          <option v-for="item in modules" :key="item.id" :value="item.id">{{ item.name }}</option>
+        </select></label
+      >
+      <label
+        ><span>知识点</span
+        ><select v-model="knowledgePointId">
+          <option v-for="item in knowledgePoints" :key="item.id" :value="item.id">
+            {{ item.name }}
+          </option>
+        </select></label
+      >
+      <label
+        ><span>难度</span
+        ><select v-model="difficulty">
+          <option v-for="item in 5" :key="item" :value="item">难度 {{ item }}</option>
+        </select></label
+      >
+      <label
+        ><span>题量</span
+        ><select v-model="questionCount">
+          <option v-for="item in [5, 10, 15, 20]" :key="item" :value="item">{{ item }} 题</option>
+        </select></label
+      >
+      <label
+        ><span>模式</span
+        ><select v-model="mode">
+          <option value="NORMAL">普通练习</option>
+          <option value="TIMED">限时练习</option>
+        </select></label
+      >
+      <t-button
+        class="practice-action"
+        :loading="creating"
+        :disabled="!knowledgePointId"
+        @click="createPractice"
+        >开始练习</t-button
+      >
     </section>
 
     <template v-else-if="currentQuestion">
       <section class="session-heading surface-card">
-        <div><strong>{{ detail.task.title }}</strong><span>{{ detail.task.mode === 'TIMED' ? '限时练习' : '普通练习' }} · 难度 {{ currentQuestion.difficulty }}</span></div>
+        <div>
+          <strong>{{ detail.task.title }}</strong
+          ><span
+            >{{ detail.task.mode === 'TIMED' ? '限时练习' : '普通练习' }} · 难度
+            {{ currentQuestion.difficulty }}</span
+          >
+        </div>
         <t-tag theme="primary" variant="light">{{ progress }}</t-tag>
       </section>
       <section class="question-card surface-card">
         <span class="question-number">第 {{ currentQuestion.sequenceNo }} 题</span>
         <h2>{{ currentQuestion.stem }}</h2>
         <pre v-if="currentQuestion.options" class="options">{{ currentQuestion.options }}</pre>
-        <input v-model="answer" :disabled="isCompleted" maxlength="200" placeholder="请输入答案" @keyup.enter="submitAnswer" />
+        <input
+          v-model="answer"
+          :disabled="isCompleted"
+          maxlength="200"
+          placeholder="请输入答案"
+          @keyup.enter="submitAnswer"
+        />
 
-        <div v-if="feedback?.solutionVisible" class="feedback" :class="feedback.answer.correct ? 'feedback--correct' : 'feedback--wrong'">
+        <div
+          v-if="feedback?.solutionVisible"
+          class="feedback"
+          :class="feedback.answer.correct ? 'feedback--correct' : 'feedback--wrong'"
+        >
           <strong>{{ feedback.answer.correct ? '回答正确' : '再检查一下' }}</strong>
-          <span v-if="!feedback.answer.correct">标准答案：{{ jsonValue(feedback.standardAnswer) }}</span>
+          <span v-if="!feedback.answer.correct"
+            >标准答案：{{ jsonValue(feedback.standardAnswer) }}</span
+          >
           <span v-if="feedback.analysis">解析：{{ feedback.analysis }}</span>
         </div>
-        <div v-else-if="isCompleted && currentQuestion.solutionVisible" class="feedback" :class="currentQuestion.latestAnswer?.correct ? 'feedback--correct' : 'feedback--wrong'">
+        <div
+          v-else-if="isCompleted && currentQuestion.solutionVisible"
+          class="feedback"
+          :class="currentQuestion.latestAnswer?.correct ? 'feedback--correct' : 'feedback--wrong'"
+        >
           <strong>{{ currentQuestion.latestAnswer?.correct ? '回答正确' : '回答错误' }}</strong>
           <span>你的答案：{{ jsonValue(currentQuestion.latestAnswer?.studentAnswer) }}</span>
           <span>标准答案：{{ jsonValue(currentQuestion.standardAnswer) }}</span>
@@ -206,13 +277,31 @@ onMounted(loadCatalog)
 
         <div v-if="!isCompleted" class="question-actions">
           <t-button v-if="!feedback" :loading="submitting" @click="submitAnswer">提交答案</t-button>
-          <t-button v-else-if="!feedback.answer.correct" variant="outline" @click="retryQuestion">再答一次</t-button>
+          <t-button v-else-if="!feedback.answer.correct" variant="outline" @click="retryQuestion"
+            >再答一次</t-button
+          >
         </div>
       </section>
       <div class="session-navigation">
-        <t-button variant="outline" :disabled="currentIndex === 0" @click="switchQuestion(currentIndex - 1)">上一题</t-button>
-        <t-button v-if="currentIndex < detail.questions.length - 1" variant="outline" @click="switchQuestion(currentIndex + 1)">下一题</t-button>
-        <t-button v-else-if="!isCompleted" theme="default" :loading="completing" @click="completePractice">完成练习</t-button>
+        <t-button
+          variant="outline"
+          :disabled="currentIndex === 0"
+          @click="switchQuestion(currentIndex - 1)"
+          >上一题</t-button
+        >
+        <t-button
+          v-if="currentIndex < detail.questions.length - 1"
+          variant="outline"
+          @click="switchQuestion(currentIndex + 1)"
+          >下一题</t-button
+        >
+        <t-button
+          v-else-if="!isCompleted"
+          theme="default"
+          :loading="completing"
+          @click="completePractice"
+          >完成练习</t-button
+        >
         <t-button v-else variant="outline" @click="detail = null">再来一组</t-button>
       </div>
     </template>
@@ -220,25 +309,137 @@ onMounted(loadCatalog)
 </template>
 
 <style scoped lang="scss">
-.loading-card { display: grid; min-height: 280px; place-items: center; }
-.practice-setup { display: grid; padding: 28px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.practice-setup label { display: grid; gap: 8px; }
-.practice-setup label span { color: var(--app-text-muted); font-size: 12px; font-weight: 700; }
-.practice-setup select, .question-card input { min-height: 44px; padding: 9px 12px; background: #fff; border: 1px solid #dfe3e7; border-radius: 11px; color: var(--app-text-strong); font: inherit; }
-.practice-setup :deep(.t-button) { align-self: end; }
-.session-heading { display: flex; padding: 22px 26px; align-items: center; justify-content: space-between; }
-.session-heading strong, .session-heading span { display: block; }
-.session-heading strong { color: var(--app-text-strong); font-size: 20px; }
-.session-heading span { margin-top: 5px; color: var(--app-text-muted); font-size: 12px; }
-.question-card { margin-top: 18px; padding: clamp(26px, 5vw, 48px); }
-.question-number { color: var(--app-primary); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
-.question-card h2 { margin-top: 18px; color: var(--app-text-strong); font-size: clamp(22px, 3vw, 32px); line-height: 1.6; }
-.options { margin-top: 18px; padding: 16px; background: #f7f8fa; border-radius: 12px; color: var(--app-text); font: inherit; line-height: 1.6; white-space: pre-wrap; }
-.question-card input { width: 100%; margin-top: 28px; font-size: 18px; }
-.feedback { display: grid; margin-top: 20px; padding: 18px; border-radius: 14px; gap: 6px; line-height: 1.6; }
-.feedback--correct { background: #eaf8ef; color: #247c44; }
-.feedback--wrong { background: #fff0e9; color: #a74b24; }
-.question-actions { margin-top: 20px; }
-.session-navigation { display: flex; margin-top: 18px; justify-content: space-between; gap: 12px; }
-@media (width <= 640px) { .practice-setup { grid-template-columns: 1fr; } }
+.loading-card {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+}
+
+.practice-setup {
+  display: grid;
+  padding: 28px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.practice-setup label {
+  display: grid;
+  gap: 8px;
+}
+
+.practice-setup label span {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.practice-setup select,
+.question-card input {
+  min-height: 44px;
+  padding: 9px 12px;
+  background: #fff;
+  border: 1px solid #dfe3e7;
+  border-radius: 11px;
+  color: var(--app-text-strong);
+  font: inherit;
+}
+
+.practice-action {
+  align-self: end;
+}
+
+.session-heading {
+  display: flex;
+  padding: 22px 26px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.session-heading strong,
+.session-heading span {
+  display: block;
+}
+
+.session-heading strong {
+  color: var(--app-text-strong);
+  font-size: 20px;
+}
+
+.session-heading span {
+  margin-top: 5px;
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.question-card {
+  margin-top: 18px;
+  padding: clamp(26px, 5vw, 48px);
+}
+
+.question-number {
+  color: var(--app-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.question-card h2 {
+  margin-top: 18px;
+  color: var(--app-text-strong);
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.6;
+}
+
+.options {
+  margin-top: 18px;
+  padding: 16px;
+  background: #f7f8fa;
+  border-radius: 12px;
+  color: var(--app-text);
+  font: inherit;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.question-card input {
+  width: 100%;
+  margin-top: 28px;
+  font-size: 18px;
+}
+
+.feedback {
+  display: grid;
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 14px;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.feedback--correct {
+  background: #eaf8ef;
+  color: #247c44;
+}
+
+.feedback--wrong {
+  background: #fff0e9;
+  color: #a74b24;
+}
+
+.question-actions {
+  margin-top: 20px;
+}
+
+.session-navigation {
+  display: flex;
+  margin-top: 18px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (width <= 640px) {
+  .practice-setup {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

@@ -15,7 +15,7 @@
 | `content/content-api` | - | 题目、知识点内部查询契约与 OpenFeign 客户端 |
 | `content/content-service` | 8005 | 内容模块、知识点、题目和错因字典的管理、审核、查询与可靠审计 |
 | `learning/learning-api` | - | 练习任务内部查询契约与 OpenFeign 客户端 |
-| `learning/learning-service` | 8006 | 练习、作答、诊断、掌握度、推荐和拍照批改的持久层及查询接口 |
+| `learning/learning-service` | 8006 | 固定题库练习、作答、诊断、掌握度、推荐、学习报告及作业进度可靠回写 |
 | `teaching/teaching-api` | - | 作业内部查询契约与 OpenFeign 客户端 |
 | `teaching/teaching-service` | 8007 | 班级成员、统一/分层作业、发布快照、提交汇总与可靠审计 |
 | `game/game-api` | - | 游戏对局内部查询契约与 OpenFeign 客户端 |
@@ -36,7 +36,8 @@ user-service 业务事务 -> sys_outbox_event -> RabbitMQ topic exchange
 
 其他业务服务 -> UserFeignClient -> Nacos + LoadBalancer -> user-service /internal/users/**
 
-teaching-service / game-service -> learning-service -> content-service / file-service
+learning-service -> content-service / teaching-service / user-service
+teaching-service / game-service -> learning-service
 ```
 
 网关校验 `satoken` 后删除外部伪造的身份头，再向下游写入 `X-User-ID`。同时建立 `X-Trace-ID`；Servlet 服务会把它写入响应头和日志 MDC。业务服务不得直接暴露到公网。
@@ -85,7 +86,7 @@ docker compose up -d postgres redis nacos rabbitmq
 
 Compose 只在 PostgreSQL 空数据目录首次初始化时创建 `user_db`、`content_db`、`learning_db`、`teaching_db`、`game_db`、`file_db`、`notification_db` 和 `audit_db`。已有数据目录需由管理员补建数据库。
 
-推荐启动顺序：基础设施 -> `user-service` / `content-service` / `file-service` -> `learning-service` -> `teaching-service` / `game-service` / `notification-service` / `audit-service` -> `gateway`。文件服务还必须配置已创建的阿里云 OSS 私有 Bucket：
+推荐启动顺序：基础设施 -> `user-service` / `content-service` / `file-service` -> `teaching-service` / `notification-service` / `audit-service` -> `learning-service` -> `game-service` -> `gateway`。学习服务创建教师作业练习时需要查询教学服务，并通过本地事务发件箱重试回写作业进度。文件服务还必须配置已创建的阿里云 OSS 私有 Bucket：
 
 ```powershell
 $env:OSS_REGION="cn-hangzhou"

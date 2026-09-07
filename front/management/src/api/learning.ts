@@ -4,6 +4,8 @@ import type {
   AnswerFeedback,
   CreatePracticeTaskInput,
   PracticeDetail,
+  PhotoTask,
+  PhotoTaskQuery,
   RecommendationItem,
   RecommendationQuery,
   StudentLearningReport,
@@ -17,6 +19,12 @@ export const createPracticeTaskApi = (data: CreatePracticeTaskInput) =>
 export const startPracticeTaskApi = (taskId: string) =>
   request<PracticeDetail>({
     url: `${LEARNING_URL}/practice-tasks/${taskId}/start`,
+    method: 'POST',
+  })
+
+export const createAssignmentTaskApi = (assignmentId: string) =>
+  request<PracticeDetail>({
+    url: `${LEARNING_URL}/assignment-tasks/${assignmentId}`,
     method: 'POST',
   })
 
@@ -63,4 +71,11 @@ export const dismissRecommendationApi = (recommendationId: string) =>
   request<void>({
     url: `${LEARNING_URL}/recommendations/${recommendationId}`,
     method: 'DELETE',
+  })
+
+export const pagePhotoTasksApi = (params: PhotoTaskQuery = {}) =>
+  request<PageResult<PhotoTask>>({
+    url: `${LEARNING_URL}/photo-marking`,
+    method: 'GET',
+    params,
   })
