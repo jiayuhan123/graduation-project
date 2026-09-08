@@ -17,13 +17,22 @@ public class GameSessionMember extends AuditableEntity {
     private Long sessionId;
     private Long studentId;
     private Integer seatNo;
+    private String memberRole;
     private String status;
+    private String result;
     private Long practiceTaskId;
     private Integer answeredCount;
     private Integer correctCount;
     private BigDecimal score;
     private BigDecimal contributionValue;
+    private Integer currentCombo;
     private Integer maxCombo;
+    private Long totalResponseMs;
+    private Integer ratingBefore;
+    private Integer ratingAfter;
+    private Integer pointsReward;
+    private Integer experienceReward;
     private OffsetDateTime joinedAt;
+    private OffsetDateTime lastAnsweredAt;
     private OffsetDateTime finishedAt;
 }

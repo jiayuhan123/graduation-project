@@ -9,14 +9,23 @@ public record GameSessionSummaryResponse(
         Long levelId,
         String mode,
         Long creatorStudentId,
+        String matchMode,
+        String inviteCode,
         String status,
         Integer memberCount,
+        Integer gradeLevelSnapshot,
+        Long knowledgePointIdSnapshot,
+        Integer difficultySnapshot,
         Integer questionCountSnapshot,
         Integer timeLimitSecondsSnapshot,
         BigDecimal passRateSnapshot,
         BigDecimal teamProgress,
+        Long winnerStudentId,
+        String resultType,
         OffsetDateTime startedAt,
         OffsetDateTime endedAt,
+        OffsetDateTime expiresAt,
+        OffsetDateTime settledAt,
         String resultDetail
 ) {
 }

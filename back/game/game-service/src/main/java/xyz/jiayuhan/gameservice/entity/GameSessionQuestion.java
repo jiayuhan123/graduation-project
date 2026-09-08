@@ -26,9 +26,17 @@ public class GameSessionQuestion extends AuditableEntity {
     private Long questionId;
     @TableField(typeHandler = JsonbTypeHandler.class)
     private String questionSnapshot;
+    private BigDecimal maxScore;
+    private String gradingStatus;
+    @TableField(typeHandler = JsonbTypeHandler.class)
+    private String studentAnswer;
+    private String answerRequestId;
     private Long answerRecordId;
     @TableField("is_correct")
     private Boolean correct;
+    private BigDecimal score;
+    private Integer responseMs;
+    private Integer comboAfter;
     private BigDecimal progressDelta;
     private Integer energyDelta;
     private OffsetDateTime answeredAt;

@@ -17,6 +17,7 @@ public class GameRewardRecord extends AuditableEntity {
     private Long id;
     private Long studentId;
     private Long sessionId;
+    private String businessType;
     private String rewardType;
     private Long amount;
     private Long balanceAfter;

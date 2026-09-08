@@ -19,6 +19,8 @@ public final class GameView {
             String description,
             Integer gradeLevel,
             Long knowledgePointId,
+            Integer difficulty,
+            String questionSource,
             String mode,
             Integer questionCount,
             Integer timeLimitSeconds,
@@ -37,14 +39,23 @@ public final class GameView {
     public record SessionMember(
             Long studentId,
             Integer seatNo,
+            String memberRole,
             String status,
+            String result,
             Long practiceTaskId,
             Integer answeredCount,
             Integer correctCount,
             BigDecimal score,
             BigDecimal contributionValue,
+            Integer currentCombo,
             Integer maxCombo,
+            Long totalResponseMs,
+            Integer ratingBefore,
+            Integer ratingAfter,
+            Integer pointsReward,
+            Integer experienceReward,
             OffsetDateTime joinedAt,
+            OffsetDateTime lastAnsweredAt,
             OffsetDateTime finishedAt
     ) {
     }
@@ -53,8 +64,12 @@ public final class GameView {
             Long id,
             Integer sequenceNo,
             Long questionId,
+            String gradingStatus,
             Long answerRecordId,
             Boolean correct,
+            BigDecimal score,
+            Integer responseMs,
+            Integer comboAfter,
             BigDecimal progressDelta,
             Integer energyDelta,
             OffsetDateTime answeredAt
@@ -75,7 +90,16 @@ public final class GameView {
             Integer playerLevel,
             Integer totalSessions,
             Integer successSessions,
-            Integer bestCombo
+            Integer levelPassedCount,
+            Integer pkSessions,
+            Integer pkWins,
+            Integer pkLosses,
+            Integer pkDraws,
+            Integer pkRating,
+            Integer currentWinStreak,
+            Integer bestWinStreak,
+            Integer bestCombo,
+            OffsetDateTime lastPlayedAt
     ) {
     }
 
@@ -84,7 +108,10 @@ public final class GameView {
             String status,
             Integer attemptCount,
             BigDecimal bestScore,
+            Integer bestCorrectCount,
+            Integer bestStarCount,
             Integer bestDurationSeconds,
+            Long lastSessionId,
             OffsetDateTime firstUnlockedAt,
             OffsetDateTime firstPassedAt,
             OffsetDateTime lastPlayedAt
@@ -94,6 +121,7 @@ public final class GameView {
     public record Reward(
             Long id,
             Long sessionId,
+            String businessType,
             String rewardType,
             Long amount,
             Long balanceAfter,

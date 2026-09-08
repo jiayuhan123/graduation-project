@@ -24,6 +24,8 @@ public class GameLevel extends VersionedEntity {
     private String description;
     private Integer gradeLevel;
     private Long knowledgePointId;
+    private Integer difficulty;
+    private String questionSource;
     private String mode;
     private Integer questionCount;
     private Integer timeLimitSeconds;

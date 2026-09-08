@@ -19,7 +19,10 @@ public class GameLevelProgress extends AuditableEntity {
     private String status;
     private Integer attemptCount;
     private BigDecimal bestScore;
+    private Integer bestCorrectCount;
+    private Integer bestStarCount;
     private Integer bestDurationSeconds;
+    private Long lastSessionId;
     private OffsetDateTime firstUnlockedAt;
     private OffsetDateTime firstPassedAt;
     private OffsetDateTime lastPlayedAt;

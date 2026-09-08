@@ -144,12 +144,17 @@ public class GameQueryServiceImpl implements GameQueryService {
     public GameView.PlayerProgress getPlayerProgress(Long studentId) {
         GamePlayerProgress progress = gamePlayerProgressMapper.selectById(studentId);
         if (progress == null) {
-            return new GameView.PlayerProgress(studentId, 0L, 0L, 1, 0, 0, 0);
+            return new GameView.PlayerProgress(
+                    studentId, 0L, 0L, 1, 0, 0, 0,
+                    0, 0, 0, 0, 1000, 0, 0, 0, null);
         }
         return new GameView.PlayerProgress(
                 progress.getStudentId(), progress.getTotalPoints(), progress.getExperience(),
                 progress.getPlayerLevel(), progress.getTotalSessions(), progress.getSuccessSessions(),
-                progress.getBestCombo());
+                progress.getLevelPassedCount(), progress.getPkSessions(), progress.getPkWins(),
+                progress.getPkLosses(), progress.getPkDraws(), progress.getPkRating(),
+                progress.getCurrentWinStreak(), progress.getBestWinStreak(), progress.getBestCombo(),
+                progress.getLastPlayedAt());
     }
 
     @Override
@@ -186,7 +191,8 @@ public class GameQueryServiceImpl implements GameQueryService {
     private GameView.Level toView(GameLevel level) {
         return new GameView.Level(
                 level.getId(), level.getCode(), level.getName(), level.getDescription(),
-                level.getGradeLevel(), level.getKnowledgePointId(), level.getMode(),
+                level.getGradeLevel(), level.getKnowledgePointId(), level.getDifficulty(),
+                level.getQuestionSource(), level.getMode(),
                 level.getQuestionCount(), level.getTimeLimitSeconds(), level.getPassRate(),
                 level.getMinPlayers(), level.getMaxPlayers(), level.getBasePoints(),
                 level.getBaseExperience(), level.getPreviousLevelId(), level.getSortOrder(),
@@ -196,39 +202,48 @@ public class GameQueryServiceImpl implements GameQueryService {
     private GameSessionSummaryResponse toSummary(GameSession session) {
         return new GameSessionSummaryResponse(
                 session.getId(), session.getLevelId(), session.getMode(),
-                session.getCreatorStudentId(), session.getStatus(), session.getMemberCount(),
+                session.getCreatorStudentId(), session.getMatchMode(), session.getInviteCode(),
+                session.getStatus(), session.getMemberCount(), session.getGradeLevelSnapshot(),
+                session.getKnowledgePointIdSnapshot(), session.getDifficultySnapshot(),
                 session.getQuestionCountSnapshot(), session.getTimeLimitSecondsSnapshot(),
-                session.getPassRateSnapshot(), session.getTeamProgress(), session.getStartedAt(),
-                session.getEndedAt(), session.getResultDetail());
+                session.getPassRateSnapshot(), session.getTeamProgress(), session.getWinnerStudentId(),
+                session.getResultType(), session.getStartedAt(), session.getEndedAt(),
+                session.getExpiresAt(), session.getSettledAt(), session.getResultDetail());
     }
 
     private GameView.SessionMember toView(GameSessionMember member) {
         return new GameView.SessionMember(
-                member.getStudentId(), member.getSeatNo(), member.getStatus(),
+                member.getStudentId(), member.getSeatNo(), member.getMemberRole(), member.getStatus(),
+                member.getResult(),
                 member.getPracticeTaskId(), member.getAnsweredCount(), member.getCorrectCount(),
-                member.getScore(), member.getContributionValue(), member.getMaxCombo(),
-                member.getJoinedAt(), member.getFinishedAt());
+                member.getScore(), member.getContributionValue(), member.getCurrentCombo(),
+                member.getMaxCombo(), member.getTotalResponseMs(), member.getRatingBefore(),
+                member.getRatingAfter(), member.getPointsReward(), member.getExperienceReward(),
+                member.getJoinedAt(), member.getLastAnsweredAt(), member.getFinishedAt());
     }
 
     private GameView.SessionQuestion toView(GameSessionQuestion question) {
         return new GameView.SessionQuestion(
                 question.getId(), question.getSequenceNo(), question.getQuestionId(),
-                question.getAnswerRecordId(), question.getCorrect(),
+                question.getGradingStatus(), question.getAnswerRecordId(), question.getCorrect(),
+                question.getScore(), question.getResponseMs(), question.getComboAfter(),
                 question.getProgressDelta(), question.getEnergyDelta(), question.getAnsweredAt());
     }
 
     private GameView.LevelProgress toView(GameLevelProgress progress) {
         return new GameView.LevelProgress(
                 progress.getLevelId(), progress.getStatus(), progress.getAttemptCount(),
-                progress.getBestScore(), progress.getBestDurationSeconds(),
+                progress.getBestScore(), progress.getBestCorrectCount(), progress.getBestStarCount(),
+                progress.getBestDurationSeconds(), progress.getLastSessionId(),
                 progress.getFirstUnlockedAt(), progress.getFirstPassedAt(),
                 progress.getLastPlayedAt());
     }
 
     private GameView.Reward toView(GameRewardRecord reward) {
         return new GameView.Reward(
-                reward.getId(), reward.getSessionId(), reward.getRewardType(), reward.getAmount(),
-                reward.getBalanceAfter(), reward.getReason(), reward.getCreatedAt());
+                reward.getId(), reward.getSessionId(), reward.getBusinessType(),
+                reward.getRewardType(), reward.getAmount(), reward.getBalanceAfter(),
+                reward.getReason(), reward.getCreatedAt());
     }
 
     private <T> PageResult<T> pageResult(Page<?> page, List<T> records) {

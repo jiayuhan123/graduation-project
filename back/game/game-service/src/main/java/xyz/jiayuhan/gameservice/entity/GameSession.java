@@ -23,14 +23,24 @@ public class GameSession extends VersionedEntity {
     private Long levelId;
     private String mode;
     private Long creatorStudentId;
+    private String matchMode;
+    private String inviteCode;
     private String status;
     private Integer memberCount;
+    private Integer gradeLevelSnapshot;
+    private Long knowledgePointIdSnapshot;
+    private Integer difficultySnapshot;
     private Integer questionCountSnapshot;
     private Integer timeLimitSecondsSnapshot;
     private BigDecimal passRateSnapshot;
+    @TableField("progress_value")
     private BigDecimal teamProgress;
+    private Long winnerStudentId;
+    private String resultType;
     private OffsetDateTime startedAt;
     private OffsetDateTime endedAt;
+    private OffsetDateTime expiresAt;
+    private OffsetDateTime settledAt;
     @TableField(typeHandler = JsonbTypeHandler.class)
     private String resultDetail;
 }
