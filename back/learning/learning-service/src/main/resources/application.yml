@@ -31,6 +31,7 @@ app:
     fixed-delay-ms: ${ASSIGNMENT_SYNC_FIXED_DELAY_MS:3000}
     batch-size: ${ASSIGNMENT_SYNC_BATCH_SIZE:50}
     retention-days: ${ASSIGNMENT_SYNC_RETENTION_DAYS:7}
+    cleanup-cron: ${ASSIGNMENT_SYNC_CLEANUP_CRON:0 20 3 * * *}
 
 springdoc:
   api-docs:

@@ -41,6 +41,7 @@ public interface ContentCatalogService {
             long size,
             String keyword,
             Long knowledgePointId,
+            String questionMode,
             String questionType,
             Integer difficulty);
 

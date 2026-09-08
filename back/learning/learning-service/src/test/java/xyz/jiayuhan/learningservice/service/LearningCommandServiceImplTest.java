@@ -115,7 +115,7 @@ class LearningCommandServiceImplTest {
         when(contentFeignClient.getKnowledgePoint(KNOWLEDGE_POINT_ID))
                 .thenReturn(Result.success(new KnowledgePointResponse(
                         KNOWLEDGE_POINT_ID, 1L, null, "KP", "整数计算", null, 2, 1, 1)));
-        when(contentFeignClient.pageQuestions(1, 100, null, KNOWLEDGE_POINT_ID, null, 3))
+        when(contentFeignClient.pageQuestions(1, 100, null, KNOWLEDGE_POINT_ID, "FIXED", null, 3))
                 .thenReturn(Result.success(new PageResult<>(1, 100, 1, 1, List.of(question))));
         doAnswer(invocation -> {
             PracticeTask task = invocation.getArgument(0);

@@ -44,10 +44,11 @@ public class InternalContentController {
             @RequestParam(defaultValue = "20") long size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long knowledgePointId,
+            @RequestParam(required = false) String questionMode,
             @RequestParam(required = false) String questionType,
             @RequestParam(required = false) Integer difficulty) {
         return Result.success(contentCatalogService.pageQuestionsInternal(
-                page, size, keyword, knowledgePointId, questionType, difficulty));
+                page, size, keyword, knowledgePointId, questionMode, questionType, difficulty));
     }
 
     @GetMapping("/knowledge-points/{knowledgePointId}")

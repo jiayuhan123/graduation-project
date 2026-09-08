@@ -49,7 +49,7 @@ learning
 
 不要对生产库自动执行 SQL。部署人员应先备份并在维护窗口按以下顺序操作：
 
-1. 确认当前 `learning_db` 已包含原始 `schema.sql` 的 11 张业务表，并先部署教学服务中接收学习进度的内部接口。
+1. 确认当前 `learning_db` 已包含原始 `schema.sql` 的 11 张业务表；先检查同一学生是否存在重复作业任务，若有重复，应人工核对并清理后再建立唯一索引。随后先部署教学服务中接收学习进度的内部接口。
 2. 对已有数据库执行 `upgrade-online-closure.sql`。脚本在同一事务中先建立“学生 + 作业”唯一索引，再建立 `assignment_sync_event` 及其待投递、已投递索引；`ON_ERROR_STOP=1` 保证出错即停止。
 3. 核对 `uk_practice_task_assignment_student`、`assignment_sync_event` 和两个事件索引均存在，再部署新版学习服务。
 4. 观察学习服务调度日志和 `assignment_sync_event` 的 `PENDING` 数量；确认教学服务可用后再开放流量。

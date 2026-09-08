@@ -146,6 +146,11 @@ public class LearningCommandServiceImpl implements LearningCommandService {
                 .map(question -> {
                     QuestionResponse snapshot = enrichKnowledgePoints(
                             readSnapshot(question.questionSnapshot()));
+                    if (!isFixedQuestion(snapshot)) {
+                        throw new BusinessException(
+                                ResultCode.ASSIGNMENT_CONTENT_INVALID,
+                                "作业只能包含已发布的固定题目");
+                    }
                     if (snapshot.knowledgePointIds() != null) {
                         knowledgePointIds.addAll(snapshot.knowledgePointIds());
                     }
@@ -231,7 +236,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
                 answer.setCorrect(correct);
                 answer.setScore(correct ? question.getMaxScore() : BigDecimal.ZERO);
                 answer.setGradedAt(now());
-                answerRecordMapper.updateById(answer);
+                assertUpdated(answerRecordMapper.updateById(answer));
                 updateLearningSignals(task, question, snapshot, answer);
             }
             latestAnswers.add(answer);
@@ -316,7 +321,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         if (difficulty != null) {
             PageResult<QuestionResponse> exact = requireRemoteData(
                     () -> contentFeignClient.pageQuestions(
-                            1, 100, null, knowledgePointId, null, difficulty),
+                            1, 100, null, knowledgePointId, "FIXED", null, difficulty),
                     "暂时无法读取题库");
             exact.records().stream()
                     .filter(this::isFixedQuestion)
@@ -325,7 +330,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         if (candidates.size() < requestedCount) {
             PageResult<QuestionResponse> fallback = requireRemoteData(
                     () -> contentFeignClient.pageQuestions(
-                            1, 100, null, knowledgePointId, null, null),
+                            1, 100, null, knowledgePointId, "FIXED", null, null),
                     "暂时无法读取题库");
             fallback.records().stream()
                     .filter(this::isFixedQuestion)

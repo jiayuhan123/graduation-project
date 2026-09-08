@@ -45,7 +45,9 @@ public class AssignmentProgressDispatchService {
             } catch (Exception exception) {
                 markRetry(event, exception);
             }
-            eventMapper.updateById(event);
+            if (eventMapper.updateById(event) != 1) {
+                throw new IllegalStateException("作业进度同步事件状态更新失败: " + event.getId());
+            }
         }
     }
 

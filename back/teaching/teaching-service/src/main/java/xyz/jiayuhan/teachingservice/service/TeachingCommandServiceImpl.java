@@ -227,10 +227,13 @@ public class TeachingCommandServiceImpl implements TeachingCommandService {
             String questionType,
             Integer difficulty) {
         Result<PageResult<QuestionResponse>> result = contentFeignClient.pageQuestions(
-                page, size, trimToNull(keyword), knowledgePointId, questionType, difficulty);
+                page, size, trimToNull(keyword), knowledgePointId, "FIXED", questionType, difficulty);
         PageResult<QuestionResponse> source = requireRemoteData(result, "暂时无法读取已发布题目");
         return new PageResult<>(source.page(), source.size(), source.total(), source.pages(),
-                source.records().stream().map(this::toCandidate).toList());
+                source.records().stream()
+                        .filter(this::isUsableFixedQuestion)
+                        .map(this::toCandidate)
+                        .toList());
     }
 
     @Override
@@ -515,10 +518,20 @@ public class TeachingCommandServiceImpl implements TeachingCommandService {
         Map<Long, QuestionResponse> byId = questions.stream()
                 .collect(Collectors.toMap(QuestionResponse::id, Function.identity()));
         if (byId.size() != questionIds.size()
-                || byId.values().stream().anyMatch(question -> !"ENABLED".equals(question.status()))) {
-            throw new BusinessException(ResultCode.ASSIGNMENT_CONTENT_INVALID, "作业只能选择已发布题目");
+                || byId.values().stream().anyMatch(question -> !isUsableFixedQuestion(question))) {
+            throw new BusinessException(
+                    ResultCode.ASSIGNMENT_CONTENT_INVALID,
+                    "作业只能选择已发布且具有标准答案的固定题目");
         }
         return byId;
+    }
+
+    private boolean isUsableFixedQuestion(QuestionResponse question) {
+        return question != null
+                && "FIXED".equals(question.questionMode())
+                && "ENABLED".equals(question.status())
+                && question.standardAnswer() != null
+                && !question.standardAnswer().isBlank();
     }
 
     private void validateLayerScores(List<PreparedQuestion> questions) {

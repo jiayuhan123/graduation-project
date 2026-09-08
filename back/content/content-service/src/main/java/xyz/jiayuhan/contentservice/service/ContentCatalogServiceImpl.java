@@ -165,6 +165,7 @@ public class ContentCatalogServiceImpl implements ContentCatalogService {
             long size,
             String keyword,
             Long knowledgePointId,
+            String questionMode,
             String questionType,
             Integer difficulty) {
         List<Long> questionIds = null;
@@ -187,6 +188,7 @@ public class ContentCatalogServiceImpl implements ContentCatalogService {
                                 .like(Question::getCode, normalizedKeyword)
                                 .or()
                                 .like(Question::getStem, normalizedKeyword))
+                        .eq(StringUtils.hasText(questionMode), Question::getQuestionMode, questionMode)
                         .eq(StringUtils.hasText(questionType), Question::getQuestionType, questionType)
                         .eq(difficulty != null, Question::getDifficulty, difficulty)
                         .eq(Question::getStatus, "ENABLED")

@@ -38,6 +38,7 @@ public interface ContentFeignClient {
             @RequestParam(name = "size", defaultValue = "20") long size,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "knowledgePointId", required = false) Long knowledgePointId,
+            @RequestParam(name = "questionMode", required = false) String questionMode,
             @RequestParam(name = "questionType", required = false) String questionType,
             @RequestParam(name = "difficulty", required = false) Integer difficulty);
 

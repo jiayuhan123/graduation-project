@@ -41,6 +41,7 @@ class AssignmentProgressDispatchServiceTest {
         when(eventMapper.selectPendingBatchForUpdate(10)).thenReturn(List.of(event));
         when(teachingFeignClient.syncAssignmentProgress(eq(2L), eq(3L), any()))
                 .thenThrow(new IllegalStateException("connection refused"));
+        when(eventMapper.updateById(event)).thenReturn(1);
         ReflectionTestUtils.setField(service, "batchSize", 10);
 
         service.dispatchPendingBatch();
