@@ -18,6 +18,7 @@ public class TeachingWebConfig implements WebMvcConfigurer {
         registry.addInterceptor(teachingAccessInterceptor)
                 .addPathPatterns(
                         "/api/teaching/teacher/**",
+                        "/api/teaching/admin/**",
                         "/api/teaching/student/**",
                         "/api/teaching/classes/teaching",
                         "/api/teaching/classes/enrolled",

@@ -5,6 +5,7 @@ import xyz.jiayuhan.userservice.model.request.admin.AdminUpdateUserRequest;
 import xyz.jiayuhan.userservice.model.request.admin.AdminStudentProfileRequest;
 import xyz.jiayuhan.userservice.model.request.admin.AdminTeacherProfileRequest;
 import xyz.jiayuhan.userservice.model.response.admin.AdminUserResponse;
+import xyz.jiayuhan.userservice.model.response.admin.AdminUserStatisticsResponse;
 import xyz.jiayuhan.common.core.model.PageResult;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public interface AdminUserService {
      * @return 管理端用户分页数据
      */
     PageResult<AdminUserResponse> page(long page, long size, String keyword, Integer status, String roleCode);
+
+    AdminUserStatisticsResponse statistics();
 
     /**
      * 查询指定用户详情及其当前有效角色。

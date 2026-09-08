@@ -2,6 +2,17 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const systemRoutes: RouteRecordRaw[] = [
   {
+    path: 'system/operations',
+    name: 'system-operations',
+    component: () => import('@/views/system/OperationsDashboardView.vue'),
+    meta: {
+      title: '运营总览',
+      requiresAuth: true,
+      roles: ['admin'],
+      permissions: ['teaching:report:query'],
+    },
+  },
+  {
     path: 'system/users',
     name: 'system-users',
     component: () => import('@/views/system/UserListView.vue'),

@@ -16,11 +16,14 @@ import xyz.jiayuhan.contentservice.model.response.AdminErrorTypeResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminKnowledgePointResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionDetailResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionSummaryResponse;
+import xyz.jiayuhan.contentservice.model.response.ContentOperationsStatisticsResponse;
 
 import java.util.List;
 
 /** 管理端内容维护应用服务。 */
 public interface ContentAdminService {
+
+    ContentOperationsStatisticsResponse statistics();
 
     PageResult<AdminContentModuleResponse> pageModules(
             long page, long size, String keyword, Integer gradeLevel, Integer semester, Integer status);

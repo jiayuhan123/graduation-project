@@ -15,6 +15,8 @@ public final class ContentAuditActions {
     public static final String QUESTION_UPDATED = "content.question.updated";
     public static final String QUESTION_REVIEWED = "content.question.reviewed";
     public static final String QUESTION_DELETED = "content.question.deleted";
+    public static final String QUESTION_FEEDBACK_CREATED = "content.question-feedback.created";
+    public static final String QUESTION_FEEDBACK_HANDLED = "content.question-feedback.handled";
     public static final String ERROR_TYPE_CREATED = "content.error-type.created";
     public static final String ERROR_TYPE_UPDATED = "content.error-type.updated";
     public static final String ERROR_TYPE_STATUS_CHANGED = "content.error-type.status-changed";

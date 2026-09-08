@@ -60,6 +60,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         permissions: ['teaching:assignment:manage'],
       },
       {
+        title: '班级学情',
+        path: '/learning/class-dashboard',
+        icon: '▥',
+        roles: ['teacher'],
+        permissions: ['teaching:report:query'],
+      },
+      {
         title: '学生学情',
         path: '/learning/records',
         icon: '⌁',
@@ -78,13 +85,20 @@ export const navigationGroups: readonly NavigationGroup[] = [
         path: '/learning/photo-reviews',
         icon: '▣',
         roles: ['teacher'],
-        permissions: ['teaching:report:query'],
+        permissions: ['learning:marking:review'],
       },
     ],
   },
   {
     title: '平台管理',
     items: [
+      {
+        title: '运营总览',
+        path: '/system/operations',
+        icon: '▤',
+        roles: ['admin'],
+        permissions: ['teaching:report:query'],
+      },
       {
         title: '内容模块',
         path: '/content/modules',
@@ -107,6 +121,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         title: '内容审核',
         path: '/content/reviews',
         icon: '✓',
+        permissions: ['content:manage'],
+      },
+      {
+        title: '题目反馈',
+        path: '/content/question-feedback',
+        icon: '⚑',
+        roles: ['admin'],
         permissions: ['content:manage'],
       },
       {
@@ -155,6 +176,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         icon: '✦',
         roles: ['admin'],
         permissions: ['system:role:manage'],
+      },
+      {
+        title: '审计日志',
+        path: '/audit/logs',
+        icon: '◫',
+        roles: ['admin'],
+        permissions: ['audit:query'],
       },
     ],
   },

@@ -4,6 +4,7 @@ import { contentRoutes } from '@/router/modules/content'
 import { systemRoutes } from '@/router/modules/system'
 import { teachingRoutes } from '@/router/modules/teaching'
 import { learningRoutes } from '@/router/modules/learning'
+import { auditRoutes } from '@/router/modules/audit'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -41,6 +42,7 @@ export const routes: RouteRecordRaw[] = [
       ...learningRoutes,
       ...contentRoutes,
       ...systemRoutes,
+      ...auditRoutes,
     ],
   },
   {

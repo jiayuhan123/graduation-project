@@ -28,6 +28,7 @@ import xyz.jiayuhan.userservice.model.request.admin.AssignRolesRequest;
 import xyz.jiayuhan.userservice.model.request.admin.ResetPasswordRequest;
 import xyz.jiayuhan.userservice.model.request.admin.UpdateStatusRequest;
 import xyz.jiayuhan.userservice.model.response.admin.AdminUserResponse;
+import xyz.jiayuhan.userservice.model.response.admin.AdminUserStatisticsResponse;
 import xyz.jiayuhan.userservice.service.AdminUserService;
 
 /** 管理端用户维护接口。 */
@@ -39,6 +40,13 @@ import xyz.jiayuhan.userservice.service.AdminUserService;
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
+
+    @SaCheckPermission("system:user:manage")
+    @Operation(summary = "查询用户运营统计")
+    @GetMapping("/statistics")
+    public Result<AdminUserStatisticsResponse> statistics() {
+        return Result.success(adminUserService.statistics());
+    }
 
     @SaCheckPermission("system:user:manage")
     @Operation(summary = "分页查询用户")

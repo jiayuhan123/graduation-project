@@ -186,3 +186,143 @@ export interface ReviewPhotoItemInput {
 export interface PhotoTaskQuery extends PageParams {
   status?: string
 }
+
+export interface PhotoReviewTask {
+  task: PhotoTask
+  studentId: string
+  studentName: string
+  pendingItemCount: number
+}
+
+export interface PhotoQuestionReference {
+  questionId: string
+  code: string
+  stem: string
+  standardAnswer: string
+}
+
+export interface PhotoReviewItem {
+  item: PhotoItem
+  matchedQuestion: PhotoQuestionReference | null
+}
+
+export interface PhotoReviewHistory {
+  id: string
+  markingItemId: string | null
+  reviewerId: string
+  reviewerName: string
+  decision: 'APPROVE' | 'CORRECT' | 'REJECT'
+  beforeData: string | null
+  afterData: string | null
+  comment: string | null
+  reviewedAt: string
+}
+
+export interface PhotoReviewDetail {
+  summary: PhotoReviewTask
+  items: PhotoReviewItem[]
+  history: PhotoReviewHistory[]
+}
+
+export interface PhotoReviewWorkbenchQuery extends PageParams {
+  classId?: string
+  studentId?: string
+  status?: string
+  reviewStatus?: string
+  submittedFrom?: string
+  submittedTo?: string
+}
+
+export interface BatchPhotoReviewResult {
+  approvedItemCount: number
+  completedTaskCount: number
+}
+
+export interface ClassLearningMetrics {
+  studentCount: number
+  taskCount: number
+  completedTaskCount: number
+  completionRate: number
+  answerCount: number
+  correctAnswerCount: number
+  accuracyRate: number
+  openErrorCount: number
+}
+
+export interface ClassWeakKnowledgePoint {
+  knowledgePointId: string
+  knowledgePointName: string
+  averageMastery: number
+  averageAccuracy: number
+  affectedStudentCount: number
+  assessedStudentCount: number
+}
+
+export interface ClassFrequentQuestion {
+  questionId: string
+  questionCode: string | null
+  stem: string
+  errorCount: number
+  affectedStudentCount: number
+}
+
+export interface ClassFrequentErrorType {
+  errorTypeId: string
+  errorTypeName: string
+  category: string | null
+  errorCount: number
+  affectedStudentCount: number
+}
+
+export interface ClassDailyTrend {
+  date: string
+  answerCount: number
+  correctAnswerCount: number
+  accuracyRate: number
+}
+
+export interface ClassStudentSnapshot {
+  studentId: string
+  username: string | null
+  displayName: string
+  avatarUrl: string | null
+  taskCount: number
+  completedTaskCount: number
+  answerCount: number
+  correctAnswerCount: number
+  accuracyRate: number
+  openErrorCount: number
+  weakKnowledgePointCount: number
+  lastActivityAt: string | null
+}
+
+export interface ClassStudentAlert {
+  studentId: string
+  displayName: string
+  code: string
+  message: string
+  severity: 'HIGH' | 'MEDIUM'
+}
+
+export interface ClassLearningDashboard {
+  classId: string
+  className: string
+  schoolName: string | null
+  gradeLevel: number
+  semester: number
+  rangeDays: number
+  rangeStart: string
+  rangeEnd: string
+  metrics: ClassLearningMetrics
+  weakKnowledgePoints: ClassWeakKnowledgePoint[]
+  frequentWrongQuestions: ClassFrequentQuestion[]
+  frequentErrorTypes: ClassFrequentErrorType[]
+  dailyTrends: ClassDailyTrend[]
+  students: ClassStudentSnapshot[]
+  alerts: ClassStudentAlert[]
+}
+
+export interface ClassPracticeCreationResult {
+  createdCount: number
+  taskIds: string[]
+}

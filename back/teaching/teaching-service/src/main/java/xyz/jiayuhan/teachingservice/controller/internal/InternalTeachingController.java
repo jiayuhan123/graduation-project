@@ -13,6 +13,8 @@ import xyz.jiayuhan.teachingapi.TeachingApiConstants;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentSummaryResponse;
 import xyz.jiayuhan.teachingapi.model.request.AssignmentProgressRequest;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentLearningResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassAccessResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassRosterResponse;
 import xyz.jiayuhan.teachingapi.model.response.StudentAccessResponse;
 import xyz.jiayuhan.teachingservice.service.TeachingCommandService;
 import xyz.jiayuhan.teachingservice.service.TeachingQueryService;
@@ -53,5 +55,17 @@ public class InternalTeachingController {
             @PathVariable Long teacherId,
             @PathVariable Long studentId) {
         return Result.success(teachingQueryService.canTeacherViewStudent(teacherId, studentId));
+    }
+
+    @GetMapping("/classes/{classId}/roster")
+    public Result<ClassRosterResponse> getClassRoster(@PathVariable Long classId) {
+        return Result.success(teachingQueryService.getClassRosterInternal(classId));
+    }
+
+    @GetMapping("/teachers/{teacherId}/classes/{classId}/access")
+    public Result<ClassAccessResponse> canViewClass(
+            @PathVariable Long teacherId,
+            @PathVariable Long classId) {
+        return Result.success(teachingQueryService.canTeacherViewClass(teacherId, classId));
     }
 }

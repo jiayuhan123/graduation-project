@@ -31,4 +31,10 @@ export const contentRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/content/ContentReviewView.vue'),
     meta: { title: '内容审核', requiresAuth: true, permissions: ['content:manage'] },
   },
+  {
+    path: 'content/question-feedback',
+    name: 'content-question-feedback',
+    component: () => import('@/views/content/QuestionFeedbackView.vue'),
+    meta: { title: '题目反馈', requiresAuth: true, permissions: ['content:manage'] },
+  },
 ]

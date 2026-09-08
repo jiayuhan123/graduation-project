@@ -26,6 +26,7 @@ import xyz.jiayuhan.userservice.model.request.admin.AdminStudentProfileRequest;
 import xyz.jiayuhan.userservice.model.request.admin.AdminTeacherProfileRequest;
 import xyz.jiayuhan.userservice.model.request.admin.AdminUpdateUserRequest;
 import xyz.jiayuhan.userservice.model.response.admin.AdminUserResponse;
+import xyz.jiayuhan.userservice.model.response.admin.AdminUserStatisticsResponse;
 import xyz.jiayuhan.userservice.model.response.admin.RoleSummaryResponse;
 import xyz.jiayuhan.userservice.service.AdminUserService;
 import xyz.jiayuhan.userservice.service.ProfileService;
@@ -78,6 +79,20 @@ public class AdminUserServiceImpl implements AdminUserService {
                 result.getTotal(),
                 result.getPages(),
                 result.getRecords().stream().map(this::toAdminUser).toList());
+    }
+
+    @Override
+    public AdminUserStatisticsResponse statistics() {
+        long total = userMapper.selectCount(null);
+        long active = userMapper.selectCount(
+                new LambdaQueryWrapper<User>().eq(User::getStatus, 1));
+        long disabled = userMapper.selectCount(
+                new LambdaQueryWrapper<User>().eq(User::getStatus, 0));
+        return new AdminUserStatisticsResponse(
+                total, active, disabled,
+                page(1, 1, null, null, "student").total(),
+                page(1, 1, null, null, "teacher").total(),
+                page(1, 1, null, null, "admin").total());
     }
 
     @Override

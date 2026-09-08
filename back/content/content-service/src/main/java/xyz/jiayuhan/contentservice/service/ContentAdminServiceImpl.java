@@ -20,6 +20,7 @@ import xyz.jiayuhan.contentservice.entity.ErrorType;
 import xyz.jiayuhan.contentservice.entity.KnowledgePoint;
 import xyz.jiayuhan.contentservice.entity.Question;
 import xyz.jiayuhan.contentservice.entity.QuestionKnowledgePoint;
+import xyz.jiayuhan.contentservice.entity.QuestionFeedback;
 import xyz.jiayuhan.contentservice.event.ContentAuditActions;
 import xyz.jiayuhan.contentservice.event.ContentEventOutboxService;
 import xyz.jiayuhan.contentservice.mapper.ContentModuleMapper;
@@ -27,6 +28,7 @@ import xyz.jiayuhan.contentservice.mapper.ErrorTypeMapper;
 import xyz.jiayuhan.contentservice.mapper.KnowledgePointMapper;
 import xyz.jiayuhan.contentservice.mapper.QuestionKnowledgePointMapper;
 import xyz.jiayuhan.contentservice.mapper.QuestionMapper;
+import xyz.jiayuhan.contentservice.mapper.QuestionFeedbackMapper;
 import xyz.jiayuhan.contentservice.model.request.CreateContentModuleRequest;
 import xyz.jiayuhan.contentservice.model.request.CreateErrorTypeRequest;
 import xyz.jiayuhan.contentservice.model.request.CreateKnowledgePointRequest;
@@ -44,6 +46,7 @@ import xyz.jiayuhan.contentservice.model.response.AdminKnowledgePointResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionDetailResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionSummaryResponse;
 import xyz.jiayuhan.contentservice.model.response.QuestionKnowledgePointBindingResponse;
+import xyz.jiayuhan.contentservice.model.response.ContentOperationsStatisticsResponse;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -65,10 +68,32 @@ public class ContentAdminServiceImpl implements ContentAdminService {
     private final ContentModuleMapper contentModuleMapper;
     private final KnowledgePointMapper knowledgePointMapper;
     private final QuestionMapper questionMapper;
+    private final QuestionFeedbackMapper questionFeedbackMapper;
     private final QuestionKnowledgePointMapper questionKnowledgePointMapper;
     private final ErrorTypeMapper errorTypeMapper;
     private final ContentEventOutboxService outboxService;
     private final ObjectMapper objectMapper;
+
+    @Override
+    public ContentOperationsStatisticsResponse statistics() {
+        return new ContentOperationsStatisticsResponse(
+                contentModuleMapper.selectCount(null),
+                contentModuleMapper.selectCount(
+                        new LambdaQueryWrapper<ContentModule>().eq(ContentModule::getStatus, 1)),
+                knowledgePointMapper.selectCount(null),
+                knowledgePointMapper.selectCount(
+                        new LambdaQueryWrapper<KnowledgePoint>().eq(KnowledgePoint::getStatus, 1)),
+                questionMapper.selectCount(null),
+                questionMapper.selectCount(
+                        new LambdaQueryWrapper<Question>().eq(Question::getStatus, ENABLED)),
+                questionMapper.selectCount(
+                        new LambdaQueryWrapper<Question>().eq(Question::getStatus, DRAFT)),
+                questionMapper.selectCount(
+                        new LambdaQueryWrapper<Question>().eq(Question::getStatus, DISABLED)),
+                questionFeedbackMapper.selectCount(
+                        new LambdaQueryWrapper<QuestionFeedback>()
+                                .in(QuestionFeedback::getStatus, List.of("PENDING", "PROCESSING"))));
+    }
 
     @Override
     public PageResult<AdminContentModuleResponse> pageModules(

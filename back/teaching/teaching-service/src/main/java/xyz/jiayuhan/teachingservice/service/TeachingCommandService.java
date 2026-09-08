@@ -29,6 +29,8 @@ public interface TeachingCommandService {
 
     TeachingView.ClassDetail getClassDetail(Long teacherId, Long classId);
 
+    TeachingView.ClassDetail getClassDetailAsAdmin(Long classId);
+
     TeachingView.ClassStudent addStudent(
             Long teacherId, Long classId, AddClassStudentRequest request);
 

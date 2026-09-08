@@ -176,3 +176,37 @@ export interface ErrorTypeInput {
   status?: EnabledStatus
   version?: number
 }
+
+export interface PublishedQuestion {
+  id: string
+  code: string
+  questionMode: QuestionMode
+  questionType: QuestionType
+  stem: string
+  options: string | null
+  difficulty: number
+  estimatedSeconds: number | null
+}
+
+export type QuestionFeedbackCategory =
+  'STEM_ERROR' | 'ANSWER_ERROR' | 'AMBIGUOUS' | 'FORMAT_ERROR' | 'OTHER'
+
+export type QuestionFeedbackStatus = 'PENDING' | 'PROCESSING' | 'RESOLVED' | 'REJECTED'
+
+export interface QuestionFeedback {
+  id: string
+  questionId: string
+  questionCode: string | null
+  questionStem: string | null
+  questionStatus: QuestionStatus | null
+  reporterId: string
+  category: QuestionFeedbackCategory
+  description: string
+  status: QuestionFeedbackStatus
+  handlerId: string | null
+  handleComment: string | null
+  handledAt: string | null
+  createdAt: string
+  updatedAt: string
+  version: number
+}

@@ -29,12 +29,17 @@ import xyz.jiayuhan.contentservice.model.request.UpdateEnabledStatusRequest;
 import xyz.jiayuhan.contentservice.model.request.UpdateErrorTypeRequest;
 import xyz.jiayuhan.contentservice.model.request.UpdateKnowledgePointRequest;
 import xyz.jiayuhan.contentservice.model.request.UpdateQuestionRequest;
+import xyz.jiayuhan.contentservice.model.request.HandleQuestionFeedbackRequest;
 import xyz.jiayuhan.contentservice.model.response.AdminContentModuleResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminErrorTypeResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminKnowledgePointResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionDetailResponse;
 import xyz.jiayuhan.contentservice.model.response.AdminQuestionSummaryResponse;
+import xyz.jiayuhan.contentservice.model.response.ContentOperationsStatisticsResponse;
+import xyz.jiayuhan.contentservice.model.response.QuestionFeedbackResponse;
 import xyz.jiayuhan.contentservice.service.ContentAdminService;
+import xyz.jiayuhan.contentservice.service.QuestionFeedbackService;
+import xyz.jiayuhan.common.security.context.UserContext;
 
 import java.util.List;
 
@@ -47,6 +52,37 @@ import java.util.List;
 public class ContentAdminController {
 
     private final ContentAdminService contentAdminService;
+    private final QuestionFeedbackService questionFeedbackService;
+
+    @Operation(summary = "查询内容运营统计")
+    @GetMapping("/statistics")
+    public Result<ContentOperationsStatisticsResponse> statistics() {
+        return Result.success(contentAdminService.statistics());
+    }
+
+    @Operation(summary = "分页查询题目质量反馈")
+    @GetMapping("/question-feedback")
+    public Result<PageResult<QuestionFeedbackResponse>> pageQuestionFeedback(
+            @RequestParam(defaultValue = "1") @Min(1) long page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) long size,
+            @RequestParam(required = false)
+            @Pattern(regexp = "PENDING|PROCESSING|RESOLVED|REJECTED", message = "反馈状态不正确")
+            String status,
+            @RequestParam(required = false)
+            @Pattern(regexp = "STEM_ERROR|ANSWER_ERROR|AMBIGUOUS|FORMAT_ERROR|OTHER", message = "反馈类型不正确")
+            String category,
+            @RequestParam(required = false) Long questionId) {
+        return Result.success(questionFeedbackService.page(page, size, status, category, questionId));
+    }
+
+    @Operation(summary = "处理题目反馈或处理后下架题目")
+    @PutMapping("/question-feedback/{feedbackId}")
+    public Result<QuestionFeedbackResponse> handleQuestionFeedback(
+            @PathVariable Long feedbackId,
+            @Valid @RequestBody HandleQuestionFeedbackRequest request) {
+        return Result.success("题目反馈已处理", questionFeedbackService.handle(
+                UserContext.requireUserId(), feedbackId, request));
+    }
 
     @Operation(summary = "分页查询全部内容模块")
     @GetMapping("/modules")

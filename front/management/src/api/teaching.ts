@@ -1,5 +1,5 @@
 import { request } from '@/utils/request'
-import type { PageResult } from '@/types/api'
+import type { PageParams, PageResult } from '@/types/api'
 import type {
   AssignmentDetail,
   AssignmentInput,
@@ -17,6 +17,13 @@ import type {
 
 const TEACHER_URL = '/api/teaching/teacher'
 const STUDENT_URL = '/api/teaching/student'
+const ADMIN_URL = '/api/teaching/admin'
+
+export const pageAdminClassesApi = (params: PageParams & { status?: 'ACTIVE' | 'ARCHIVED' } = {}) =>
+  request<PageResult<ClassMembership>>({ url: `${ADMIN_URL}/classes`, method: 'GET', params })
+
+export const getAdminClassApi = (classId: string) =>
+  request<ClassDetail>({ url: `${ADMIN_URL}/classes/${classId}`, method: 'GET' })
 
 export const pageTeacherClassesApi = (params: ClassQuery = {}) =>
   request<PageResult<ClassMembership>>({ url: `${TEACHER_URL}/classes`, method: 'GET', params })
@@ -113,6 +120,7 @@ export const pageQuestionCandidatesApi = (params: {
   page?: number
   size?: number
   keyword?: string
+  knowledgePointId?: string
   questionType?: string
   difficulty?: number
 }) =>

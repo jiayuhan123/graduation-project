@@ -12,6 +12,7 @@ import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.contentapi.ContentApiConstants;
 import xyz.jiayuhan.contentapi.model.request.BatchQuestionQueryRequest;
 import xyz.jiayuhan.contentapi.model.response.KnowledgePointResponse;
+import xyz.jiayuhan.contentapi.model.response.ErrorTypeResponse;
 import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 
 import java.util.List;
@@ -45,4 +46,7 @@ public interface ContentFeignClient {
     @GetMapping("/knowledge-points/{knowledgePointId}")
     Result<KnowledgePointResponse> getKnowledgePoint(
             @PathVariable("knowledgePointId") Long knowledgePointId);
+
+    @GetMapping("/error-types")
+    Result<List<ErrorTypeResponse>> listErrorTypes();
 }

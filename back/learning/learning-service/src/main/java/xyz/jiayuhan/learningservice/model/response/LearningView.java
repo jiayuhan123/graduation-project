@@ -4,6 +4,7 @@ import xyz.jiayuhan.learningapi.model.response.PracticeTaskSummaryResponse;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -144,6 +145,54 @@ public final class LearningView {
     public record PhotoDetail(PhotoTask task, List<PhotoItem> items) {
     }
 
+    public record PhotoReviewTask(
+            PhotoTask task,
+            Long studentId,
+            String studentName,
+            long pendingItemCount
+    ) {
+    }
+
+    public record QuestionReference(
+            Long questionId,
+            String code,
+            String stem,
+            String standardAnswer
+    ) {
+    }
+
+    public record PhotoReviewItem(
+            PhotoItem item,
+            QuestionReference matchedQuestion
+    ) {
+    }
+
+    public record PhotoReviewHistory(
+            Long id,
+            Long markingItemId,
+            Long reviewerId,
+            String reviewerName,
+            String decision,
+            String beforeData,
+            String afterData,
+            String comment,
+            OffsetDateTime reviewedAt
+    ) {
+    }
+
+    public record PhotoReviewDetail(
+            PhotoReviewTask summary,
+            List<PhotoReviewItem> items,
+            List<PhotoReviewHistory> history
+    ) {
+    }
+
+    public record BatchPhotoReviewResult(
+            int approvedItemCount,
+            int completedTaskCount
+    ) {
+    }
+
     /** 供 OCR 工作器领取的最小任务描述，不包含任何公开下载地址。 */
     public record PhotoWorkItem(
             Long markingTaskId,
@@ -187,6 +236,104 @@ public final class LearningView {
             List<Mastery> weakKnowledgePoints,
             List<Error> recentErrors,
             List<RecommendationItem> recommendations
+    ) {
+    }
+
+    public record ClassMetrics(
+            int studentCount,
+            long taskCount,
+            long completedTaskCount,
+            BigDecimal completionRate,
+            long answerCount,
+            long correctAnswerCount,
+            BigDecimal accuracyRate,
+            long openErrorCount
+    ) {
+    }
+
+    public record WeakKnowledgePoint(
+            Long knowledgePointId,
+            String knowledgePointName,
+            BigDecimal averageMastery,
+            BigDecimal averageAccuracy,
+            int affectedStudentCount,
+            int assessedStudentCount
+    ) {
+    }
+
+    public record FrequentQuestion(
+            Long questionId,
+            String questionCode,
+            String stem,
+            long errorCount,
+            int affectedStudentCount
+    ) {
+    }
+
+    public record FrequentErrorType(
+            Long errorTypeId,
+            String errorTypeName,
+            String category,
+            long errorCount,
+            int affectedStudentCount
+    ) {
+    }
+
+    public record DailyTrend(
+            LocalDate date,
+            long answerCount,
+            long correctAnswerCount,
+            BigDecimal accuracyRate
+    ) {
+    }
+
+    public record StudentSnapshot(
+            Long studentId,
+            String username,
+            String displayName,
+            String avatarUrl,
+            long taskCount,
+            long completedTaskCount,
+            long answerCount,
+            long correctAnswerCount,
+            BigDecimal accuracyRate,
+            long openErrorCount,
+            long weakKnowledgePointCount,
+            OffsetDateTime lastActivityAt
+    ) {
+    }
+
+    public record StudentAlert(
+            Long studentId,
+            String displayName,
+            String code,
+            String message,
+            String severity
+    ) {
+    }
+
+    public record ClassDashboard(
+            Long classId,
+            String className,
+            String schoolName,
+            Integer gradeLevel,
+            Integer semester,
+            int rangeDays,
+            OffsetDateTime rangeStart,
+            OffsetDateTime rangeEnd,
+            ClassMetrics metrics,
+            List<WeakKnowledgePoint> weakKnowledgePoints,
+            List<FrequentQuestion> frequentWrongQuestions,
+            List<FrequentErrorType> frequentErrorTypes,
+            List<DailyTrend> dailyTrends,
+            List<StudentSnapshot> students,
+            List<StudentAlert> alerts
+    ) {
+    }
+
+    public record ClassPracticeCreationResult(
+            int createdCount,
+            List<Long> taskIds
     ) {
     }
 }

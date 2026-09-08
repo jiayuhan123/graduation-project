@@ -151,9 +151,26 @@ public class TeachingCommandServiceImpl implements TeachingCommandService {
     @Override
     public TeachingView.ClassDetail getClassDetail(Long teacherId, Long classId) {
         ManagedClass managed = requireManagedClass(teacherId, classId);
+        return classDetail(managed.teachingClass(), toMembership(managed.teachingClass(), managed.membership()));
+    }
+
+    @Override
+    public TeachingView.ClassDetail getClassDetailAsAdmin(Long classId) {
+        TeachingClass teachingClass = requireClass(classId);
+        TeachingView.ClassMembership summary = new TeachingView.ClassMembership(
+                teachingClass.getId(), teachingClass.getClassCode(), teachingClass.getName(),
+                teachingClass.getSchoolName(), teachingClass.getAcademicYear(),
+                teachingClass.getGradeLevel(), teachingClass.getSemester(), teachingClass.getStatus(),
+                "ADMIN", "ACTIVE", teachingClass.getCreatedAt(), teachingClass.getCreatedBy(),
+                teachingClass.getVersion());
+        return classDetail(teachingClass, summary);
+    }
+
+    private TeachingView.ClassDetail classDetail(
+            TeachingClass teachingClass, TeachingView.ClassMembership summary) {
         List<ClassStudent> memberships = classStudentMapper.selectList(
                 new LambdaQueryWrapper<ClassStudent>()
-                        .eq(ClassStudent::getClassId, classId)
+                        .eq(ClassStudent::getClassId, teachingClass.getId())
                         .orderByAsc(ClassStudent::getStatus)
                         .orderByAsc(ClassStudent::getStudentNoInClass)
                         .orderByAsc(ClassStudent::getStudentId));
@@ -162,8 +179,7 @@ public class TeachingCommandServiceImpl implements TeachingCommandService {
         List<TeachingView.ClassStudent> students = memberships.stream()
                 .map(membership -> toClassStudent(membership, users.get(membership.getStudentId())))
                 .toList();
-        return new TeachingView.ClassDetail(
-                toMembership(managed.teachingClass(), managed.membership()), students);
+        return new TeachingView.ClassDetail(summary, students);
     }
 
     @Override

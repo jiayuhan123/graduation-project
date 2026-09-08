@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { Loading as TLoading, Tag as TTag } from 'tdesign-vue-next'
 import { getOwnLearningReportApi, getStudentLearningReportApi } from '@/api/learning'
 import PageHeader from '@/components/PageHeader.vue'
@@ -8,6 +9,7 @@ import { useUserStore } from '@/stores/user'
 import type { StudentLearningReport } from '@/types/learning'
 
 const userStore = useUserStore()
+const route = useRoute()
 const loading = ref(false)
 const studentId = ref('')
 const report = ref<StudentLearningReport | null>(null)
@@ -53,7 +55,14 @@ watch(
   },
 )
 onMounted(() => {
-  if (isStudent.value) void loadReport()
+  if (isStudent.value) {
+    void loadReport()
+    return
+  }
+  if (typeof route.query.studentId === 'string') {
+    studentId.value = route.query.studentId
+    void loadReport()
+  }
 })
 </script>
 

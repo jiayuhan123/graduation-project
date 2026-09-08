@@ -14,6 +14,7 @@ import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.contentapi.ContentApiConstants;
 import xyz.jiayuhan.contentapi.model.request.BatchQuestionQueryRequest;
 import xyz.jiayuhan.contentapi.model.response.KnowledgePointResponse;
+import xyz.jiayuhan.contentapi.model.response.ErrorTypeResponse;
 import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 import xyz.jiayuhan.contentservice.service.ContentCatalogService;
 
@@ -54,5 +55,10 @@ public class InternalContentController {
     @GetMapping("/knowledge-points/{knowledgePointId}")
     public Result<KnowledgePointResponse> getKnowledgePoint(@PathVariable Long knowledgePointId) {
         return Result.success(contentCatalogService.getKnowledgePoint(knowledgePointId, false));
+    }
+
+    @GetMapping("/error-types")
+    public Result<List<ErrorTypeResponse>> listErrorTypes() {
+        return Result.success(contentCatalogService.listErrorTypes(null, null, null));
     }
 }

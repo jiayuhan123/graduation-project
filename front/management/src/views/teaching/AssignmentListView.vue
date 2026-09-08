@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Button as TButton,
   Loading as TLoading,
@@ -52,6 +52,7 @@ interface AssignmentForm {
 
 const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
 const isTeacher = computed(() => userStore.activeRole === 'teacher')
 const loading = ref(true)
 const saving = ref(false)
@@ -173,6 +174,39 @@ function resetForm() {
 function openCreate() {
   editingId.value = null
   resetForm()
+  editorVisible.value = true
+}
+
+async function openPresetAssignment() {
+  if (!isTeacher.value || route.query.create !== '1') return
+  const knowledgePointId =
+    typeof route.query.knowledgePointId === 'string' ? route.query.knowledgePointId : ''
+  if (!knowledgePointId) return
+  const result = await pageQuestionCandidatesApi({
+    page: 1,
+    size: 100,
+    knowledgePointId,
+  })
+  candidates.value = result.records
+  editingId.value = null
+  resetForm()
+  const requestedClassId = typeof route.query.classId === 'string' ? route.query.classId : ''
+  if (classes.value.some((item) => item.classId === requestedClassId)) {
+    form.classId = requestedClassId
+  }
+  const pointName =
+    typeof route.query.knowledgePointName === 'string'
+      ? route.query.knowledgePointName
+      : '薄弱知识点'
+  form.title = `${pointName}巩固作业`
+  form.description = `根据班级学情看板生成，重点巩固：${pointName}`
+  selectedQuestions.value = result.records.slice(0, 10).map((candidate, index) => ({
+    questionId: candidate.id,
+    layerCode: 'ALL',
+    sequenceNo: index + 1,
+    score: 10,
+    candidate,
+  }))
   editorVisible.value = true
 }
 
@@ -382,7 +416,10 @@ watch(
     await Promise.all([loadAssignments(), loadTeacherData()])
   },
 )
-onMounted(() => Promise.all([loadAssignments(), loadTeacherData()]))
+onMounted(async () => {
+  await Promise.all([loadAssignments(), loadTeacherData()])
+  await openPresetAssignment()
+})
 </script>
 
 <template>

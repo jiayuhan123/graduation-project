@@ -8,6 +8,17 @@ export const learningRoutes: RouteRecordRaw[] = [
     meta: { title: '个性练习', requiresAuth: true, roles: ['student'] },
   },
   {
+    path: 'learning/class-dashboard',
+    name: 'learning-class-dashboard',
+    component: () => import('@/views/learning/ClassDashboardView.vue'),
+    meta: {
+      title: '班级学情',
+      requiresAuth: true,
+      roles: ['teacher'],
+      permissions: ['teaching:report:query'],
+    },
+  },
+  {
     path: 'learning/records',
     name: 'learning-records',
     component: () => import('@/views/learning/LearningRecordListView.vue'),

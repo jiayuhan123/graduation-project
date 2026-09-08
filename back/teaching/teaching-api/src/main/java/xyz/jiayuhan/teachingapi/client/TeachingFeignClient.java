@@ -10,6 +10,8 @@ import xyz.jiayuhan.teachingapi.TeachingApiConstants;
 import xyz.jiayuhan.teachingapi.model.request.AssignmentProgressRequest;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentLearningResponse;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentSummaryResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassAccessResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassRosterResponse;
 import xyz.jiayuhan.teachingapi.model.response.StudentAccessResponse;
 
 /** 教学服务内部只读客户端。 */
@@ -39,4 +41,12 @@ public interface TeachingFeignClient {
     Result<StudentAccessResponse> canViewStudent(
             @PathVariable("teacherId") Long teacherId,
             @PathVariable("studentId") Long studentId);
+
+    @GetMapping("/classes/{classId}/roster")
+    Result<ClassRosterResponse> getClassRoster(@PathVariable("classId") Long classId);
+
+    @GetMapping("/teachers/{teacherId}/classes/{classId}/access")
+    Result<ClassAccessResponse> canViewClass(
+            @PathVariable("teacherId") Long teacherId,
+            @PathVariable("classId") Long classId);
 }

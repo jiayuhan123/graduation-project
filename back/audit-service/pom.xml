@@ -17,6 +17,10 @@
     <dependencies>
         <dependency>
             <groupId>xyz.jiayuhan</groupId>
+            <artifactId>user-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
             <artifactId>common-core</artifactId>
         </dependency>
         <dependency>

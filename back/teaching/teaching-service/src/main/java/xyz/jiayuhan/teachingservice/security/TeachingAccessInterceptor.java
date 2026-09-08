@@ -19,6 +19,7 @@ public class TeachingAccessInterceptor implements HandlerInterceptor {
 
     public static final String CLASS_PERMISSION = "teaching:class:manage";
     public static final String ASSIGNMENT_PERMISSION = "teaching:assignment:manage";
+    public static final String REPORT_PERMISSION = "teaching:report:query";
 
     private final UserFeignClient userFeignClient;
 
@@ -35,6 +36,9 @@ public class TeachingAccessInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
         if (isStudentPath(uri)) {
             requireStudent(userId);
+        } else if (uri.contains("/api/teaching/admin/")) {
+            requireAdmin(userId);
+            requirePermission(userId, REPORT_PERMISSION);
         } else {
             requirePermission(userId, isClassPath(uri) ? CLASS_PERMISSION : ASSIGNMENT_PERMISSION);
         }
@@ -55,6 +59,17 @@ public class TeachingAccessInterceptor implements HandlerInterceptor {
         Result<UserValidationResponse> result = userFeignClient.validateUser(userId, "student");
         if (result == null || !Integer.valueOf(200).equals(result.getCode()) || result.getData() == null) {
             throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, "暂时无法校验学生身份");
+        }
+        UserValidationResponse validation = result.getData();
+        if (!validation.exists() || !validation.active() || !validation.roleMatched()) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+    }
+
+    private void requireAdmin(Long userId) {
+        Result<UserValidationResponse> result = userFeignClient.validateUser(userId, "admin");
+        if (result == null || !Integer.valueOf(200).equals(result.getCode()) || result.getData() == null) {
+            throw new BusinessException(ResultCode.SERVICE_UNAVAILABLE, "暂时无法校验管理员身份");
         }
         UserValidationResponse validation = result.getData();
         if (!validation.exists() || !validation.active() || !validation.roleMatched()) {

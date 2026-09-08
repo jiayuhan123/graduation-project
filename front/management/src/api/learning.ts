@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+import { download, request } from '@/utils/request'
 import type { PageResult } from '@/types/api'
 import type {
   AnswerFeedback,
@@ -11,6 +11,12 @@ import type {
   RecommendationQuery,
   ReviewPhotoItemInput,
   StudentLearningReport,
+  BatchPhotoReviewResult,
+  ClassLearningDashboard,
+  ClassPracticeCreationResult,
+  PhotoReviewDetail,
+  PhotoReviewTask,
+  PhotoReviewWorkbenchQuery,
 } from '@/types/learning'
 
 const LEARNING_URL = '/api/learning'
@@ -122,4 +128,62 @@ export const reviewStudentPhotoItemApi = (
     url: `${LEARNING_URL}/photo-reviews/students/${studentId}/${markingTaskId}/items/${markingItemId}`,
     method: 'POST',
     data,
+  })
+
+export const getClassLearningDashboardApi = (classId: string, days = 30) =>
+  request<ClassLearningDashboard>({
+    url: `${LEARNING_URL}/class-reports/${classId}`,
+    method: 'GET',
+    params: { days },
+  })
+
+export const createClassTargetedPracticeApi = (classId: string, data: CreatePracticeTaskInput) =>
+  request<ClassPracticeCreationResult>({
+    url: `${LEARNING_URL}/class-reports/${classId}/practice-tasks`,
+    method: 'POST',
+    data,
+  })
+
+export const pagePhotoReviewWorkbenchApi = (params: PhotoReviewWorkbenchQuery) =>
+  request<PageResult<PhotoReviewTask>>({
+    url: `${LEARNING_URL}/photo-reviews`,
+    method: 'GET',
+    params,
+  })
+
+export const getPhotoReviewWorkbenchDetailApi = (markingTaskId: string) =>
+  request<PhotoReviewDetail>({
+    url: `${LEARNING_URL}/photo-reviews/${markingTaskId}`,
+    method: 'GET',
+  })
+
+export const reviewPhotoWorkbenchItemApi = (
+  markingTaskId: string,
+  markingItemId: string,
+  data: ReviewPhotoItemInput,
+) =>
+  request<PhotoReviewDetail>({
+    url: `${LEARNING_URL}/photo-reviews/${markingTaskId}/items/${markingItemId}`,
+    method: 'POST',
+    data,
+  })
+
+export const retryPhotoRecognitionApi = (markingTaskId: string) =>
+  request<PhotoReviewDetail>({
+    url: `${LEARNING_URL}/photo-reviews/${markingTaskId}/retry`,
+    method: 'POST',
+  })
+
+export const batchApprovePhotoReviewApi = (markingTaskIds: string[]) =>
+  request<BatchPhotoReviewResult>({
+    url: `${LEARNING_URL}/photo-reviews/batch-approve`,
+    method: 'POST',
+    data: { markingTaskIds },
+  })
+
+export const downloadPhotoReviewFileApi = (ownerId: string, fileId: string) =>
+  download({
+    url: `/api/files/reviews/${fileId}`,
+    method: 'GET',
+    params: { ownerId },
   })

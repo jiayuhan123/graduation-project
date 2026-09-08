@@ -16,6 +16,7 @@ import java.util.UUID;
  */
 public record AuditLogVO(
         UUID id,
+        Long operatorId,
         String source,
         String action,
         String targetType,

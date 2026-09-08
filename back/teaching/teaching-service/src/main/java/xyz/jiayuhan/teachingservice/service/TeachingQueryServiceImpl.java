@@ -11,6 +11,8 @@ import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentSummaryResponse;
 import xyz.jiayuhan.teachingapi.model.response.AssignmentLearningResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassAccessResponse;
+import xyz.jiayuhan.teachingapi.model.response.ClassRosterResponse;
 import xyz.jiayuhan.teachingapi.model.response.StudentAccessResponse;
 import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 import xyz.jiayuhan.teachingservice.entity.Assignment;
@@ -26,6 +28,7 @@ import xyz.jiayuhan.teachingservice.mapper.ClassStudentMapper;
 import xyz.jiayuhan.teachingservice.mapper.ClassTeacherMapper;
 import xyz.jiayuhan.teachingservice.mapper.TeachingClassMapper;
 import xyz.jiayuhan.teachingservice.model.response.TeachingView;
+import xyz.jiayuhan.teachingservice.model.response.TeachingOperationsStatisticsResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -60,6 +63,24 @@ public class TeachingQueryServiceImpl implements TeachingQueryService {
                 .map(membership -> toView(classes.get(membership.getClassId()), membership))
                 .toList();
         return pageResult(memberships, records);
+    }
+
+    @Override
+    public PageResult<TeachingView.ClassMembership> pageAllClasses(
+            long page, long size, String status) {
+        Page<TeachingClass> classes = teachingClassMapper.selectPage(
+                new Page<>(page, size),
+                new LambdaQueryWrapper<TeachingClass>()
+                        .eq(status != null, TeachingClass::getStatus, status)
+                        .orderByDesc(TeachingClass::getCreatedAt)
+                        .orderByDesc(TeachingClass::getId));
+        List<TeachingView.ClassMembership> records = classes.getRecords().stream()
+                .map(value -> new TeachingView.ClassMembership(
+                        value.getId(), value.getClassCode(), value.getName(), value.getSchoolName(),
+                        value.getAcademicYear(), value.getGradeLevel(), value.getSemester(), value.getStatus(),
+                        "ADMIN", "ACTIVE", value.getCreatedAt(), value.getCreatedBy(), value.getVersion()))
+                .toList();
+        return pageResult(classes, records);
     }
 
     @Override
@@ -188,6 +209,56 @@ public class TeachingQueryServiceImpl implements TeachingQueryService {
                         .eq(ClassStudent::getStudentId, studentId)
                         .eq(ClassStudent::getStatus, "ACTIVE")) > 0;
         return new StudentAccessResponse(teacherId, studentId, accessible);
+    }
+
+    @Override
+    public ClassRosterResponse getClassRosterInternal(Long classId) {
+        TeachingClass teachingClass = teachingClassMapper.selectById(classId);
+        if (teachingClass == null) {
+            throw new BusinessException(ResultCode.TEACHING_CLASS_NOT_FOUND);
+        }
+        List<Long> studentIds = classStudentMapper.selectList(
+                        new LambdaQueryWrapper<ClassStudent>()
+                                .eq(ClassStudent::getClassId, classId)
+                                .eq(ClassStudent::getStatus, "ACTIVE")
+                                .orderByAsc(ClassStudent::getStudentId))
+                .stream()
+                .map(ClassStudent::getStudentId)
+                .distinct()
+                .toList();
+        return new ClassRosterResponse(
+                teachingClass.getId(), teachingClass.getName(), teachingClass.getSchoolName(),
+                teachingClass.getGradeLevel(), teachingClass.getSemester(),
+                teachingClass.getStatus(), studentIds);
+    }
+
+    @Override
+    public ClassAccessResponse canTeacherViewClass(Long teacherId, Long classId) {
+        boolean accessible = classTeacherMapper.exists(new LambdaQueryWrapper<ClassTeacher>()
+                .eq(ClassTeacher::getTeacherId, teacherId)
+                .eq(ClassTeacher::getClassId, classId));
+        return new ClassAccessResponse(teacherId, classId, accessible);
+    }
+
+    @Override
+    public TeachingOperationsStatisticsResponse operationsStatistics() {
+        long totalClasses = teachingClassMapper.selectCount(null);
+        long activeClasses = teachingClassMapper.selectCount(
+                new LambdaQueryWrapper<TeachingClass>().eq(TeachingClass::getStatus, "ACTIVE"));
+        long teacherMemberships = classTeacherMapper.selectCount(null);
+        long activeStudentMemberships = classStudentMapper.selectCount(
+                new LambdaQueryWrapper<ClassStudent>().eq(ClassStudent::getStatus, "ACTIVE"));
+        long totalAssignments = assignmentMapper.selectCount(null);
+        long publishedAssignments = assignmentMapper.selectCount(
+                new LambdaQueryWrapper<Assignment>()
+                        .in(Assignment::getStatus, List.of("PUBLISHED", "CLOSED")));
+        long totalSubmissions = assignmentSubmissionMapper.selectCount(null);
+        long completedSubmissions = assignmentSubmissionMapper.selectCount(
+                new LambdaQueryWrapper<AssignmentSubmission>()
+                        .in(AssignmentSubmission::getStatus, List.of("SUBMITTED", "GRADED")));
+        return new TeachingOperationsStatisticsResponse(
+                totalClasses, activeClasses, teacherMemberships, activeStudentMemberships,
+                totalAssignments, publishedAssignments, totalSubmissions, completedSubmissions);
     }
 
     private TeachingView.AssignmentDetail detail(

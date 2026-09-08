@@ -72,6 +72,34 @@ public class AuditLogServiceImpl implements AuditLogService {
                 result.getRecords().stream().map(this::toVO).toList());
     }
 
+    @Override
+    public PageResult<AuditLogVO> page(
+            long page,
+            long size,
+            Long operatorId,
+            String source,
+            String action,
+            String targetType,
+            String targetId,
+            LocalDateTime occurredFrom,
+            LocalDateTime occurredTo) {
+        Page<AuditLog> result = auditLogMapper.selectPage(
+                new Page<>(page, size),
+                new LambdaQueryWrapper<AuditLog>()
+                        .eq(operatorId != null, AuditLog::getOperatorId, operatorId)
+                        .eq(StringUtils.hasText(source), AuditLog::getSource, source)
+                        .eq(StringUtils.hasText(action), AuditLog::getAction, action)
+                        .eq(StringUtils.hasText(targetType), AuditLog::getTargetType, targetType)
+                        .eq(StringUtils.hasText(targetId), AuditLog::getTargetId, targetId)
+                        .ge(occurredFrom != null, AuditLog::getOccurredAt, occurredFrom)
+                        .le(occurredTo != null, AuditLog::getOccurredAt, occurredTo)
+                        .orderByDesc(AuditLog::getOccurredAt)
+                        .orderByDesc(AuditLog::getId));
+        return new PageResult<>(
+                result.getCurrent(), result.getSize(), result.getTotal(), result.getPages(),
+                result.getRecords().stream().map(this::toVO).toList());
+    }
+
     private void store(
             UUID eventId,
             Long operatorId,
@@ -102,6 +130,7 @@ public class AuditLogServiceImpl implements AuditLogService {
     private AuditLogVO toVO(AuditLog auditLog) {
         return new AuditLogVO(
                 auditLog.getId(),
+                auditLog.getOperatorId(),
                 auditLog.getSource(),
                 auditLog.getAction(),
                 auditLog.getTargetType(),

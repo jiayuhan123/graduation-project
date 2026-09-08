@@ -15,6 +15,10 @@ import type {
   QuestionInput,
   QuestionQuery,
   QuestionSummary,
+  PublishedQuestion,
+  QuestionFeedback,
+  QuestionFeedbackCategory,
+  QuestionFeedbackStatus,
 } from '@/types/content'
 
 const ADMIN_CONTENT_URL = '/api/content/admin'
@@ -170,4 +174,54 @@ export const deleteErrorTypeApi = (errorTypeId: string, version: number) =>
     url: `${ADMIN_CONTENT_URL}/error-types/${errorTypeId}`,
     method: 'DELETE',
     params: { version },
+  })
+
+export const pagePublishedQuestionsApi = (params: {
+  page?: number
+  size?: number
+  knowledgePointId?: string
+  questionType?: string
+  difficulty?: number
+}) =>
+  request<PageResult<PublishedQuestion>>({
+    url: `${CONTENT_URL}/questions`,
+    method: 'GET',
+    params,
+  })
+
+export const createQuestionFeedbackApi = (
+  questionId: string,
+  data: { category: QuestionFeedbackCategory; description: string },
+) =>
+  request<QuestionFeedback>({
+    url: `${CONTENT_URL}/questions/${questionId}/feedback`,
+    method: 'POST',
+    data,
+  })
+
+export const pageQuestionFeedbackApi = (params: {
+  page?: number
+  size?: number
+  status?: QuestionFeedbackStatus
+  category?: QuestionFeedbackCategory
+  questionId?: string
+}) =>
+  request<PageResult<QuestionFeedback>>({
+    url: `${ADMIN_CONTENT_URL}/question-feedback`,
+    method: 'GET',
+    params,
+  })
+
+export const handleQuestionFeedbackApi = (
+  feedbackId: string,
+  data: {
+    action: 'PROCESS' | 'RESOLVE' | 'REJECT' | 'RESOLVE_AND_DISABLE'
+    comment?: string
+    version: number
+  },
+) =>
+  request<QuestionFeedback>({
+    url: `${ADMIN_CONTENT_URL}/question-feedback/${feedbackId}`,
+    method: 'PUT',
+    data,
   })
