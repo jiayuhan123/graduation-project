@@ -20,6 +20,8 @@ import xyz.jiayuhan.common.core.result.Result;
 import xyz.jiayuhan.common.security.context.UserContext;
 import xyz.jiayuhan.learningapi.model.response.PracticeTaskSummaryResponse;
 import xyz.jiayuhan.learningservice.model.request.CreatePracticeTaskRequest;
+import xyz.jiayuhan.learningservice.model.request.CreatePhotoMarkingRequest;
+import xyz.jiayuhan.learningservice.model.request.ReviewPhotoItemRequest;
 import xyz.jiayuhan.learningservice.model.request.SubmitAnswerRequest;
 import xyz.jiayuhan.learningservice.model.response.LearningView;
 import xyz.jiayuhan.learningservice.service.LearningCommandService;
@@ -46,6 +48,24 @@ public class LearningRecordController {
             @Valid @RequestBody CreatePracticeTaskRequest request) {
         return Result.success(learningCommandService.createSelfPractice(
                 UserContext.requireUserId(), request));
+    }
+
+    @Operation(summary = "创建拍照批改任务")
+    @PostMapping("/photo-marking")
+    public Result<LearningView.PhotoDetail> createPhotoMarking(
+            @Valid @RequestBody CreatePhotoMarkingRequest request) {
+        return Result.success(learningCommandService.createPhotoMarking(
+                UserContext.requireUserId(), request));
+    }
+
+    @Operation(summary = "学生确认或修正低可信识别结果")
+    @PostMapping("/photo-marking/{markingTaskId}/items/{markingItemId}/confirm")
+    public Result<LearningView.PhotoDetail> confirmPhotoItem(
+            @PathVariable Long markingTaskId,
+            @PathVariable Long markingItemId,
+            @Valid @RequestBody ReviewPhotoItemRequest request) {
+        return Result.success(learningCommandService.confirmPhotoItem(
+                UserContext.requireUserId(), markingTaskId, markingItemId, request));
     }
 
     @Operation(summary = "从教师作业创建或获取练习任务")

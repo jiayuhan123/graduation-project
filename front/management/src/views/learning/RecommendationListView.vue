@@ -14,6 +14,7 @@ import {
   pageRecommendationsApi,
 } from '@/api/learning'
 import PageHeader from '@/components/PageHeader.vue'
+import StudentSelector from '@/components/StudentSelector.vue'
 import { useUserStore } from '@/stores/user'
 import type { RecommendationItem } from '@/types/learning'
 
@@ -94,15 +95,7 @@ onMounted(() => {
     />
 
     <section v-if="!isStudent" class="surface-card recommendation-query">
-      <input
-        v-model="studentId"
-        inputmode="numeric"
-        maxlength="20"
-        placeholder="输入学生 ID"
-        @keyup.enter="load"
-      />
-      <t-button :loading="loading" :disabled="!studentId.trim()" @click="load">查询推荐</t-button>
-      <t-tag theme="primary" variant="light">只读</t-tag>
+      <StudentSelector v-model="studentId" @change="load" />
     </section>
 
     <div v-if="loading" class="surface-card content-loading">
@@ -143,19 +136,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .recommendation-query {
-  display: flex;
   padding: 22px;
-  align-items: center;
-  gap: 10px;
-}
-
-.recommendation-query input {
-  width: min(360px, 100%);
-  min-height: 42px;
-  padding: 9px 12px;
-  border: 1px solid #dfe3e7;
-  border-radius: 10px;
-  font: inherit;
 }
 
 .recommendation-grid {

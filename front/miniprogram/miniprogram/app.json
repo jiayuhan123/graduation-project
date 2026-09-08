@@ -31,6 +31,7 @@
       "root": "packages/game",
       "pages": [
         "pages/levels/index",
+        "pages/play/index",
         "pages/sessions/index",
         "pages/progress/index",
         "pages/rewards/index"

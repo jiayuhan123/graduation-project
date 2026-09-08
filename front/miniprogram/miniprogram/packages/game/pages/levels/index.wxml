@@ -1,1 +1,57 @@
-<t-empty description="关卡页面样板已就绪" />
+<view class="page-shell pk-lobby">
+  <view class="hero-card">
+    <text class="hero-card__eyebrow">MATH DUEL</text>
+    <text class="hero-card__title">双人实时 PK</text>
+    <text class="hero-card__description">双方使用完全相同的固定题目，先比得分，再比正确数和总耗时。</text>
+    <view class="hero-card__links">
+      <text bindtap="openHistory">对局记录</text>
+      <text bindtap="openProgress">成长战绩</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="surface-card state-card">
+    <t-loading theme="circular" text="正在准备 PK 题库" />
+  </view>
+
+  <block wx:elif="{{matching || waitingRoom}}">
+    <view class="surface-card waiting-card">
+      <view class="pulse"><text>⚔</text></view>
+      <text class="waiting-card__title">{{waitingRoom ? '房间已创建' : '正在匹配对手'}}</text>
+      <text wx:if="{{roomInviteCode}}" class="invite-code" bindtap="copyInviteCode">{{roomInviteCode}}</text>
+      <text class="waiting-card__description">{{waitingText}}</text>
+      <text wx:if="{{roomInviteCode}}" class="waiting-card__hint">点击邀请码即可复制</text>
+      <button class="secondary-button" bindtap="cancelWaiting">取消等待</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="surface-card form-card">
+      <text class="section-title">本局题目</text>
+      <picker range="{{moduleNames}}" value="{{moduleIndex}}" bindchange="onModuleChange">
+        <view class="picker-row"><text>内容模块</text><text>{{moduleNames[moduleIndex] || '暂无可用模块'}} ›</text></view>
+      </picker>
+      <picker range="{{knowledgePointNames}}" value="{{knowledgePointIndex}}" bindchange="onKnowledgePointChange">
+        <view class="picker-row"><text>知识点</text><text>{{loadingPoints ? '加载中' : (knowledgePointNames[knowledgePointIndex] || '暂无可用知识点')}} ›</text></view>
+      </picker>
+      <picker range="{{difficultyOptions}}" value="{{difficultyIndex}}" bindchange="onDifficultyChange">
+        <view class="picker-row"><text>难度</text><text>{{difficulty}} 级 ›</text></view>
+      </picker>
+      <picker range="{{questionCountOptions}}" value="{{questionCountIndex}}" bindchange="onQuestionCountChange">
+        <view class="picker-row"><text>题量</text><text>{{questionCount}} 题 ›</text></view>
+      </picker>
+      <picker range="{{timeOptions}}" value="{{timeIndex}}" bindchange="onTimeChange">
+        <view class="picker-row"><text>总时限</text><text>{{timeLimitSeconds}} 秒 ›</text></view>
+      </picker>
+      <button class="primary-button" loading="{{submitting}}" disabled="{{submitting || loadingPoints}}" bindtap="randomMatch">随机匹配</button>
+      <button class="outline-button" loading="{{submitting}}" disabled="{{submitting || loadingPoints}}" bindtap="createRoom">创建邀请码房间</button>
+    </view>
+
+    <view class="surface-card join-card">
+      <text class="section-title">加入好友房间</text>
+      <view class="join-row">
+        <input value="{{inviteCode}}" maxlength="12" placeholder="输入邀请码" bindinput="onInviteCodeInput" />
+        <button loading="{{submitting}}" disabled="{{submitting}}" bindtap="joinRoom">加入</button>
+      </view>
+    </view>
+  </block>
+</view>

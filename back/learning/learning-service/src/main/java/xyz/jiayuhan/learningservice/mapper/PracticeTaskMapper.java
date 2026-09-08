@@ -34,4 +34,20 @@ public interface PracticeTaskMapper extends BaseMapper<PracticeTask> {
             DO NOTHING
             """)
     int insertAssignmentIfAbsent(PracticeTask task);
+
+    @Insert("""
+            INSERT INTO practice_task (
+                id, student_id, source_type, source_id, title, mode, status,
+                question_count, time_limit_seconds, target_accuracy, started_at,
+                completed_at, expires_at, created_at, updated_at, version
+            ) VALUES (
+                #{id}, #{studentId}, #{sourceType}, #{sourceId}, #{title}, #{mode}, #{status},
+                #{questionCount}, #{timeLimitSeconds}, #{targetAccuracy}, #{startedAt},
+                #{completedAt}, #{expiresAt}, #{createdAt}, #{updatedAt}, #{version}
+            )
+            ON CONFLICT (student_id, source_type, source_id)
+            WHERE source_type = 'GAME' AND source_id IS NOT NULL
+            DO NOTHING
+            """)
+    int insertGameIfAbsent(PracticeTask task);
 }

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 import xyz.jiayuhan.common.mq.publisher.DomainEventPublisher;
+import xyz.jiayuhan.common.mq.MqTopology;
+import xyz.jiayuhan.common.mq.event.GameLearningEvent;
 import xyz.jiayuhan.gameservice.entity.GameEventOutbox;
 import xyz.jiayuhan.gameservice.mapper.GameEventOutboxMapper;
 
@@ -32,7 +34,7 @@ public class GameEventOutboxDispatchService {
     public void publishPendingBatch() {
         for (GameEventOutbox outbox : outboxMapper.selectPendingBatchForUpdate(batchSize)) {
             try {
-                GameDomainEvent event = objectMapper.readValue(outbox.getPayload(), GameDomainEvent.class);
+                GameLearningEvent event = objectMapper.readValue(outbox.getPayload(), GameLearningEvent.class);
                 eventPublisher.publish(routingKey(outbox.getEventType()), event);
                 markSent(outbox);
             } catch (Exception exception) {
@@ -50,8 +52,8 @@ public class GameEventOutboxDispatchService {
 
     private String routingKey(String eventType) {
         return switch (eventType) {
-            case GameEventOutboxService.ANSWER_GRADED -> "game.answer.graded";
-            case GameEventOutboxService.SESSION_COMPLETED -> "game.session.completed";
+            case GameEventOutboxService.ANSWER_GRADED -> MqTopology.GAME_ANSWER_GRADED_ROUTING_KEY;
+            case GameEventOutboxService.SESSION_COMPLETED -> MqTopology.GAME_SESSION_COMPLETED_ROUTING_KEY;
             default -> "game.event";
         };
     }

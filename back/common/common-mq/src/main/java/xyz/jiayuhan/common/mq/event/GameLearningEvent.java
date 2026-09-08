@@ -1,13 +1,11 @@
-package xyz.jiayuhan.gameservice.event;
-
-import xyz.jiayuhan.common.mq.event.DomainEvent;
+package xyz.jiayuhan.common.mq.event;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
-/** 游戏服务向学习与通知场景发布的通用不可变事件。 */
-public record GameDomainEvent(
+/** 游戏逐题结果和对局结算向学习域发布的稳定跨服务事件。 */
+public record GameLearningEvent(
         UUID eventId,
         String eventType,
         Instant occurredAt,

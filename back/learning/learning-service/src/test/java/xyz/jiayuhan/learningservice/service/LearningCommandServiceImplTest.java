@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -19,6 +20,8 @@ import xyz.jiayuhan.learningservice.entity.AnswerRecord;
 import xyz.jiayuhan.learningservice.entity.ErrorRecord;
 import xyz.jiayuhan.learningservice.entity.MasteryChangeLog;
 import xyz.jiayuhan.learningservice.entity.MasteryRecord;
+import xyz.jiayuhan.learningservice.entity.PhotoMarkingItem;
+import xyz.jiayuhan.learningservice.entity.PhotoMarkingTask;
 import xyz.jiayuhan.learningservice.entity.PracticeTask;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskKnowledgePoint;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskQuestion;
@@ -28,11 +31,17 @@ import xyz.jiayuhan.learningservice.mapper.AnswerRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.ErrorRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.MasteryChangeLogMapper;
 import xyz.jiayuhan.learningservice.mapper.MasteryRecordMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoMarkingItemMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoMarkingTaskMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoReviewRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskKnowledgePointMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskQuestionMapper;
 import xyz.jiayuhan.learningservice.mapper.RecommendationMapper;
 import xyz.jiayuhan.learningservice.model.request.CreatePracticeTaskRequest;
+import xyz.jiayuhan.learningservice.model.request.CreatePhotoMarkingRequest;
+import xyz.jiayuhan.learningservice.model.request.PhotoRecognitionItemRequest;
+import xyz.jiayuhan.learningservice.model.request.PhotoRecognitionRequest;
 import xyz.jiayuhan.learningservice.model.request.SubmitAnswerRequest;
 import xyz.jiayuhan.learningservice.model.response.LearningView;
 import xyz.jiayuhan.learningservice.support.AnswerGrader;
@@ -44,6 +53,8 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -70,6 +81,9 @@ class LearningCommandServiceImplTest {
     @Mock private MasteryRecordMapper masteryRecordMapper;
     @Mock private MasteryChangeLogMapper masteryChangeLogMapper;
     @Mock private RecommendationMapper recommendationMapper;
+    @Mock private PhotoMarkingTaskMapper photoMarkingTaskMapper;
+    @Mock private PhotoMarkingItemMapper photoMarkingItemMapper;
+    @Mock private PhotoReviewRecordMapper photoReviewRecordMapper;
     @Mock private ContentFeignClient contentFeignClient;
     @Mock private TeachingFeignClient teachingFeignClient;
     @Mock private UserFeignClient userFeignClient;
@@ -84,6 +98,7 @@ class LearningCommandServiceImplTest {
         MapperBuilderAssistant assistant = new MapperBuilderAssistant(new MybatisConfiguration(), "test");
         TableInfoHelper.initTableInfo(assistant, ErrorRecord.class);
         TableInfoHelper.initTableInfo(assistant, Recommendation.class);
+        TableInfoHelper.initTableInfo(assistant, PhotoMarkingTask.class);
         objectMapper = JsonMapper.builder().build();
         service = new LearningCommandServiceImpl(
                 practiceTaskMapper,
@@ -94,6 +109,9 @@ class LearningCommandServiceImplTest {
                 masteryRecordMapper,
                 masteryChangeLogMapper,
                 recommendationMapper,
+                photoMarkingTaskMapper,
+                photoMarkingItemMapper,
+                photoReviewRecordMapper,
                 contentFeignClient,
                 teachingFeignClient,
                 userFeignClient,
@@ -105,6 +123,8 @@ class LearningCommandServiceImplTest {
         lenient().when(answerRecordMapper.updateById(any(AnswerRecord.class))).thenReturn(1);
         lenient().when(masteryRecordMapper.updateById(any(MasteryRecord.class))).thenReturn(1);
         lenient().when(masteryRecordMapper.acquireUpdateLock(anyLong(), anyLong())).thenReturn(1);
+        lenient().when(photoMarkingTaskMapper.updateById(any(PhotoMarkingTask.class))).thenReturn(1);
+        lenient().when(photoMarkingItemMapper.updateById(any(PhotoMarkingItem.class))).thenReturn(1);
     }
 
     @Test
@@ -229,6 +249,66 @@ class LearningCommandServiceImplTest {
                 any(OffsetDateTime.class));
     }
 
+    @Test
+    void createsIdempotentPhotoMarkingTaskForUploadedFile() {
+        UUID fileId = UUID.randomUUID();
+        LearningView.PhotoDetail expected = photoDetail(1301L, fileId, "UPLOADED");
+        when(userFeignClient.validateUser(STUDENT_ID, "student"))
+                .thenReturn(Result.success(new UserValidationResponse(STUDENT_ID, true, true, true)));
+        when(photoMarkingTaskMapper.selectOne(any())).thenReturn(null);
+        doAnswer(invocation -> {
+            PhotoMarkingTask task = invocation.getArgument(0);
+            task.setId(1301L);
+            return 1;
+        }).when(photoMarkingTaskMapper).insertIfAbsent(any(PhotoMarkingTask.class));
+        when(learningQueryService.getPhotoTask(STUDENT_ID, 1301L)).thenReturn(expected);
+
+        LearningView.PhotoDetail result = service.createPhotoMarking(
+                STUDENT_ID, new CreatePhotoMarkingRequest(fileId, 1));
+
+        assertThat(result).isSameAs(expected);
+        ArgumentCaptor<PhotoMarkingTask> taskCaptor = ArgumentCaptor.forClass(PhotoMarkingTask.class);
+        verify(photoMarkingTaskMapper).insertIfAbsent(taskCaptor.capture());
+        assertThat(taskCaptor.getValue().getStatus()).isEqualTo("UPLOADED");
+        assertThat(taskCaptor.getValue().getReviewStatus()).isEqualTo("NOT_REQUIRED");
+    }
+
+    @Test
+    void routesLowConfidenceRecognitionToManualReviewWithoutGrading() {
+        UUID fileId = UUID.randomUUID();
+        PhotoMarkingTask markingTask = new PhotoMarkingTask();
+        markingTask.setId(1401L);
+        markingTask.setStudentId(STUDENT_ID);
+        markingTask.setOriginalFileId(fileId);
+        markingTask.setStatus("UPLOADED");
+        markingTask.setPageCount(1);
+        markingTask.setVersion(0);
+        when(photoMarkingTaskMapper.selectForUpdate(1401L)).thenReturn(markingTask);
+        when(photoMarkingItemMapper.selectList(any())).thenReturn(List.of());
+        doAnswer(invocation -> {
+            PracticeTask task = invocation.getArgument(0);
+            task.setId(1501L);
+            return 1;
+        }).when(practiceTaskMapper).insert(any(PracticeTask.class));
+        QuestionResponse question = question(701L, "{\"value\":42}");
+        when(contentFeignClient.getQuestion(701L)).thenReturn(Result.success(question));
+        LearningView.PhotoDetail expected = photoDetail(1401L, fileId, "REVIEW_REQUIRED");
+        when(learningQueryService.getPhotoTask(STUDENT_ID, 1401L)).thenReturn(expected);
+
+        LearningView.PhotoDetail result = service.applyPhotoRecognition(
+                1401L,
+                new PhotoRecognitionRequest(List.of(new PhotoRecognitionItemRequest(
+                        1, null, Map.of("x", 10, "y", 20), "计算", "41", 701L,
+                        new BigDecimal("0.7200")))));
+
+        assertThat(result).isSameAs(expected);
+        ArgumentCaptor<PhotoMarkingItem> itemCaptor = ArgumentCaptor.forClass(PhotoMarkingItem.class);
+        verify(photoMarkingItemMapper).insert(itemCaptor.capture());
+        assertThat(itemCaptor.getValue().getStatus()).isEqualTo("REVIEW_REQUIRED");
+        assertThat(markingTask.getReviewStatus()).isEqualTo("PENDING");
+        verify(answerRecordMapper, never()).insert(any(AnswerRecord.class));
+    }
+
     private PracticeTask task(Long id, String sourceType, String status) {
         PracticeTask task = new PracticeTask();
         task.setId(id);
@@ -266,6 +346,15 @@ class LearningCommandServiceImplTest {
                         taskId, STUDENT_ID, sourceType, null, "练习", "NORMAL", status,
                         1, null, null, null, null),
                 List.of(KNOWLEDGE_POINT_ID),
+                List.of());
+    }
+
+    private LearningView.PhotoDetail photoDetail(Long taskId, UUID fileId, String status) {
+        return new LearningView.PhotoDetail(
+                new LearningView.PhotoTask(
+                        taskId, fileId, null, status, 1, null, 0,
+                        "UPLOADED".equals(status) ? "NOT_REQUIRED" : "PENDING",
+                        OffsetDateTime.now(ZoneOffset.UTC), null, null, null),
                 List.of());
     }
 }

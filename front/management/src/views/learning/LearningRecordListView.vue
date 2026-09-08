@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { Button as TButton, Loading as TLoading, Tag as TTag } from 'tdesign-vue-next'
+import { Loading as TLoading, Tag as TTag } from 'tdesign-vue-next'
 import { getOwnLearningReportApi, getStudentLearningReportApi } from '@/api/learning'
 import PageHeader from '@/components/PageHeader.vue'
+import StudentSelector from '@/components/StudentSelector.vue'
 import { useUserStore } from '@/stores/user'
 import type { StudentLearningReport } from '@/types/learning'
 
@@ -64,25 +65,12 @@ onMounted(() => {
       :description="
         isStudent
           ? '查看你的练习、正确率、错题和薄弱知识点。'
-          : '按学生编号查询学情；教师只能查看本人有效班级中的学生。'
+          : '从可访问的学生名单中选择，快速查看练习、错题和掌握度。'
       "
     />
 
     <section v-if="!isStudent" class="surface-card report-query">
-      <label>
-        <span>学生编号</span>
-        <input
-          v-model="studentId"
-          inputmode="numeric"
-          maxlength="20"
-          placeholder="输入学生 ID"
-          @keyup.enter="loadReport"
-        />
-      </label>
-      <t-button :loading="loading" :disabled="!studentId.trim()" @click="loadReport">
-        查询学情
-      </t-button>
-      <small>管理员可查询全部学生；教师查询时服务端会校验真实师生关系。</small>
+      <StudentSelector v-model="studentId" @change="loadReport" />
     </section>
 
     <div v-if="loading" class="surface-card content-loading">
@@ -181,35 +169,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .report-query {
-  display: grid;
   padding: 22px;
-  align-items: end;
-  grid-template-columns: minmax(220px, 360px) auto 1fr;
-  gap: 12px;
-}
-
-.report-query label {
-  display: grid;
-  gap: 7px;
-}
-
-.report-query label span {
-  color: var(--app-text-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.report-query input {
-  min-height: 42px;
-  padding: 9px 12px;
-  border: 1px solid #dfe3e7;
-  border-radius: 10px;
-  font: inherit;
-}
-
-.report-query small {
-  align-self: center;
-  color: var(--app-text-muted);
 }
 
 .student-card {
@@ -330,18 +290,12 @@ onMounted(() => {
 }
 
 @media (width <= 900px) {
-  .report-query,
   .overview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .report-query small {
-    grid-column: 1 / -1;
   }
 }
 
 @media (width <= 640px) {
-  .report-query,
   .overview-grid,
   .report-grid {
     grid-template-columns: 1fr;

@@ -15,5 +15,7 @@ public interface FileService {
 
     FileDownload download(Long ownerId, UUID fileId);
 
+    FileDownload downloadInternal(Long ownerId, UUID fileId);
+
     void delete(Long ownerId, UUID fileId);
 }

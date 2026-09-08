@@ -1,1 +1,23 @@
-<t-empty description="游戏进度页面样板已就绪" />
+<view class="page-shell">
+  <view wx:if="{{loading}}" class="state"><t-loading theme="circular" text="正在读取成长数据" /></view>
+  <block wx:elif="{{progress}}">
+    <view class="rating-card">
+      <text class="rating-card__label">PK RATING</text>
+      <text class="rating-card__value">{{progress.pkRating}}</text>
+      <text class="rating-card__meta">玩家等级 Lv.{{progress.playerLevel}} · 当前连胜 {{progress.currentWinStreak}}</text>
+    </view>
+    <view class="stats-grid">
+      <view class="surface-card"><strong>{{progress.pkSessions}}</strong><text>总场次</text></view>
+      <view class="surface-card"><strong>{{progress.pkWins}}</strong><text>胜场</text></view>
+      <view class="surface-card"><strong>{{winRate}}%</strong><text>胜率</text></view>
+      <view class="surface-card"><strong>{{progress.bestCombo}}</strong><text>最佳连击</text></view>
+    </view>
+    <view class="surface-card reward-card">
+      <view class="section-header"><strong>最近奖励</strong><text bindtap="openRewards">全部 ›</text></view>
+      <view wx:for="{{rewards}}" wx:key="id" class="reward-row">
+        <text>{{item.rewardType}} · {{item.reason}}</text><strong>+{{item.amount}}</strong>
+      </view>
+      <text wx:if="{{!rewards.length}}" class="empty">完成 PK 后会记录积分和经验。</text>
+    </view>
+  </block>
+</view>

@@ -144,6 +144,16 @@ public final class LearningView {
     public record PhotoDetail(PhotoTask task, List<PhotoItem> items) {
     }
 
+    /** 供 OCR 工作器领取的最小任务描述，不包含任何公开下载地址。 */
+    public record PhotoWorkItem(
+            Long markingTaskId,
+            Long studentId,
+            UUID originalFileId,
+            Integer pageCount,
+            OffsetDateTime submittedAt
+    ) {
+    }
+
     public record AnswerFeedback(
             Long taskId,
             Long taskQuestionId,

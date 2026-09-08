@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
+import xyz.jiayuhan.common.mq.event.GameLearningEvent;
 import xyz.jiayuhan.gameservice.entity.GameEventOutbox;
 import xyz.jiayuhan.gameservice.mapper.GameEventOutboxMapper;
 
@@ -33,7 +34,7 @@ public class GameEventOutboxService {
             Long aggregateId,
             Long studentId,
             Map<String, Object> data) {
-        GameDomainEvent event = new GameDomainEvent(
+        GameLearningEvent event = new GameLearningEvent(
                 UUID.randomUUID(),
                 eventType,
                 Instant.now(),

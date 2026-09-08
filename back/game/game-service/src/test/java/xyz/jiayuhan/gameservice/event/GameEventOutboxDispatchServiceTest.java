@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import xyz.jiayuhan.common.mq.publisher.DomainEventPublisher;
+import xyz.jiayuhan.common.mq.event.GameLearningEvent;
 import xyz.jiayuhan.gameservice.entity.GameEventOutbox;
 import xyz.jiayuhan.gameservice.mapper.GameEventOutboxMapper;
 
@@ -39,7 +40,7 @@ class GameEventOutboxDispatchServiceTest {
 
     @Test
     void marksEventSentOnlyAfterPublisherReturns() {
-        GameDomainEvent event = new GameDomainEvent(
+        GameLearningEvent event = new GameLearningEvent(
                 UUID.randomUUID(),
                 GameEventOutboxService.ANSWER_GRADED,
                 Instant.now(),
@@ -59,7 +60,7 @@ class GameEventOutboxDispatchServiceTest {
 
         service.publishPendingBatch();
 
-        verify(eventPublisher).publish(eq("game.answer.graded"), any(GameDomainEvent.class));
+        verify(eventPublisher).publish(eq("game.answer.graded"), any(GameLearningEvent.class));
         assertThat(outbox.getDeliveryStatus()).isEqualTo("SENT");
         assertThat(outbox.getSentAt()).isNotNull();
     }

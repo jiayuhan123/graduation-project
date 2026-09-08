@@ -1,63 +1,207 @@
 .page {
   min-height: 100vh;
-  padding: 32rpx;
-  background: #f7f8fa;
+  padding: 28rpx;
+  background: #f5f7f8;
   box-sizing: border-box;
 }
-.notice {
+.hero {
   display: flex;
   padding: 38rpx 32rpx;
   flex-direction: column;
-  background: linear-gradient(145deg, #fff, #fff4ec);
-  border: 1rpx solid #f3dfd2;
+  background: linear-gradient(145deg, #16324f, #255b78);
   border-radius: 28rpx;
+  color: #fff;
+  box-shadow: 0 16rpx 38rpx rgba(22, 50, 79, 0.18);
 }
-.badge {
-  align-self: flex-start;
-  padding: 7rpx 15rpx;
-  background: #fff0e7;
-  border-radius: 999rpx;
-  color: #dc621b;
-  font-size: 21rpx;
+.eyebrow {
+  color: #9fe7d7;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
 }
 .title {
-  margin-top: 22rpx;
-  color: #2d3436;
-  font-size: 40rpx;
+  margin-top: 14rpx;
+  font-size: 42rpx;
   font-weight: 800;
 }
 .description {
-  margin-top: 16rpx;
-  color: #737c82;
+  margin-top: 14rpx;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 25rpx;
-  line-height: 1.7;
+  line-height: 1.65;
 }
-.section-title {
-  display: block;
-  margin: 34rpx 8rpx 18rpx;
-  color: #41494e;
-  font-size: 28rpx;
+button {
+  margin: 0;
+  border-radius: 999rpx;
+  font-size: 25rpx;
+}
+button::after {
+  border: 0;
+}
+.choose-button {
+  width: 100%;
+  margin-top: 28rpx;
+  background: #fff;
+  color: #19415d;
   font-weight: 700;
 }
-.list {
+.surface {
+  background: #fff;
+  border: 1rpx solid #e8edef;
+  border-radius: 22rpx;
+}
+.preview-card {
+  display: grid;
+  margin-top: 20rpx;
+  padding: 22rpx;
+  color: #6b7479;
+  font-size: 23rpx;
+  gap: 18rpx;
+}
+.preview {
+  width: 100%;
+  height: 360rpx;
+  background: #f0f2f3;
+  border-radius: 16rpx;
+}
+.primary-button {
+  background: #17a085;
+  color: #fff;
+}
+.detail,
+.editor {
+  margin-top: 28rpx;
+}
+.section-head {
+  display: flex;
+  margin: 0 6rpx 16rpx;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-head text {
+  display: block;
+}
+.section-title {
+  color: #273238;
+  font-size: 29rpx;
+  font-weight: 750;
+}
+.section-tip,
+.meta {
+  margin-top: 5rpx;
+  color: #8a949a;
+  font-size: 21rpx;
+}
+.link {
+  color: #168c77;
+  font-size: 24rpx;
+}
+.waiting {
+  display: flex;
+  min-height: 150rpx;
+  align-items: center;
+  justify-content: center;
+  color: #7c878c;
+  font-size: 24rpx;
+  gap: 10rpx;
+}
+.spinner {
+  color: #17a085;
+  font-size: 38rpx;
+}
+.item-list,
+.task-list {
   display: grid;
   gap: 14rpx;
 }
-.card {
+.item-card {
+  display: grid;
+  padding: 22rpx;
+  gap: 12rpx;
+}
+.item-card--review {
+  border-color: #f1b77c;
+  box-shadow: 0 5rpx 18rpx rgba(224, 137, 47, 0.08);
+}
+.item-head,
+.task-card {
   display: flex;
-  padding: 25rpx;
+  align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-radius: 20rpx;
-  color: #626b71;
+  gap: 16rpx;
+}
+.item-title,
+.task-title {
+  color: #29343a;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+.status {
+  color: #168c77;
+  font-size: 22rpx;
+}
+.stem {
+  color: #465158;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+.answer {
+  padding: 14rpx;
+  background: #f5f8f8;
+  border-radius: 12rpx;
+  color: #273238;
   font-size: 24rpx;
+}
+.editor {
+  display: grid;
+  padding: 24rpx;
+  gap: 18rpx;
+}
+.editor label {
+  display: grid;
+  color: #68747a;
+  font-size: 22rpx;
+  gap: 8rpx;
+}
+.editor textarea,
+.editor input {
+  width: 100%;
+  min-height: 76rpx;
+  padding: 15rpx;
+  background: #f5f7f8;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+  color: #273238;
+  font-size: 25rpx;
+}
+.editor textarea {
+  min-height: 150rpx;
+}
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12rpx;
+}
+.actions .danger-button {
+  grid-column: 1 / -1;
+  background: #fff0ef;
+  color: #c6544d;
+}
+.history-head {
+  margin-top: 34rpx;
+}
+.task-card {
+  padding: 23rpx;
+}
+.task-card text {
+  display: block;
 }
 .state {
   display: grid;
-  min-height: 35vh;
+  min-height: 260rpx;
   color: #92999e;
   place-items: center;
 }
 .state--small {
-  min-height: 180rpx;
+  min-height: 150rpx;
 }

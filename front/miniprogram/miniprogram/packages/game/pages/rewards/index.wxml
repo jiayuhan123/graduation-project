@@ -1,1 +1,10 @@
-<t-empty description="奖励记录页面样板已就绪" />
+<view class="page-shell">
+  <view wx:if="{{loading}}" class="state"><t-loading theme="circular" text="正在读取奖励" /></view>
+  <view wx:elif="{{records.length}}" class="reward-list">
+    <view wx:for="{{records}}" wx:key="id" class="surface-card reward-item">
+      <view><strong>{{item.rewardType}}</strong><text>{{item.reason}} · 对局 #{{item.sessionId}}</text></view>
+      <view class="reward-item__amount"><strong>+{{item.amount}}</strong><text>余额 {{item.balanceAfter}}</text></view>
+    </view>
+  </view>
+  <t-empty wx:else description="暂无奖励记录" />
+</view>

@@ -35,5 +35,7 @@ public interface LearningQueryService {
 
     LearningView.PhotoDetail getPhotoTask(Long studentId, Long markingTaskId);
 
+    List<LearningView.PhotoWorkItem> listPendingPhotoTasks(int limit);
+
     LearningView.Overview getOverview(Long studentId);
 }

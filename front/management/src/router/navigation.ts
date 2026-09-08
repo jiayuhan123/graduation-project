@@ -73,6 +73,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         roles: ['teacher'],
         permissions: ['teaching:report:query'],
       },
+      {
+        title: '拍照复核',
+        path: '/learning/photo-reviews',
+        icon: '▣',
+        roles: ['teacher'],
+        permissions: ['teaching:report:query'],
+      },
     ],
   },
   {

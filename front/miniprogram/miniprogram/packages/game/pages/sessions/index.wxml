@@ -1,1 +1,21 @@
-<t-empty description="闯关对局页面样板已就绪" />
+<view class="page-shell">
+  <view class="page-heading">
+    <text class="page-heading__eyebrow">PK HISTORY</text>
+    <text class="page-heading__title">我的对局</text>
+    <text class="page-heading__description">进行中的对局可以继续进入，已完成对局保留双方成绩与胜负。</text>
+  </view>
+  <view wx:if="{{loading}}" class="state"><t-loading theme="circular" text="正在读取对局" /></view>
+  <view wx:elif="{{records.length}}" class="session-list">
+    <view wx:for="{{records}}" wx:key="id" class="surface-card session-card" data-id="{{item.id}}" bindtap="openSession">
+      <view>
+        <text class="session-card__title">{{item.matchMode === 'ROOM' ? '好友房间' : '随机匹配'}} · {{item.questionCountSnapshot}} 题</text>
+        <text class="session-card__meta">难度 {{item.difficultySnapshot}} · {{item.timeLimitSecondsSnapshot}} 秒</text>
+      </view>
+      <view class="session-card__result">
+        <t-tag theme="{{item.status === 'COMPLETED' ? 'success' : 'warning'}}" variant="light">{{item.resultType || item.status}}</t-tag>
+        <text>{{item.settledAt || item.startedAt || item.expiresAt}}</text>
+      </view>
+    </view>
+  </view>
+  <t-empty wx:else description="还没有 PK 记录" />
+</view>

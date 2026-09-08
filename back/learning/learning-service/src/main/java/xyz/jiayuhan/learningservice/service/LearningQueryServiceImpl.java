@@ -194,6 +194,20 @@ public class LearningQueryServiceImpl implements LearningQueryService {
     }
 
     @Override
+    public List<LearningView.PhotoWorkItem> listPendingPhotoTasks(int limit) {
+        return photoMarkingTaskMapper.selectList(new LambdaQueryWrapper<PhotoMarkingTask>()
+                        .eq(PhotoMarkingTask::getStatus, "UPLOADED")
+                        .orderByAsc(PhotoMarkingTask::getSubmittedAt)
+                        .orderByAsc(PhotoMarkingTask::getId)
+                        .last("LIMIT " + limit))
+                .stream()
+                .map(task -> new LearningView.PhotoWorkItem(
+                        task.getId(), task.getStudentId(), task.getOriginalFileId(),
+                        task.getPageCount(), task.getSubmittedAt()))
+                .toList();
+    }
+
+    @Override
     public LearningView.Overview getOverview(Long studentId) {
         long taskCount = practiceTaskMapper.selectCount(new LambdaQueryWrapper<PracticeTask>()
                 .eq(PracticeTask::getStudentId, studentId));

@@ -342,14 +342,22 @@ public class GameSessionTransactionService {
                 "ANSWER",
                 question.getId(),
                 studentId,
-                Map.of(
-                        "sessionId", sessionId,
-                        "questionId", question.getQuestionId(),
-                        "knowledgePointId", session.getKnowledgePointIdSnapshot(),
-                        "correct", correct,
-                        "score", score,
-                        "responseMs", request.responseMs(),
-                        "combo", combo));
+                Map.ofEntries(
+                        Map.entry("sessionId", sessionId),
+                        Map.entry("sessionQuestionId", question.getId()),
+                        Map.entry("sequenceNo", question.getSequenceNo()),
+                        Map.entry("questionId", question.getQuestionId()),
+                        Map.entry("knowledgePointId", session.getKnowledgePointIdSnapshot()),
+                        Map.entry("gradeLevel", session.getGradeLevelSnapshot()),
+                        Map.entry("difficulty", session.getDifficultySnapshot()),
+                        Map.entry("questionCount", session.getQuestionCountSnapshot()),
+                        Map.entry("timeLimitSeconds", session.getTimeLimitSecondsSnapshot()),
+                        Map.entry("mode", session.getMode()),
+                        Map.entry("studentAnswer", request.answer()),
+                        Map.entry("correct", correct),
+                        Map.entry("score", score),
+                        Map.entry("responseMs", request.responseMs()),
+                        Map.entry("combo", combo)));
 
         boolean shouldSettle = LEVEL.equals(session.getMode())
                 ? member.getAnsweredCount().equals(session.getQuestionCountSnapshot())
@@ -762,15 +770,19 @@ public class GameSessionTransactionService {
                 "SESSION",
                 session.getId(),
                 member.getStudentId(),
-                Map.of(
-                        "mode", session.getMode(),
-                        "result", member.getResult(),
-                        "score", member.getScore(),
-                        "correctCount", member.getCorrectCount(),
-                        "questionCount", session.getQuestionCountSnapshot(),
-                        "pointsReward", member.getPointsReward(),
-                        "experienceReward", member.getExperienceReward(),
-                        "pkRating", pkRating));
+                Map.ofEntries(
+                        Map.entry("mode", session.getMode()),
+                        Map.entry("result", member.getResult()),
+                        Map.entry("score", member.getScore()),
+                        Map.entry("correctCount", member.getCorrectCount()),
+                        Map.entry("questionCount", session.getQuestionCountSnapshot()),
+                        Map.entry("knowledgePointId", session.getKnowledgePointIdSnapshot()),
+                        Map.entry("gradeLevel", session.getGradeLevelSnapshot()),
+                        Map.entry("difficulty", session.getDifficultySnapshot()),
+                        Map.entry("timeLimitSeconds", session.getTimeLimitSecondsSnapshot()),
+                        Map.entry("pointsReward", member.getPointsReward()),
+                        Map.entry("experienceReward", member.getExperienceReward()),
+                        Map.entry("pkRating", pkRating == null ? 0 : pkRating)));
     }
 
     private void cancelSession(GameSession session, OffsetDateTime endedAt, String reason) {

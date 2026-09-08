@@ -4,6 +4,7 @@ import type {
   AnswerQuery,
   AnswerFeedback,
   AnswerRecord,
+  CreatePhotoMarkingInput,
   CreatePracticeTaskInput,
   ErrorRecord,
   ErrorRecordQuery,
@@ -18,6 +19,7 @@ import type {
   PracticeTaskSummary,
   RecommendationItem,
   RecommendationQuery,
+  ReviewPhotoItemInput,
   StudentLearningReport,
   SubmitAnswerInput,
 } from '../types/learning'
@@ -112,3 +114,21 @@ export const pagePhotoTasksApi = (query: PhotoTaskQuery = {}) =>
 
 export const getPhotoTaskApi = (markingTaskId: string) =>
   request<PhotoDetail>({ path: `${LEARNING_BASE_URL}/photo-marking/${markingTaskId}` })
+
+export const createPhotoMarkingApi = (data: CreatePhotoMarkingInput) =>
+  request<PhotoDetail, CreatePhotoMarkingInput>({
+    path: `${LEARNING_BASE_URL}/photo-marking`,
+    method: 'POST',
+    data,
+  })
+
+export const confirmPhotoItemApi = (
+  markingTaskId: string,
+  markingItemId: string,
+  data: ReviewPhotoItemInput,
+) =>
+  request<PhotoDetail, ReviewPhotoItemInput>({
+    path: `${LEARNING_BASE_URL}/photo-marking/${markingTaskId}/items/${markingItemId}/confirm`,
+    method: 'POST',
+    data,
+  })

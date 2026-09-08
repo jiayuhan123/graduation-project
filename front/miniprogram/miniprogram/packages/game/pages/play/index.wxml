@@ -1,0 +1,57 @@
+<view class="play-page">
+  <view wx:if="{{loading}}" class="state"><t-loading theme="circular" text="正在进入对局" /></view>
+
+  <block wx:elif="{{detail}}">
+    <view class="duel-header">
+      <view class="player player--me">
+        <text class="player__avatar">我</text>
+        <text class="player__score">{{myMember.score || 0}}</text>
+        <text class="player__meta">正确 {{myMember.correctCount || 0}}/{{detail.session.questionCountSnapshot}}</text>
+      </view>
+      <view class="timer {{remainingSeconds <= 15 ? 'timer--urgent' : ''}}">
+        <text>{{remainingSeconds}}</text><small>秒</small>
+      </view>
+      <view class="player player--opponent">
+        <text class="player__avatar">TA</text>
+        <text class="player__score">{{opponentMember.score || 0}}</text>
+        <text class="player__meta">正确 {{opponentMember.correctCount || 0}}/{{detail.session.questionCountSnapshot}}</text>
+      </view>
+    </view>
+
+    <view class="progress-row">
+      <view class="progress-track"><view class="progress-fill progress-fill--me" style="width: {{myProgress}}%"></view></view>
+      <text>VS</text>
+      <view class="progress-track"><view class="progress-fill progress-fill--opponent" style="width: {{opponentProgress}}%"></view></view>
+    </view>
+
+    <view wx:if="{{completed}}" class="result-card">
+      <text class="result-card__badge">PK RESULT</text>
+      <text class="result-card__title">{{resultText}}</text>
+      <text class="result-card__score">{{myMember.score || 0}} : {{opponentMember.score || 0}}</text>
+      <view class="result-stats">
+        <text>正确 {{myMember.correctCount || 0}} 题</text>
+        <text>最高连击 {{myMember.maxCombo || 0}}</text>
+        <text>积分 +{{myMember.pointsReward || 0}}</text>
+        <text>经验 +{{myMember.experienceReward || 0}}</text>
+      </view>
+      <button class="primary-button" bindtap="playAgain">再来一局</button>
+      <button class="secondary-button" bindtap="openHistory">查看对局记录</button>
+    </view>
+
+    <view wx:elif="{{currentQuestion}}" class="question-card">
+      <view class="question-card__top">
+        <text>第 {{currentQuestion.sequenceNo}} / {{detail.session.questionCountSnapshot}} 题</text>
+        <text>连击 {{myMember.currentCombo || 0}}</text>
+      </view>
+      <text class="question-stem">{{currentQuestion.stem}}</text>
+      <text wx:if="{{currentQuestion.options}}" class="question-options">{{currentQuestion.options}}</text>
+      <input class="answer-input" value="{{answerValue}}" maxlength="200" focus placeholder="输入答案" confirm-type="done" bindinput="onAnswerInput" bindconfirm="submitAnswer" />
+      <view wx:if="{{feedbackText}}" class="feedback {{feedbackCorrect ? 'feedback--correct' : 'feedback--wrong'}}">{{feedbackText}}</view>
+      <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitAnswer">提交答案</button>
+    </view>
+
+    <view wx:else class="waiting-result">
+      <t-loading theme="circular" text="已完成答题，等待对手结算" />
+    </view>
+  </block>
+</view>

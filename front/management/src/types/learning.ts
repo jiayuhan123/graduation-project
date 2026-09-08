@@ -156,6 +156,33 @@ export interface PhotoTask {
   failureReason: string | null
 }
 
+export interface PhotoItem {
+  id: string
+  itemNo: number
+  cropFileId: string | null
+  boundingBox: string | null
+  recognizedStem: string | null
+  recognizedAnswer: string | null
+  matchedQuestionId: string | null
+  recognitionConfidence: number | null
+  taskQuestionId: string | null
+  answerRecordId: string | null
+  status: string
+}
+
+export interface PhotoDetail {
+  task: PhotoTask
+  items: PhotoItem[]
+}
+
+export interface ReviewPhotoItemInput {
+  decision: 'APPROVE' | 'CORRECT' | 'REJECT'
+  recognizedStem?: string
+  recognizedAnswer?: string
+  matchedQuestionId?: string
+  comment?: string
+}
+
 export interface PhotoTaskQuery extends PageParams {
   status?: string
 }

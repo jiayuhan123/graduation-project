@@ -124,6 +124,10 @@ Page({
     void wx.navigateTo({ url: '/packages/learning/pages/recommendations/index' })
   },
 
+  openPk() {
+    void wx.navigateTo({ url: '/packages/game/pages/levels/index' })
+  },
+
   openPhotoMarking() {
     void wx.navigateTo({ url: '/packages/learning/pages/photo-marking/index' })
   },

@@ -19,6 +19,9 @@ import xyz.jiayuhan.learningservice.entity.AnswerRecord;
 import xyz.jiayuhan.learningservice.entity.ErrorRecord;
 import xyz.jiayuhan.learningservice.entity.MasteryChangeLog;
 import xyz.jiayuhan.learningservice.entity.MasteryRecord;
+import xyz.jiayuhan.learningservice.entity.PhotoMarkingItem;
+import xyz.jiayuhan.learningservice.entity.PhotoMarkingTask;
+import xyz.jiayuhan.learningservice.entity.PhotoReviewRecord;
 import xyz.jiayuhan.learningservice.entity.PracticeTask;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskKnowledgePoint;
 import xyz.jiayuhan.learningservice.entity.PracticeTaskQuestion;
@@ -28,11 +31,21 @@ import xyz.jiayuhan.learningservice.mapper.AnswerRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.ErrorRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.MasteryChangeLogMapper;
 import xyz.jiayuhan.learningservice.mapper.MasteryRecordMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoMarkingItemMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoMarkingTaskMapper;
+import xyz.jiayuhan.learningservice.mapper.PhotoReviewRecordMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskKnowledgePointMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskMapper;
 import xyz.jiayuhan.learningservice.mapper.PracticeTaskQuestionMapper;
 import xyz.jiayuhan.learningservice.mapper.RecommendationMapper;
 import xyz.jiayuhan.learningservice.model.request.CreatePracticeTaskRequest;
+import xyz.jiayuhan.learningservice.model.request.CreatePhotoMarkingRequest;
+import xyz.jiayuhan.learningservice.model.request.GameAnswerSyncCommand;
+import xyz.jiayuhan.learningservice.model.request.GameSessionSyncCommand;
+import xyz.jiayuhan.learningservice.model.request.PhotoRecognitionItemRequest;
+import xyz.jiayuhan.learningservice.model.request.PhotoRecognitionFailureRequest;
+import xyz.jiayuhan.learningservice.model.request.PhotoRecognitionRequest;
+import xyz.jiayuhan.learningservice.model.request.ReviewPhotoItemRequest;
 import xyz.jiayuhan.learningservice.model.request.SubmitAnswerRequest;
 import xyz.jiayuhan.learningservice.model.response.LearningView;
 import xyz.jiayuhan.learningservice.support.AnswerGrader;
@@ -63,6 +76,8 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     private static final String SELF = "SELF";
     private static final String ASSIGNMENT = "ASSIGNMENT";
     private static final String RECOMMENDATION = "RECOMMENDATION";
+    private static final String PHOTO = "PHOTO";
+    private static final String GAME = "GAME";
     private static final String PENDING = "PENDING";
     private static final String IN_PROGRESS = "IN_PROGRESS";
     private static final String COMPLETED = "COMPLETED";
@@ -70,6 +85,7 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     private static final BigDecimal MASTERY_BASELINE = new BigDecimal("0.5000");
     private static final BigDecimal MASTERY_HISTORY_WEIGHT = new BigDecimal("0.7000");
     private static final BigDecimal MASTERY_RESULT_WEIGHT = new BigDecimal("0.3000");
+    private static final BigDecimal OCR_AUTO_CONFIRM_THRESHOLD = new BigDecimal("0.8500");
 
     private final PracticeTaskMapper practiceTaskMapper;
     private final PracticeTaskKnowledgePointMapper taskKnowledgePointMapper;
@@ -79,6 +95,9 @@ public class LearningCommandServiceImpl implements LearningCommandService {
     private final MasteryRecordMapper masteryRecordMapper;
     private final MasteryChangeLogMapper masteryChangeLogMapper;
     private final RecommendationMapper recommendationMapper;
+    private final PhotoMarkingTaskMapper photoMarkingTaskMapper;
+    private final PhotoMarkingItemMapper photoMarkingItemMapper;
+    private final PhotoReviewRecordMapper photoReviewRecordMapper;
     private final ContentFeignClient contentFeignClient;
     private final TeachingFeignClient teachingFeignClient;
     private final UserFeignClient userFeignClient;
@@ -313,6 +332,412 @@ public class LearningCommandServiceImpl implements LearningCommandService {
                 .eq(Recommendation::getStatus, PENDING)
                 .set(Recommendation::getStatus, "DISMISSED")
                 .set(Recommendation::getUpdatedAt, dismissedAt)));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail createPhotoMarking(
+            Long studentId, CreatePhotoMarkingRequest request) {
+        requireActiveStudent(studentId);
+        PhotoMarkingTask existing = photoMarkingTaskMapper.selectOne(
+                new LambdaQueryWrapper<PhotoMarkingTask>()
+                        .eq(PhotoMarkingTask::getOriginalFileId, request.originalFileId())
+                        .last("LIMIT 1"));
+        if (existing != null) {
+            if (!studentId.equals(existing.getStudentId())) {
+                throw new BusinessException(ResultCode.FORBIDDEN);
+            }
+            return learningQueryService.getPhotoTask(studentId, existing.getId());
+        }
+
+        OffsetDateTime submittedAt = now();
+        PhotoMarkingTask task = new PhotoMarkingTask();
+        task.setId(IdWorker.getId());
+        task.setStudentId(studentId);
+        task.setOriginalFileId(request.originalFileId());
+        task.setStatus("UPLOADED");
+        task.setPageCount(request.pageCount() == null ? 1 : request.pageCount());
+        task.setRecognizedItemCount(0);
+        task.setReviewStatus("NOT_REQUIRED");
+        task.setSubmittedAt(submittedAt);
+        task.setCreatedAt(submittedAt);
+        task.setUpdatedAt(submittedAt);
+        task.setVersion(0);
+        if (photoMarkingTaskMapper.insertIfAbsent(task) == 0) {
+            PhotoMarkingTask concurrent = photoMarkingTaskMapper.selectOne(
+                    new LambdaQueryWrapper<PhotoMarkingTask>()
+                            .eq(PhotoMarkingTask::getOriginalFileId, request.originalFileId())
+                            .last("LIMIT 1"));
+            if (concurrent == null) {
+                throw new BusinessException(ResultCode.CONFLICT, "拍照任务正在创建，请稍后重试");
+            }
+            if (!studentId.equals(concurrent.getStudentId())) {
+                throw new BusinessException(ResultCode.FORBIDDEN);
+            }
+            task = concurrent;
+        }
+        return learningQueryService.getPhotoTask(studentId, task.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail applyPhotoRecognition(
+            Long markingTaskId, PhotoRecognitionRequest request) {
+        PhotoMarkingTask markingTask = requirePhotoTaskForUpdate(markingTaskId);
+        List<PhotoMarkingItem> existingItems = photoMarkingItemMapper.selectList(
+                new LambdaQueryWrapper<PhotoMarkingItem>()
+                        .eq(PhotoMarkingItem::getMarkingTaskId, markingTaskId));
+        if (!existingItems.isEmpty()) {
+            return learningQueryService.getPhotoTask(markingTask.getStudentId(), markingTaskId);
+        }
+        if (!"UPLOADED".equals(markingTask.getStatus())
+                && !"PROCESSING".equals(markingTask.getStatus())) {
+            throw new BusinessException(ResultCode.PRACTICE_TASK_STATE_INVALID, "当前拍照任务不能接收识别结果");
+        }
+        long distinctItemCount = request.items().stream()
+                .map(PhotoRecognitionItemRequest::itemNo)
+                .distinct()
+                .count();
+        if (distinctItemCount != request.items().size()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "识别结果中的题号不能重复");
+        }
+
+        markingTask.setStatus("PROCESSING");
+        assertUpdated(photoMarkingTaskMapper.updateById(markingTask));
+        PracticeTask practiceTask = createPhotoPracticeTask(markingTask, request.items().size());
+        boolean needsReview = false;
+        BigDecimal totalConfidence = BigDecimal.ZERO;
+        for (PhotoRecognitionItemRequest recognized : request.items()) {
+            QuestionResponse question = resolveRecognizedQuestion(
+                    recognized.matchedQuestionId(), recognized.recognizedStem());
+            PhotoMarkingItem item = createPhotoItem(markingTaskId, recognized, question);
+            boolean autoConfirm = question != null
+                    && recognized.recognitionConfidence().compareTo(OCR_AUTO_CONFIRM_THRESHOLD) >= 0;
+            if (autoConfirm) {
+                recordOcrAnswer(practiceTask, item, question, recognized.recognizedAnswer());
+                item.setStatus("CONFIRMED");
+            } else {
+                item.setStatus("REVIEW_REQUIRED");
+                needsReview = true;
+            }
+            photoMarkingItemMapper.insert(item);
+            totalConfidence = totalConfidence.add(recognized.recognitionConfidence());
+        }
+
+        OffsetDateTime processedAt = now();
+        markingTask.setPracticeTaskId(practiceTask.getId());
+        markingTask.setRecognizedItemCount(request.items().size());
+        markingTask.setOverallConfidence(totalConfidence.divide(
+                BigDecimal.valueOf(request.items().size()), 4, RoundingMode.HALF_UP));
+        markingTask.setProcessedAt(processedAt);
+        markingTask.setStatus(needsReview ? "REVIEW_REQUIRED" : COMPLETED);
+        markingTask.setReviewStatus(needsReview ? PENDING : "NOT_REQUIRED");
+        assertUpdated(photoMarkingTaskMapper.updateById(markingTask));
+        if (!needsReview) {
+            completePhotoPracticeTask(practiceTask, processedAt);
+        }
+        return learningQueryService.getPhotoTask(markingTask.getStudentId(), markingTaskId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail startPhotoRecognition(Long markingTaskId) {
+        PhotoMarkingTask task = requirePhotoTaskForUpdate(markingTaskId);
+        if (!"UPLOADED".equals(task.getStatus())) {
+            throw new BusinessException(ResultCode.CONFLICT, "拍照任务已被领取或处理");
+        }
+        task.setStatus("PROCESSING");
+        assertUpdated(photoMarkingTaskMapper.updateById(task));
+        return learningQueryService.getPhotoTask(task.getStudentId(), task.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail failPhotoRecognition(
+            Long markingTaskId, PhotoRecognitionFailureRequest request) {
+        PhotoMarkingTask task = requirePhotoTaskForUpdate(markingTaskId);
+        if (COMPLETED.equals(task.getStatus()) || "REVIEW_REQUIRED".equals(task.getStatus())) {
+            throw new BusinessException(ResultCode.CONFLICT, "拍照任务已经生成识别结果");
+        }
+        if (!"FAILED".equals(task.getStatus())) {
+            task.setStatus("FAILED");
+            task.setFailureReason(request.reason().trim());
+            task.setProcessedAt(now());
+            assertUpdated(photoMarkingTaskMapper.updateById(task));
+        }
+        return learningQueryService.getPhotoTask(task.getStudentId(), task.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail confirmPhotoItem(
+            Long studentId,
+            Long markingTaskId,
+            Long markingItemId,
+            ReviewPhotoItemRequest request) {
+        PhotoMarkingTask task = requirePhotoTaskForUpdate(markingTaskId);
+        if (!studentId.equals(task.getStudentId())) {
+            throw new BusinessException(ResultCode.PHOTO_MARKING_TASK_NOT_FOUND);
+        }
+        return reviewPhotoItem(task, studentId, markingItemId, request);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public LearningView.PhotoDetail reviewPhotoItem(
+            Long reviewerId,
+            Long markingTaskId,
+            Long markingItemId,
+            ReviewPhotoItemRequest request) {
+        return reviewPhotoItem(
+                requirePhotoTaskForUpdate(markingTaskId), reviewerId, markingItemId, request);
+    }
+
+    private LearningView.PhotoDetail reviewPhotoItem(
+            PhotoMarkingTask task,
+            Long reviewerId,
+            Long markingItemId,
+            ReviewPhotoItemRequest request) {
+        PhotoMarkingItem item = photoMarkingItemMapper.selectOne(
+                new LambdaQueryWrapper<PhotoMarkingItem>()
+                        .eq(PhotoMarkingItem::getId, markingItemId)
+                        .eq(PhotoMarkingItem::getMarkingTaskId, task.getId())
+                        .last("LIMIT 1"));
+        if (item == null) {
+            throw new BusinessException(ResultCode.PRACTICE_QUESTION_NOT_FOUND, "识别题目不存在");
+        }
+        if ("CONFIRMED".equals(item.getStatus()) || "REJECTED".equals(item.getStatus())) {
+            return learningQueryService.getPhotoTask(task.getStudentId(), task.getId());
+        }
+        if (!"REVIEW_REQUIRED".equals(item.getStatus())) {
+            throw new BusinessException(ResultCode.PRACTICE_TASK_STATE_INVALID, "该识别题目无需复核");
+        }
+
+        String beforeData = photoReviewSnapshot(item);
+        if ("REJECT".equals(request.decision())) {
+            item.setStatus("REJECTED");
+        } else {
+            String stem = hasText(request.recognizedStem())
+                    ? request.recognizedStem().trim() : item.getRecognizedStem();
+            String answer = hasText(request.recognizedAnswer())
+                    ? request.recognizedAnswer().trim() : extractRecognizedAnswer(item.getRecognizedAnswer());
+            Long questionId = request.matchedQuestionId() == null
+                    ? item.getMatchedQuestionId() : request.matchedQuestionId();
+            if (!hasText(answer)) {
+                throw new BusinessException(ResultCode.PRACTICE_ANSWER_INVALID, "请填写识别答案");
+            }
+            QuestionResponse question = resolveRecognizedQuestion(questionId, stem);
+            if (question == null) {
+                throw new BusinessException(ResultCode.QUESTION_NOT_FOUND, "请先匹配一道已发布的固定题目");
+            }
+            item.setRecognizedStem(stem);
+            item.setRecognizedAnswer(answerJson(answer));
+            item.setMatchedQuestionId(question.id());
+            if ("CORRECT".equals(request.decision())) {
+                item.setRecognitionConfidence(BigDecimal.ONE);
+            }
+            PracticeTask practiceTask = requireTask(task.getPracticeTaskId(), task.getStudentId());
+            recordOcrAnswer(practiceTask, item, question, answer);
+            item.setStatus("CONFIRMED");
+        }
+        assertUpdated(photoMarkingItemMapper.updateById(item));
+
+        PhotoReviewRecord record = new PhotoReviewRecord();
+        record.setMarkingTaskId(task.getId());
+        record.setMarkingItemId(item.getId());
+        record.setReviewerId(reviewerId);
+        record.setDecision(request.decision());
+        record.setBeforeData(beforeData);
+        record.setAfterData(photoReviewSnapshot(item));
+        record.setComment(request.comment());
+        record.setReviewedAt(now());
+        photoReviewRecordMapper.insert(record);
+
+        long remaining = photoMarkingItemMapper.selectCount(
+                new LambdaQueryWrapper<PhotoMarkingItem>()
+                        .eq(PhotoMarkingItem::getMarkingTaskId, task.getId())
+                        .eq(PhotoMarkingItem::getStatus, "REVIEW_REQUIRED"));
+        if (remaining == 0) {
+            OffsetDateTime reviewedAt = now();
+            task.setStatus(COMPLETED);
+            task.setReviewerId(reviewerId);
+            task.setReviewedAt(reviewedAt);
+            long changedCount = photoReviewRecordMapper.selectCount(
+                    new LambdaQueryWrapper<PhotoReviewRecord>()
+                            .eq(PhotoReviewRecord::getMarkingTaskId, task.getId())
+                            .ne(PhotoReviewRecord::getDecision, "APPROVE"));
+            task.setReviewStatus(changedCount == 0 ? "APPROVED" : "CORRECTED");
+            assertUpdated(photoMarkingTaskMapper.updateById(task));
+            completePhotoPracticeTask(
+                    requireTask(task.getPracticeTaskId(), task.getStudentId()), reviewedAt);
+        }
+        return learningQueryService.getPhotoTask(task.getStudentId(), task.getId());
+    }
+
+    private PhotoMarkingTask requirePhotoTaskForUpdate(Long markingTaskId) {
+        PhotoMarkingTask task = photoMarkingTaskMapper.selectForUpdate(markingTaskId);
+        if (task == null) {
+            throw new BusinessException(ResultCode.PHOTO_MARKING_TASK_NOT_FOUND);
+        }
+        return task;
+    }
+
+    private PracticeTask createPhotoPracticeTask(PhotoMarkingTask markingTask, int itemCount) {
+        PracticeTask task = new PracticeTask();
+        task.setStudentId(markingTask.getStudentId());
+        task.setSourceType(PHOTO);
+        task.setSourceId(String.valueOf(markingTask.getId()));
+        task.setTitle("拍照批改学习记录");
+        task.setMode("NORMAL");
+        task.setStatus(IN_PROGRESS);
+        task.setQuestionCount(itemCount);
+        task.setStartedAt(now());
+        task.setVersion(0);
+        practiceTaskMapper.insert(task);
+        return task;
+    }
+
+    private PhotoMarkingItem createPhotoItem(
+            Long markingTaskId,
+            PhotoRecognitionItemRequest recognized,
+            QuestionResponse question) {
+        PhotoMarkingItem item = new PhotoMarkingItem();
+        item.setId(IdWorker.getId());
+        item.setMarkingTaskId(markingTaskId);
+        item.setItemNo(recognized.itemNo());
+        item.setCropFileId(recognized.cropFileId());
+        item.setBoundingBox(recognized.boundingBox() == null
+                ? null : objectMapper.writeValueAsString(recognized.boundingBox()));
+        item.setRecognizedStem(recognized.recognizedStem().trim());
+        item.setRecognizedAnswer(answerJson(recognized.recognizedAnswer()));
+        item.setMatchedQuestionId(question == null ? recognized.matchedQuestionId() : question.id());
+        item.setRecognitionConfidence(recognized.recognitionConfidence());
+        return item;
+    }
+
+    private void recordOcrAnswer(
+            PracticeTask task,
+            PhotoMarkingItem item,
+            QuestionResponse question,
+            String answerValue) {
+        PracticeTaskQuestion taskQuestion = new PracticeTaskQuestion();
+        taskQuestion.setTaskId(task.getId());
+        taskQuestion.setQuestionId(question.id());
+        taskQuestion.setSequenceNo(item.getItemNo());
+        taskQuestion.setQuestionSnapshot(objectMapper.writeValueAsString(question));
+        taskQuestion.setMaxScore(BigDecimal.ONE);
+        taskQuestion.setSourceDetail(objectMapper.writeValueAsString(Map.of(
+                "sourceType", PHOTO,
+                "markingTaskId", item.getMarkingTaskId(),
+                "markingItemId", item.getId())));
+        taskQuestionMapper.insert(taskQuestion);
+
+        ensureTaskKnowledgePoints(task, question);
+        boolean correct = answerGrader.isCorrect(question.standardAnswer(), answerValue);
+        OffsetDateTime gradedAt = now();
+        AnswerRecord answer = new AnswerRecord();
+        answer.setTaskQuestionId(taskQuestion.getId());
+        answer.setStudentId(task.getStudentId());
+        answer.setAttemptNo(1);
+        answer.setStudentAnswer(answerJson(answerValue));
+        answer.setGradingStatus("GRADED");
+        answer.setCorrect(correct);
+        answer.setScore(correct ? BigDecimal.ONE : BigDecimal.ZERO);
+        answer.setAnswerSource("OCR");
+        answer.setRecognitionConfidence(item.getRecognitionConfidence());
+        answer.setSubmittedAt(gradedAt);
+        answer.setGradedAt(gradedAt);
+        answerRecordMapper.insert(answer);
+        updateLearningSignals(task, taskQuestion, question, answer);
+        item.setTaskQuestionId(taskQuestion.getId());
+        item.setAnswerRecordId(answer.getId());
+    }
+
+    private void ensureTaskKnowledgePoints(PracticeTask task, QuestionResponse question) {
+        if (question.knowledgePointIds() == null) {
+            return;
+        }
+        for (Long knowledgePointId : question.knowledgePointIds().stream().distinct().toList()) {
+            Long count = taskKnowledgePointMapper.selectCount(
+                    new LambdaQueryWrapper<PracticeTaskKnowledgePoint>()
+                            .eq(PracticeTaskKnowledgePoint::getTaskId, task.getId())
+                            .eq(PracticeTaskKnowledgePoint::getKnowledgePointId, knowledgePointId));
+            if (count == 0) {
+                PracticeTaskKnowledgePoint relation = new PracticeTaskKnowledgePoint();
+                relation.setTaskId(task.getId());
+                relation.setKnowledgePointId(knowledgePointId);
+                relation.setTargetQuestionCount(task.getQuestionCount());
+                taskKnowledgePointMapper.insert(relation);
+            }
+        }
+    }
+
+    private QuestionResponse resolveRecognizedQuestion(Long questionId, String recognizedStem) {
+        if (questionId != null) {
+            try {
+                Result<QuestionResponse> result = contentFeignClient.getQuestion(questionId);
+                if (result != null && Integer.valueOf(200).equals(result.getCode())
+                        && isFixedQuestion(result.getData())) {
+                    return result.getData();
+                }
+            } catch (RuntimeException ignored) {
+                // 题目未匹配时进入人工复核，避免单题拖垮整份 OCR 结果。
+            }
+        }
+        if (!hasText(recognizedStem)) {
+            return null;
+        }
+        PageResult<QuestionResponse> candidates;
+        try {
+            Result<PageResult<QuestionResponse>> result = contentFeignClient.pageQuestions(
+                    1, 20, recognizedStem.trim(), null, "FIXED", null, null);
+            candidates = result == null || !Integer.valueOf(200).equals(result.getCode())
+                    ? null : result.getData();
+        } catch (RuntimeException ignored) {
+            candidates = null;
+        }
+        if (candidates == null || candidates.records() == null) {
+            return null;
+        }
+        String normalizedStem = recognizedStem.trim().replaceAll("\\s+", " ");
+        return candidates.records().stream()
+                .filter(this::isFixedQuestion)
+                .filter(candidate -> candidate.stem() != null
+                        && normalizedStem.equals(candidate.stem().trim().replaceAll("\\s+", " ")))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void completePhotoPracticeTask(PracticeTask task, OffsetDateTime completedAt) {
+        if (COMPLETED.equals(task.getStatus())) {
+            return;
+        }
+        task.setStatus(COMPLETED);
+        task.setCompletedAt(completedAt);
+        assertUpdated(practiceTaskMapper.updateById(task));
+    }
+
+    private String photoReviewSnapshot(PhotoMarkingItem item) {
+        return objectMapper.writeValueAsString(Map.ofEntries(
+                Map.entry("itemNo", item.getItemNo()),
+                Map.entry("recognizedStem", nullToEmpty(item.getRecognizedStem())),
+                Map.entry("recognizedAnswer", nullToEmpty(item.getRecognizedAnswer())),
+                Map.entry("matchedQuestionId", item.getMatchedQuestionId() == null ? 0L : item.getMatchedQuestionId()),
+                Map.entry("recognitionConfidence", item.getRecognitionConfidence() == null
+                        ? BigDecimal.ZERO : item.getRecognitionConfidence()),
+                Map.entry("status", item.getStatus())));
+    }
+
+    private String extractRecognizedAnswer(String json) {
+        return hasText(json) ? answerGrader.extractValue(json) : null;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private String nullToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private List<QuestionResponse> selectQuestions(
@@ -713,6 +1138,119 @@ public class LearningCommandServiceImpl implements LearningCommandService {
         if (task == null) {
             throw new BusinessException(ResultCode.PRACTICE_TASK_NOT_FOUND);
         }
+        return task;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recordGameAnswer(Long studentId, GameAnswerSyncCommand command) {
+        PracticeTask task = getOrCreateGameTask(
+                studentId, command.sessionId(), command.knowledgePointId(),
+                command.questionCount(), command.timeLimitSeconds(), command.occurredAt());
+        PracticeTaskQuestion taskQuestion = taskQuestionMapper.selectOne(
+                new LambdaQueryWrapper<PracticeTaskQuestion>()
+                        .eq(PracticeTaskQuestion::getTaskId, task.getId())
+                        .eq(PracticeTaskQuestion::getQuestionId, command.questionId())
+                        .last("LIMIT 1"));
+        QuestionResponse snapshot = null;
+        if (taskQuestion == null) {
+            snapshot = requireRemoteData(
+                    () -> contentFeignClient.getQuestion(command.questionId()),
+                    "暂时无法读取游戏题目快照");
+            if (!isFixedQuestion(snapshot)) {
+                throw new BusinessException(ResultCode.QUESTION_NOT_FOUND, "游戏题目已失效");
+            }
+            taskQuestion = new PracticeTaskQuestion();
+            taskQuestion.setTaskId(task.getId());
+            taskQuestion.setQuestionId(command.questionId());
+            taskQuestion.setSequenceNo(command.sequenceNo());
+            taskQuestion.setQuestionSnapshot(objectMapper.writeValueAsString(snapshot));
+            taskQuestion.setMaxScore(BigDecimal.ONE);
+            taskQuestion.setSourceDetail(objectMapper.writeValueAsString(Map.of(
+                    "sourceType", GAME,
+                    "sessionQuestionId", command.sessionQuestionId(),
+                    "difficulty", command.difficulty())));
+            taskQuestionMapper.insert(taskQuestion);
+        }
+        AnswerRecord existing = answerRecordMapper.selectOne(new LambdaQueryWrapper<AnswerRecord>()
+                .eq(AnswerRecord::getTaskQuestionId, taskQuestion.getId())
+                .eq(AnswerRecord::getStudentId, studentId)
+                .eq(AnswerRecord::getAttemptNo, 1));
+        if (existing != null) {
+            return;
+        }
+        if (snapshot == null) {
+            snapshot = readSnapshot(taskQuestion.getQuestionSnapshot());
+        }
+        AnswerRecord answer = new AnswerRecord();
+        answer.setTaskQuestionId(taskQuestion.getId());
+        answer.setStudentId(studentId);
+        answer.setAttemptNo(1);
+        answer.setStudentAnswer(answerJson(command.studentAnswer()));
+        answer.setGradingStatus("GRADED");
+        answer.setCorrect(command.correct());
+        answer.setScore(command.score());
+        answer.setResponseMs(command.responseMs());
+        answer.setAnswerSource(GAME);
+        answer.setSubmittedAt(command.occurredAt());
+        answer.setGradedAt(command.occurredAt());
+        answerRecordMapper.insert(answer);
+        updateLearningSignals(task, taskQuestion, snapshot, answer);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void completeGameSession(Long studentId, GameSessionSyncCommand command) {
+        PracticeTask task = getOrCreateGameTask(
+                studentId, command.sessionId(), command.knowledgePointId(),
+                command.questionCount(), command.timeLimitSeconds(), command.occurredAt());
+        if (COMPLETED.equals(task.getStatus())) {
+            return;
+        }
+        task.setStatus(COMPLETED);
+        task.setCompletedAt(command.occurredAt());
+        assertUpdated(practiceTaskMapper.updateById(task));
+    }
+
+    private PracticeTask getOrCreateGameTask(
+            Long studentId,
+            Long sessionId,
+            Long knowledgePointId,
+            Integer questionCount,
+            Integer timeLimitSeconds,
+            OffsetDateTime occurredAt) {
+        String sourceId = String.valueOf(sessionId);
+        PracticeTask existing = findSourceTask(studentId, GAME, sourceId);
+        if (existing != null) {
+            return existing;
+        }
+        OffsetDateTime timestamp = occurredAt == null ? now() : occurredAt;
+        PracticeTask task = new PracticeTask();
+        task.setId(IdWorker.getId());
+        task.setStudentId(studentId);
+        task.setSourceType(GAME);
+        task.setSourceId(sourceId);
+        task.setTitle("双人 PK 学习记录");
+        task.setMode("TIMED");
+        task.setStatus(IN_PROGRESS);
+        task.setQuestionCount(Math.max(1, questionCount));
+        task.setTimeLimitSeconds(timeLimitSeconds);
+        task.setStartedAt(timestamp);
+        task.setCreatedAt(timestamp);
+        task.setUpdatedAt(timestamp);
+        task.setVersion(0);
+        if (practiceTaskMapper.insertGameIfAbsent(task) == 0) {
+            PracticeTask concurrent = findSourceTask(studentId, GAME, sourceId);
+            if (concurrent == null) {
+                throw new BusinessException(ResultCode.CONFLICT, "游戏学习记录正在同步，请稍后重试");
+            }
+            return concurrent;
+        }
+        PracticeTaskKnowledgePoint relation = new PracticeTaskKnowledgePoint();
+        relation.setTaskId(task.getId());
+        relation.setKnowledgePointId(knowledgePointId);
+        relation.setTargetQuestionCount(task.getQuestionCount());
+        taskKnowledgePointMapper.insert(relation);
         return task;
     }
 

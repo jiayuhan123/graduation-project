@@ -186,6 +186,19 @@ export interface PhotoDetail {
   items: PhotoItem[]
 }
 
+export interface CreatePhotoMarkingInput {
+  originalFileId: string
+  pageCount?: number
+}
+
+export interface ReviewPhotoItemInput {
+  decision: 'APPROVE' | 'CORRECT' | 'REJECT'
+  recognizedStem?: string
+  recognizedAnswer?: string
+  matchedQuestionId?: string
+  comment?: string
+}
+
 export interface PracticeTaskQuery extends PageParams {
   status?: string
 }

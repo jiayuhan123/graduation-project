@@ -20,7 +20,7 @@ created_at         TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 updated_at         TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 version            INTEGER       NOT NULL DEFAULT 0,
 CONSTRAINT ck_practice_task_source CHECK (source_type IN
-('SELF', 'RECOMMENDATION', 'ASSIGNMENT', 'GAME_REMEDIAL', 'PHOTO')),
+('SELF', 'RECOMMENDATION', 'ASSIGNMENT', 'GAME', 'GAME_REMEDIAL', 'PHOTO')),
 CONSTRAINT ck_practice_task_mode CHECK (mode IN
 ('NORMAL', 'TIMED', 'SPECIAL', 'REVIEW')),
 CONSTRAINT ck_practice_task_status CHECK (status IN
@@ -41,6 +41,9 @@ ON practice_task (source_type, source_id) WHERE source_id IS NOT NULL;
 CREATE UNIQUE INDEX uk_practice_task_assignment_student
 ON practice_task (student_id, source_type, source_id)
 WHERE source_type = 'ASSIGNMENT' AND source_id IS NOT NULL;
+CREATE UNIQUE INDEX uk_practice_task_game_student
+ON practice_task (student_id, source_type, source_id)
+WHERE source_type = 'GAME' AND source_id IS NOT NULL;
 COMMENT ON TABLE practice_task IS '所有学习入口统一使用的练习任务';
 COMMENT ON COLUMN practice_task.id IS '练习任务编号';
 COMMENT ON COLUMN practice_task.student_id IS '完成练习的学生';

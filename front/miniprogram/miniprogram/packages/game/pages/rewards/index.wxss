@@ -1,0 +1,35 @@
+.state {
+  display: grid;
+  min-height: 70vh;
+  place-items: center;
+}
+.reward-list {
+  display: grid;
+  gap: 16rpx;
+}
+.reward-item {
+  display: flex;
+  padding: 26rpx;
+  align-items: center;
+  justify-content: space-between;
+}
+.reward-item strong,
+.reward-item text {
+  display: block;
+}
+.reward-item strong {
+  color: #2d3436;
+  font-size: 27rpx;
+}
+.reward-item text {
+  margin-top: 7rpx;
+  color: #8b9297;
+  font-size: 21rpx;
+}
+.reward-item__amount {
+  text-align: right;
+}
+.reward-item__amount strong {
+  color: #e76f2b;
+  font-size: 31rpx;
+}

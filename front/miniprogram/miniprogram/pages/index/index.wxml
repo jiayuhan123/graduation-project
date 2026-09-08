@@ -68,7 +68,8 @@
         <t-cell title="错题本" description="查看待巩固与已掌握错题" left-icon="error-circle" arrow bind:click="openErrors" />
         <t-cell title="知识点掌握" description="查看正确率和复习安排" left-icon="chart" arrow bind:click="openMastery" />
         <t-cell title="巩固推荐" description="接受或忽略针对性练习" left-icon="lightbulb" arrow bind:click="openRecommendations" />
-        <t-cell title="拍照批改" description="OCR 暂未开放，可查已有记录" left-icon="image" arrow bind:click="openPhotoMarking" />
+        <t-cell title="双人 PK" description="好友房间或随机匹配，限时同题对战" left-icon="gamepad" arrow bind:click="openPk" />
+        <t-cell title="拍照批改" description="上传作业并查看识别与复核结果" left-icon="image" arrow bind:click="openPhotoMarking" />
       </view>
     </block>
 

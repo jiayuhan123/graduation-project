@@ -52,21 +52,36 @@ const roleModules = computed<ModuleCard[]>(() => {
       },
       {
         title: '拍照批改',
-        description: 'OCR 暂未开放，可查历史',
+        description: '查看 OCR 进度并确认低可信题目',
         icon: '▣',
         path: '/learning/photo-reviews',
       },
-      { title: '数学闯关', description: '游戏服务接入后开放', icon: '★', pending: true },
     ],
     teacher: [
       { title: '教师资料', description: '职称与公开简介', icon: '📐', path: '/account/teacher' },
-      { title: '班级管理', description: '教学服务接入后开放', icon: '♧', pending: true },
-      { title: '作业管理', description: '教学服务接入后开放', icon: '▤', pending: true },
+      {
+        title: '班级管理',
+        description: '维护班级与在班学生',
+        icon: '♧',
+        path: '/teaching/classes',
+      },
+      {
+        title: '作业管理',
+        description: '布置统一或分层作业',
+        icon: '▤',
+        path: '/teaching/assignments',
+      },
       {
         title: '学情反馈',
         description: '查询本人班级学生学情',
         icon: '⌁',
         path: '/learning/records',
+      },
+      {
+        title: '拍照复核',
+        description: '处理班级学生低可信 OCR 结果',
+        icon: '▣',
+        path: '/learning/photo-reviews',
       },
     ],
     admin: [
@@ -98,7 +113,19 @@ const roleModules = computed<ModuleCard[]>(() => {
         path: '/learning/records',
         permission: 'teaching:report:query',
       },
-      { title: '内容管理', description: '内容服务接入后开放', icon: '▦', pending: true },
+      {
+        title: '拍照复核',
+        description: '处理全平台低可信 OCR 结果',
+        icon: '▣',
+        path: '/learning/photo-reviews',
+      },
+      {
+        title: '内容管理',
+        description: '维护模块、知识点与固定题库',
+        icon: '▦',
+        path: '/content/modules',
+        permission: 'content:manage',
+      },
     ],
   }
   return [...(modules[userStore.activeRole] ?? []), ...common].filter(

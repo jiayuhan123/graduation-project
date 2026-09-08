@@ -1,0 +1,172 @@
+.pk-lobby {
+  padding-bottom: 60rpx;
+}
+.hero-card {
+  padding: 40rpx 34rpx;
+  overflow: hidden;
+  background: linear-gradient(145deg, #2d3436, #4d3a68);
+  border-radius: 30rpx;
+  box-shadow: 0 18rpx 48rpx rgba(45, 52, 54, 0.2);
+  color: #fff;
+}
+.hero-card__eyebrow,
+.hero-card__title,
+.hero-card__description {
+  display: block;
+}
+.hero-card__eyebrow {
+  color: #ffbe91;
+  font-size: 22rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+}
+.hero-card__title {
+  margin-top: 12rpx;
+  font-size: 44rpx;
+  font-weight: 900;
+}
+.hero-card__description {
+  margin-top: 18rpx;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 25rpx;
+  line-height: 1.7;
+}
+.hero-card__links {
+  display: flex;
+  margin-top: 26rpx;
+  gap: 28rpx;
+  color: #ffd9bf;
+  font-size: 24rpx;
+}
+.state-card,
+.form-card,
+.join-card,
+.waiting-card {
+  margin-top: 24rpx;
+  padding: 30rpx;
+}
+.state-card {
+  display: grid;
+  min-height: 240rpx;
+  place-items: center;
+}
+.section-title {
+  display: block;
+  margin-bottom: 12rpx;
+  color: #2d3436;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+.picker-row {
+  display: flex;
+  min-height: 86rpx;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid #eef0f2;
+  color: #596168;
+  font-size: 26rpx;
+}
+.picker-row text:last-child {
+  max-width: 62%;
+  overflow: hidden;
+  color: #2d3436;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.primary-button,
+.outline-button,
+.secondary-button {
+  height: 86rpx;
+  border: 0;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 750;
+  line-height: 86rpx;
+}
+.primary-button {
+  margin-top: 30rpx;
+  background: linear-gradient(135deg, #ff934d, #ff6f21);
+  color: #fff;
+}
+.outline-button {
+  margin-top: 16rpx;
+  background: #fff3eb;
+  color: #dc611f;
+}
+.secondary-button {
+  width: 100%;
+  margin-top: 34rpx;
+  background: #f3f4f5;
+  color: #60686e;
+}
+.primary-button::after,
+.outline-button::after,
+.secondary-button::after,
+.join-row button::after {
+  border: 0;
+}
+.join-row {
+  display: grid;
+  grid-template-columns: 1fr 150rpx;
+  gap: 14rpx;
+}
+.join-row input {
+  height: 82rpx;
+  padding: 0 22rpx;
+  background: #f7f8fa;
+  border-radius: 18rpx;
+  font-size: 28rpx;
+  letter-spacing: 3rpx;
+}
+.join-row button {
+  height: 82rpx;
+  margin: 0;
+  background: #2d3436;
+  border: 0;
+  border-radius: 18rpx;
+  color: #fff;
+  font-size: 27rpx;
+  line-height: 82rpx;
+}
+.waiting-card {
+  display: flex;
+  min-height: 500rpx;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.pulse {
+  display: grid;
+  width: 130rpx;
+  height: 130rpx;
+  place-items: center;
+  background: #fff0e7;
+  border-radius: 50%;
+  color: #ee6e28;
+  font-size: 58rpx;
+}
+.waiting-card__title {
+  margin-top: 28rpx;
+  color: #2d3436;
+  font-size: 36rpx;
+  font-weight: 850;
+}
+.waiting-card__description,
+.waiting-card__hint {
+  display: block;
+  margin-top: 14rpx;
+  color: #858d93;
+  font-size: 24rpx;
+}
+.waiting-card__hint {
+  margin-top: 8rpx;
+  font-size: 21rpx;
+}
+.invite-code {
+  margin-top: 22rpx;
+  color: #ee6e28;
+  font-size: 52rpx;
+  font-weight: 900;
+  letter-spacing: 9rpx;
+}

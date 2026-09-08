@@ -4,10 +4,12 @@ import type {
   AnswerFeedback,
   CreatePracticeTaskInput,
   PracticeDetail,
+  PhotoDetail,
   PhotoTask,
   PhotoTaskQuery,
   RecommendationItem,
   RecommendationQuery,
+  ReviewPhotoItemInput,
   StudentLearningReport,
 } from '@/types/learning'
 
@@ -78,4 +80,46 @@ export const pagePhotoTasksApi = (params: PhotoTaskQuery = {}) =>
     url: `${LEARNING_URL}/photo-marking`,
     method: 'GET',
     params,
+  })
+
+export const getPhotoTaskApi = (markingTaskId: string) =>
+  request<PhotoDetail>({
+    url: `${LEARNING_URL}/photo-marking/${markingTaskId}`,
+    method: 'GET',
+  })
+
+export const confirmPhotoItemApi = (
+  markingTaskId: string,
+  markingItemId: string,
+  data: ReviewPhotoItemInput,
+) =>
+  request<PhotoDetail>({
+    url: `${LEARNING_URL}/photo-marking/${markingTaskId}/items/${markingItemId}/confirm`,
+    method: 'POST',
+    data,
+  })
+
+export const pageStudentPhotoTasksApi = (studentId: string, params: PhotoTaskQuery = {}) =>
+  request<PageResult<PhotoTask>>({
+    url: `${LEARNING_URL}/photo-reviews/students/${studentId}`,
+    method: 'GET',
+    params,
+  })
+
+export const getStudentPhotoTaskApi = (studentId: string, markingTaskId: string) =>
+  request<PhotoDetail>({
+    url: `${LEARNING_URL}/photo-reviews/students/${studentId}/${markingTaskId}`,
+    method: 'GET',
+  })
+
+export const reviewStudentPhotoItemApi = (
+  studentId: string,
+  markingTaskId: string,
+  markingItemId: string,
+  data: ReviewPhotoItemInput,
+) =>
+  request<PhotoDetail>({
+    url: `${LEARNING_URL}/photo-reviews/students/${studentId}/${markingTaskId}/items/${markingItemId}`,
+    method: 'POST',
+    data,
   })

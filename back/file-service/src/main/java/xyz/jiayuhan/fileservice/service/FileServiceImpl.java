@@ -88,6 +88,15 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileDownload download(Long ownerId, UUID fileId) {
         FileObject file = requireOwnedFile(ownerId, fileId);
+        return toDownload(file);
+    }
+
+    @Override
+    public FileDownload downloadInternal(Long ownerId, UUID fileId) {
+        return toDownload(requireOwnedFile(ownerId, fileId));
+    }
+
+    private FileDownload toDownload(FileObject file) {
         return new FileDownload(
                 objectStorage.open(file.getObjectKey()),
                 file.getOriginalName(),
