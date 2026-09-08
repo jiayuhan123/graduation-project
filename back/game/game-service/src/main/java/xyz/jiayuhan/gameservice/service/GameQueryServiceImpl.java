@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import xyz.jiayuhan.common.core.exception.BusinessException;
 import xyz.jiayuhan.common.core.exception.ResultCode;
 import xyz.jiayuhan.common.core.model.PageResult;
+import xyz.jiayuhan.contentapi.model.response.QuestionResponse;
 import xyz.jiayuhan.gameapi.model.response.GameSessionSummaryResponse;
 import xyz.jiayuhan.gameservice.entity.GameLevel;
 import xyz.jiayuhan.gameservice.entity.GameLevelProgress;
@@ -41,6 +44,7 @@ public class GameQueryServiceImpl implements GameQueryService {
     private final GamePlayerProgressMapper gamePlayerProgressMapper;
     private final GameLevelProgressMapper gameLevelProgressMapper;
     private final GameRewardRecordMapper gameRewardRecordMapper;
+    private final ObjectMapper objectMapper;
 
     @Override
     public PageResult<GameView.Level> pageLevels(
@@ -223,11 +227,22 @@ public class GameQueryServiceImpl implements GameQueryService {
     }
 
     private GameView.SessionQuestion toView(GameSessionQuestion question) {
+        QuestionResponse snapshot = readQuestionSnapshot(question.getQuestionSnapshot());
         return new GameView.SessionQuestion(
                 question.getId(), question.getSequenceNo(), question.getQuestionId(),
-                question.getGradingStatus(), question.getAnswerRecordId(), question.getCorrect(),
+                snapshot.questionType(), snapshot.stem(), snapshot.options(),
+                question.getGradingStatus(), question.getStudentAnswer(),
+                question.getAnswerRecordId(), question.getCorrect(),
                 question.getScore(), question.getResponseMs(), question.getComboAfter(),
                 question.getProgressDelta(), question.getEnergyDelta(), question.getAnsweredAt());
+    }
+
+    private QuestionResponse readQuestionSnapshot(String json) {
+        try {
+            return objectMapper.readValue(json, QuestionResponse.class);
+        } catch (JacksonException exception) {
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "游戏题目快照损坏");
+        }
     }
 
     private GameView.LevelProgress toView(GameLevelProgress progress) {

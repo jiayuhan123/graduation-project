@@ -23,7 +23,7 @@ app:
     token: ${INTERNAL_API_TOKEN:}
   openapi:
     title: 游戏闯关服务 API
-    description: 关卡、单人和团队对局、进度与奖励接口
+    description: 单人闯关、双人PK、进度与奖励接口
     version: 1.0.0
   mq:
     confirm-timeout: ${MQ_CONFIRM_TIMEOUT:5s}

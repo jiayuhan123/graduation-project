@@ -11,7 +11,7 @@ import xyz.jiayuhan.common.data.typehandler.JsonbTypeHandler;
 
 import java.math.BigDecimal;
 
-/** 可配置的单人或团队闯关关卡。 */
+/** 可配置的单人闯关关卡。 */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "game_level", autoResultMap = true)

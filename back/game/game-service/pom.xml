@@ -12,12 +12,20 @@
 
     <artifactId>game-service</artifactId>
     <name>game-service</name>
-    <description>关卡、单人和团队对局、进度与奖励服务</description>
+    <description>单人闯关、双人PK、进度与奖励服务</description>
 
     <dependencies>
         <dependency>
             <groupId>xyz.jiayuhan</groupId>
             <artifactId>game-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>content-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>user-api</artifactId>
         </dependency>
         <dependency>
             <groupId>xyz.jiayuhan</groupId>
@@ -92,4 +100,3 @@
         </plugins>
     </build>
 </project>
-

@@ -12,7 +12,7 @@ import xyz.jiayuhan.common.data.typehandler.JsonbTypeHandler;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-/** 一次单人或团队闯关对局。 */
+/** 一次单人闯关或双人 PK 对局。 */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "game_session", autoResultMap = true)
