@@ -425,7 +425,7 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="TEACHING"
+      eyebrow="教学与班级"
       :title="isTeacher ? '作业管理' : '我的作业'"
       :description="
         isTeacher
@@ -455,7 +455,7 @@ onMounted(async () => {
             <option value="OVERDUE">已逾期</option></template
           >
         </select>
-        <span class="muted">发布后题目快照和学生名单固定，保证作业过程可追溯。</span>
+        <span class="muted">发布前请确认题目和学生名单，发布后将按当前内容安排作业。</span>
       </div>
       <div v-if="loading" class="content-loading"><t-loading text="正在加载作业" /></div>
       <div v-else-if="isTeacher && assignments.length" class="content-list">
@@ -757,9 +757,9 @@ onMounted(async () => {
 .layer-summary {
   display: flex;
   padding: 9px;
-  background: #fff6ef;
+  background: var(--app-primary-soft);
   border-radius: 9px;
-  color: #a7521b;
+  color: var(--app-primary);
   flex-wrap: wrap;
   gap: 10px;
   font-size: 12px;
@@ -831,6 +831,10 @@ onMounted(async () => {
 }
 
 @media (width <= 640px) {
+  .assignment-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .assignment-toolbar,
   .candidate-row {
     grid-template-columns: 1fr;

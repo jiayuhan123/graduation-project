@@ -1,10 +1,12 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view class="directory-summary">
     <view>
       <text class="directory-summary__title">用户目录</text>
       <text class="directory-summary__text">共 {{total}} 个账号</text>
     </view>
-    <view class="directory-summary__icon">👥</view>
+    <view class="directory-summary__icon">
+      <t-icon name="usergroup" size="40rpx" color="#52705f" />
+    </view>
   </view>
 
   <view class="search-row">
@@ -19,7 +21,13 @@
         bindconfirm="onSearch"
       />
     </view>
-    <picker mode="selector" range="{{roleFilters}}" range-key="label" value="{{roleIndex}}" bindchange="onRoleChange">
+    <picker
+      mode="selector"
+      range="{{roleFilters}}"
+      range-key="label"
+      value="{{roleIndex}}"
+      bindchange="onRoleChange"
+    >
       <view class="filter-button">
         <text>{{roleFilters[roleIndex].label}}</text>
         <t-icon name="chevron-down" size="30rpx" />
@@ -45,7 +53,12 @@
       <view class="user-card__content">
         <view class="user-card__name-row">
           <text class="user-card__name">{{item.displayName}}</text>
-          <t-tag theme="{{item.status === 1 ? 'success' : 'danger'}}" variant="light" shape="round" size="small">
+          <t-tag
+            theme="{{item.status === 1 ? 'success' : 'danger'}}"
+            variant="light"
+            shape="square"
+            size="small"
+          >
             {{item.status === 1 ? '正常' : '已禁用'}}
           </t-tag>
         </view>
@@ -56,7 +69,9 @@
     </view>
 
     <view wx:if="{{page < pages}}" class="load-more">
-      <t-button theme="light" shape="round" loading="{{loadingMore}}" bind:tap="loadMore">加载更多</t-button>
+      <t-button theme="light" shape="rectangle" loading="{{loadingMore}}" bind:tap="loadMore">
+        加载更多
+      </t-button>
     </view>
     <text wx:else class="list-end">已加载全部用户</text>
   </view>

@@ -2,9 +2,9 @@
   display: flex;
   padding: 30rpx;
   align-items: center;
-  background: linear-gradient(135deg, #eef7ff, #ffffff);
+  background: var(--app-soft);
   border: 1rpx solid #d9eeff;
-  border-radius: 30rpx;
+  border-radius: 20rpx;
   gap: 22rpx;
 }
 
@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 20rpx rgba(77, 171, 247, 0.14);
+  border-radius: 20rpx;
+  box-shadow: none;
   font-size: 40rpx;
 }
 
@@ -31,23 +31,23 @@
 
 .teacher-banner__title {
   font-size: 30rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .teacher-banner__text {
   margin-top: 8rpx;
-  color: #7b8289;
+  color: var(--app-muted);
   font-size: 22rpx;
 }
 
 .readonly-value {
-  color: #2d3436;
+  color: var(--app-ink);
   font-size: 30rpx;
 }
 
 .field-hint,
 .character-count {
-  color: #a0a6ad;
+  color: var(--app-muted);
   font-size: 21rpx;
 }
 

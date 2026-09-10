@@ -182,7 +182,7 @@ onMounted(loadClasses)
 <template>
   <div>
     <PageHeader
-      eyebrow="TEACHING"
+      eyebrow="教学与班级"
       :title="isTeacher ? '班级管理' : '我的班级'"
       :description="
         isTeacher
@@ -380,9 +380,9 @@ onMounted(loadClasses)
 
 .class-card {
   padding: 20px;
-  background: linear-gradient(145deg, #fff, #fffaf7);
+  background: #fff;
   border: 1px solid #eceef0;
-  border-radius: 19px;
+  border-radius: 8px;
 }
 
 .class-card__top,
@@ -395,16 +395,17 @@ onMounted(loadClasses)
 }
 
 .class-code {
-  color: #dc691f;
+  color: var(--app-primary);
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 600;
   letter-spacing: 0.12em;
 }
 
 .class-card h2 {
-  margin-top: 20px;
+  margin-top: 18px;
   color: var(--app-text-strong);
-  font-size: 19px;
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .class-card p {
@@ -420,6 +421,8 @@ onMounted(loadClasses)
 }
 
 .class-card__actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--app-border-color);
   margin-top: 20px;
   justify-content: flex-end;
   flex-wrap: wrap;

@@ -35,7 +35,7 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="RBAC"
+      eyebrow="平台管理"
       title="权限字典"
       description="页面只做可视化核对，最终鉴权始终由用户服务和网关执行。"
     >
@@ -91,11 +91,11 @@ onMounted(async () => {
   display: inline-flex;
   width: fit-content;
   padding: 6px 9px;
-  background: #fff1e8;
+  background: var(--app-primary-soft);
   border-radius: 8px;
-  color: #d9651d;
+  color: var(--app-primary);
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.08em;
 }
 

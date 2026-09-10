@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/AppIcon.vue'
 import { onMounted, ref } from 'vue'
 import { Loading as TLoading, Tag as TTag } from 'tdesign-vue-next'
 import { listRolesApi } from '@/api/admin'
@@ -21,15 +22,15 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="RBAC"
+      eyebrow="平台管理"
       title="角色管理"
-      description="一个账号可以同时拥有多个角色，登录后按当前身份展示模块，权限在服务端合并校验。"
+      description="查看角色说明、启用状态与可使用的功能。"
     />
     <div v-if="loading" class="surface-card loading-area"><t-loading text="正在加载角色" /></div>
     <div v-else class="role-grid">
       <article v-for="role in roles" :key="role.id" class="surface-card role-card">
         <header>
-          <span class="role-icon">{{ roleMeta(role.code).icon }}</span>
+          <span class="role-icon"><AppIcon :name="roleMeta(role.code).icon" /></span>
           <div>
             <div class="role-title">
               <h2>{{ role.name }}</h2>
@@ -83,7 +84,7 @@ onMounted(async () => {
   width: 52px;
   height: 52px;
   place-items: center;
-  background: #fff2e9;
+  background: var(--app-primary-soft);
   border-radius: 17px;
   font-size: 26px;
 }

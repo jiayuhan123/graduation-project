@@ -1,3 +1,5 @@
+@import 'styles/theme.wxss';
+
 page {
   --td-brand-color: #ff8a3d;
   --td-brand-color-active: #e96f24;

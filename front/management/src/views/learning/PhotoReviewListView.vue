@@ -396,7 +396,7 @@ onUnmounted(() => {
 <template>
   <div>
     <PageHeader
-      eyebrow="OCR REVIEW"
+      eyebrow="作业批改"
       title="OCR 复核工作台"
       :description="
         isStudent
@@ -930,7 +930,7 @@ header strong {
 
 .task-list > button.active {
   background: #f0faf7;
-  box-shadow: inset 0 0 0 1px #65aa9c;
+  box-shadow: none;
 }
 
 .task-list small,
@@ -992,7 +992,7 @@ header strong {
 
 .item-navigation button.pending:not(.active) {
   border-color: #efa958;
-  background: #fff8ef;
+  background: var(--app-primary-soft);
 }
 
 .comparison-grid {
@@ -1058,7 +1058,7 @@ header strong {
   align-items: center;
   grid-template-columns: auto 130px 1fr auto;
   border-radius: 11px;
-  background: #fff8ef;
+  background: var(--app-primary-soft);
   gap: 9px;
 }
 

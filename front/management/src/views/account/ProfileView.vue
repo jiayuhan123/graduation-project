@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/AppIcon.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import {
   Button as TButton,
@@ -89,7 +90,7 @@ onMounted(loadProfile)
 
 <template>
   <div>
-    <PageHeader eyebrow="ACCOUNT" title="个人资料" description="Web 与小程序共享同一份账号资料。">
+    <PageHeader eyebrow="个人账号" title="个人资料" description="Web 与小程序共享同一份账号资料。">
       <template #actions>
         <t-button v-if="profile && !editing" @click="editing = true">编辑资料</t-button>
       </template>
@@ -117,16 +118,12 @@ onMounted(loadProfile)
             {{ profile.wechatBound ? '● 微信身份已绑定' : '○ 微信身份未绑定' }}
           </span>
         </div>
-        <div class="profile-hero__stats">
-          <div>
-            <strong>{{ profile.roles.length }}</strong
-            ><span>角色</span>
-          </div>
-          <div>
-            <strong>{{ profile.permissions.length }}</strong
-            ><span>权限</span>
-          </div>
-        </div>
+        <RouterLink to="/account/security" class="profile-security"
+          ><AppIcon name="shield" :size="20" /><span
+            ><strong>账号安全</strong
+            ><small>{{ profile.passwordSet ? '已设置登录密码' : '尚未设置登录密码' }}</small></span
+          ><AppIcon name="chevron" :size="16"
+        /></RouterLink>
       </section>
 
       <div class="profile-grid">
@@ -195,7 +192,7 @@ onMounted(loadProfile)
           <div class="card-heading">
             <div>
               <h3>账号身份</h3>
-              <p>点击侧边栏中的身份即可切换空间</p>
+              <p>选择身份，切换对应的工作空间</p>
             </div>
           </div>
           <div class="role-items">
@@ -206,7 +203,7 @@ onMounted(loadProfile)
               :class="{ active: role === userStore.activeRole }"
               @click="userStore.setActiveRole(role)"
             >
-              <span>{{ roleMeta(role).icon }}</span>
+              <span><AppIcon :name="roleMeta(role).icon" /></span>
               <span
                 ><strong>{{ roleMeta(role).label }}</strong
                 ><small>{{ roleMeta(role).description }}</small></span
@@ -229,25 +226,25 @@ onMounted(loadProfile)
 
 .profile-hero {
   display: flex;
-  padding: clamp(25px, 4vw, 38px);
+  padding: 24px;
   align-items: center;
-  background: linear-gradient(135deg, #fff, #fff8f2);
-  gap: 22px;
+  background: #fff;
+  gap: 18px;
 }
 
 .profile-avatar {
   display: grid;
-  width: 94px;
-  height: 94px;
+  width: 56px;
+  height: 56px;
   flex: none;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffad73, #ff7a2a);
-  border-radius: 29px;
-  box-shadow: 0 14px 34px rgb(255 122 42 / 22%);
+  background: var(--app-primary);
+  border-radius: 12px;
+  box-shadow: none;
   color: #fff;
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .profile-avatar img {
@@ -269,7 +266,7 @@ onMounted(loadProfile)
 
 .profile-hero h2 {
   color: var(--app-text-strong);
-  font-size: 28px;
+  font-size: 22px;
 }
 
 .profile-hero__copy p {
@@ -288,24 +285,27 @@ onMounted(loadProfile)
   color: #169c53;
 }
 
-.profile-hero__stats {
-  display: flex;
-  gap: 32px;
-}
-
-.profile-hero__stats > div {
+.profile-security {
   display: flex;
   align-items: center;
+  gap: 12px;
+  color: var(--app-primary);
+  text-decoration: none;
+}
+
+.profile-security span {
+  display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
-.profile-hero__stats strong {
-  color: var(--app-text-strong);
-  font-size: 24px;
+.profile-security strong {
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 500;
 }
 
-.profile-hero__stats span {
-  margin-top: 4px;
+.profile-security small {
   color: var(--app-text-muted);
   font-size: 11px;
 }
@@ -344,7 +344,7 @@ onMounted(loadProfile)
   display: grid;
   padding: 15px 0;
   border-top: 1px solid #f0f1f3;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 84px minmax(0, 1fr);
 }
 
 .detail-list dt {
@@ -352,6 +352,7 @@ onMounted(loadProfile)
 }
 
 .detail-list dd {
+  overflow-wrap: anywhere;
   color: var(--app-text-strong);
   text-align: right;
 }
@@ -382,18 +383,18 @@ onMounted(loadProfile)
   align-items: center;
   background: #f8f9fa;
   border: 1px solid #eceef0;
-  border-radius: 16px;
+  border-radius: 8px;
   color: inherit;
   cursor: pointer;
   font: inherit;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
   gap: 11px;
   text-align: left;
 }
 
 .role-items button.active {
-  background: #fff4ed;
-  border-color: #ffdac2;
+  background: var(--app-primary-soft);
+  border-color: #c6d6f3;
 }
 
 .role-items button > span:first-child {
@@ -421,13 +422,13 @@ onMounted(loadProfile)
 }
 
 .role-items b {
-  color: #d9651d;
+  color: var(--app-primary);
   font-size: 10px;
 }
 
 @media (width <= 980px) {
   .profile-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -438,17 +439,17 @@ onMounted(loadProfile)
   }
 
   .profile-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 22px;
-    font-size: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    font-size: 22px;
   }
 
-  .profile-hero__stats {
+  .profile-security {
     width: 100%;
     padding-top: 18px;
-    justify-content: space-around;
-    border-top: 1px solid #f0e9e4;
+    justify-content: flex-start;
+    border-top: 1px solid var(--app-border-color);
   }
 
   .form-grid {

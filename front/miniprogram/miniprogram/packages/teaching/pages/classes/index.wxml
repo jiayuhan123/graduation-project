@@ -1,33 +1,198 @@
-<view class="page-shell teaching-page">
-  <view wx:if="{{loading}}" class="page-loading"><t-loading theme="circular" size="52rpx" text="正在加载班级" /></view>
+<view class="app-page page-shell teaching-page">
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在加载班级" />
+  </view>
   <block wx:else>
-    <view class="teaching-hero"><text class="teaching-hero__eyebrow">TEACHING</text><text class="teaching-hero__title">{{isTeacher ? '班级管理' : '我的班级'}}</text><text class="teaching-hero__description">{{isTeacher ? '创建教学班，并维护在班学生。' : '输入教师提供的班级码加入班级。'}}</text></view>
+    <view class="teaching-hero">
+      <text class="teaching-hero__eyebrow">班级</text>
+      <text class="teaching-hero__title">{{isTeacher ? '班级管理' : '我的班级'}}</text>
+      <text class="teaching-hero__description">
+        {{isTeacher ? '创建教学班，并维护在班学生。' : '输入教师提供的班级码加入班级。'}}
+      </text>
+    </view>
 
-    <view wx:if="{{isTeacher}}" class="top-action"><t-button block theme="primary" bind:tap="toggleCreate">{{showCreate ? '收起创建表单' : '创建班级'}}</t-button></view>
+    <view wx:if="{{isTeacher}}" class="top-action">
+      <t-button block theme="primary" bind:tap="toggleCreate">
+        {{showCreate ? '收起创建表单' : '创建班级'}}
+      </t-button>
+    </view>
     <view wx:else class="surface-card join-form">
-      <view class="field"><text class="field__label">班级码</text><input class="field__control" value="{{joinCode}}" maxlength="12" placeholder="例如 A8K2P6Q9" data-field="joinCode" bindinput="onInput" /></view>
-      <view class="field"><text class="field__label">班内学号（选填）</text><input class="field__control" value="{{joinStudentNo}}" maxlength="32" data-field="joinStudentNo" bindinput="onInput" /></view>
-      <view class="form-inner-action"><t-button block loading="{{submitting}}" bind:tap="joinClass">加入班级</t-button></view>
+      <view class="field">
+        <text class="field__label">班级码</text>
+        <input
+          class="field__control"
+          value="{{joinCode}}"
+          maxlength="12"
+          placeholder="例如 A8K2P6Q9"
+          data-field="joinCode"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="field">
+        <text class="field__label">班内学号（选填）</text>
+        <input
+          class="field__control"
+          value="{{joinStudentNo}}"
+          maxlength="32"
+          data-field="joinStudentNo"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="form-inner-action">
+        <t-button block loading="{{submitting}}" bind:tap="joinClass">加入班级</t-button>
+      </view>
     </view>
 
     <view wx:if="{{showCreate}}" class="surface-card create-form">
-      <view class="field"><text class="field__label">班级名称</text><input class="field__control" value="{{className}}" maxlength="100" data-field="className" bindinput="onInput" /></view>
-      <view class="field"><text class="field__label">学校名称（选填）</text><input class="field__control" value="{{schoolName}}" maxlength="150" data-field="schoolName" bindinput="onInput" /></view>
-      <view class="field"><text class="field__label">学年</text><input class="field__control" value="{{academicYear}}" data-field="academicYear" bindinput="onInput" /></view>
-      <view class="picker-grid"><picker range="{{gradeOptions}}" value="{{gradeLevel - 1}}" bindchange="selectGrade"><view class="picker-control">{{gradeLevel}} 年级</view></picker><picker range="{{semesterOptions}}" value="{{semester - 1}}" bindchange="selectSemester"><view class="picker-control">{{semester === 1 ? '上学期' : '下学期'}}</view></picker></view>
-      <view class="form-inner-action"><t-button block loading="{{submitting}}" bind:tap="createClass">确认创建</t-button></view>
+      <view class="field">
+        <text class="field__label">班级名称</text>
+        <input
+          class="field__control"
+          value="{{className}}"
+          maxlength="100"
+          data-field="className"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="field">
+        <text class="field__label">学校名称（选填）</text>
+        <input
+          class="field__control"
+          value="{{schoolName}}"
+          maxlength="150"
+          data-field="schoolName"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="field">
+        <text class="field__label">学年</text>
+        <input
+          class="field__control"
+          value="{{academicYear}}"
+          data-field="academicYear"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="picker-grid">
+        <picker range="{{gradeOptions}}" value="{{gradeLevel - 1}}" bindchange="selectGrade">
+          <view class="picker-control">{{gradeLevel}} 年级</view>
+        </picker>
+        <picker range="{{semesterOptions}}" value="{{semester - 1}}" bindchange="selectSemester">
+          <view class="picker-control">{{semester === 1 ? '上学期' : '下学期'}}</view>
+        </picker>
+      </view>
+      <view class="form-inner-action">
+        <t-button block loading="{{submitting}}" bind:tap="createClass">确认创建</t-button>
+      </view>
     </view>
 
     <text class="section-heading">{{isTeacher ? '我任教的班级' : '已加入班级'}}</text>
     <view wx:if="{{classes.length}}" class="class-list">
       <view wx:for="{{classes}}" wx:key="classId" class="surface-card class-card">
-        <view class="class-card__top"><text class="class-code">{{item.classCode}}</text><t-tag theme="{{item.classStatus === 'ACTIVE' && item.membershipStatus === 'ACTIVE' ? 'success' : 'default'}}" variant="light">{{item.membershipStatus === 'LEFT' ? '已退出' : item.classStatus === 'ACTIVE' ? '进行中' : '已归档'}}</t-tag></view>
-        <text class="class-card__name">{{item.name}}</text><text class="class-card__school">{{item.schoolName || '未填写学校'}}</text><text class="class-card__meta">{{item.academicYear}} · {{item.gradeLevel}} 年级{{item.semester === 1 ? '上学期' : '下学期'}}</text>
-          <view class="class-card__actions"><block wx:if="{{isTeacher}}"><t-button size="small" variant="outline" data-id="{{item.classId}}" bind:tap="openStudents">学生名单</t-button><t-button size="small" variant="text" data-id="{{item.classId}}" data-version="{{item.version}}" data-status="{{item.classStatus}}" bind:tap="toggleClassStatus">{{item.classStatus === 'ACTIVE' ? '归档' : '恢复'}}</t-button></block><t-button wx:elif="{{item.membershipStatus === 'ACTIVE'}}" size="small" theme="danger" variant="text" data-id="{{item.classId}}" bind:tap="leaveClass">退出班级</t-button></view>
+        <view class="class-card__top">
+          <text class="class-code">{{item.classCode}}</text>
+          <t-tag
+            theme="{{item.classStatus === 'ACTIVE' && item.membershipStatus === 'ACTIVE' ? 'success' : 'default'}}"
+            variant="light"
+          >
+            {{item.membershipStatus === 'LEFT' ? '已退出' : item.classStatus === 'ACTIVE' ? '进行中'
+            : '已归档'}}
+          </t-tag>
+        </view>
+        <text class="class-card__name">{{item.name}}</text>
+        <text class="class-card__school">{{item.schoolName || '未填写学校'}}</text>
+        <text class="class-card__meta">
+          {{item.academicYear}} · {{item.gradeLevel}} 年级{{item.semester === 1 ? '上学期' :
+          '下学期'}}
+        </text>
+        <view class="class-card__actions">
+          <block wx:if="{{isTeacher}}">
+            <t-button
+              size="small"
+              variant="outline"
+              data-id="{{item.classId}}"
+              bind:tap="openStudents"
+            >
+              学生名单
+            </t-button>
+            <t-button
+              size="small"
+              variant="text"
+              data-id="{{item.classId}}"
+              data-version="{{item.version}}"
+              data-status="{{item.classStatus}}"
+              bind:tap="toggleClassStatus"
+            >
+              {{item.classStatus === 'ACTIVE' ? '归档' : '恢复'}}
+            </t-button>
+          </block>
+          <t-button
+            wx:elif="{{item.membershipStatus === 'ACTIVE'}}"
+            size="small"
+            theme="danger"
+            variant="text"
+            data-id="{{item.classId}}"
+            bind:tap="leaveClass"
+          >
+            退出班级
+          </t-button>
+        </view>
       </view>
     </view>
-    <view wx:else class="surface-card empty-state"><t-empty description="{{isTeacher ? '还没有创建班级' : '还没有加入班级'}}" /></view>
+    <view wx:else class="surface-card empty-state">
+      <t-empty description="{{isTeacher ? '还没有创建班级' : '还没有加入班级'}}" />
+    </view>
 
-    <block wx:if="{{detail}}"><text class="section-heading">{{detail.classInfo.name}} · 学生名单</text><view class="surface-card student-panel"><view class="field"><text class="field__label">学生用户 ID</text><input class="field__control" value="{{studentId}}" type="number" data-field="studentId" bindinput="onInput" /></view><view class="field"><text class="field__label">班内学号（选填）</text><input class="field__control" value="{{studentNo}}" data-field="studentNo" bindinput="onInput" /></view><view class="student-actions"><t-button size="small" bind:tap="addStudent">添加学生</t-button><t-button size="small" variant="text" bind:tap="closeStudents">关闭</t-button></view><view wx:for="{{detail.students}}" wx:key="studentId" class="student-row"><view><text class="student-row__name">{{item.displayName || item.username || item.studentId}}</text><text class="student-row__meta">{{item.studentNoInClass || '暂无班内学号'}}</text></view><view class="student-row__action"><t-tag theme="{{item.status === 'ACTIVE' ? 'success' : 'default'}}" variant="light">{{item.status === 'ACTIVE' ? '在班' : '已退出'}}</t-tag><t-button wx:if="{{item.status === 'ACTIVE'}}" size="small" theme="danger" variant="text" data-id="{{item.studentId}}" bind:tap="removeStudent">移出</t-button></view></view></view></block>
+    <block wx:if="{{detail}}">
+      <text class="section-heading">{{detail.classInfo.name}} · 学生名单</text>
+      <view class="surface-card student-panel">
+        <view class="field">
+          <text class="field__label">学生用户 ID</text>
+          <input
+            class="field__control"
+            value="{{studentId}}"
+            type="number"
+            data-field="studentId"
+            bindinput="onInput"
+          />
+        </view>
+        <view class="field">
+          <text class="field__label">班内学号（选填）</text>
+          <input
+            class="field__control"
+            value="{{studentNo}}"
+            data-field="studentNo"
+            bindinput="onInput"
+          />
+        </view>
+        <view class="student-actions">
+          <t-button size="small" bind:tap="addStudent">添加学生</t-button>
+          <t-button size="small" variant="text" bind:tap="closeStudents">关闭</t-button>
+        </view>
+        <view wx:for="{{detail.students}}" wx:key="studentId" class="student-row">
+          <view>
+            <text class="student-row__name">
+              {{item.displayName || item.username || item.studentId}}
+            </text>
+            <text class="student-row__meta">{{item.studentNoInClass || '暂无班内学号'}}</text>
+          </view>
+          <view class="student-row__action">
+            <t-tag theme="{{item.status === 'ACTIVE' ? 'success' : 'default'}}" variant="light">
+              {{item.status === 'ACTIVE' ? '在班' : '已退出'}}
+            </t-tag>
+            <t-button
+              wx:if="{{item.status === 'ACTIVE'}}"
+              size="small"
+              theme="danger"
+              variant="text"
+              data-id="{{item.studentId}}"
+              bind:tap="removeStudent"
+            >
+              移出
+            </t-button>
+          </view>
+        </view>
+      </view>
+    </block>
   </block>
 </view>

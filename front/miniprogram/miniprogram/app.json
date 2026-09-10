@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/learning/index",
+    "pages/classroom/index",
     "pages/login/index",
     "pages/profile/index",
     "pages/profile-edit/index",
@@ -49,24 +51,40 @@
   },
   "window": {
     "navigationBarTitleText": "小学数学",
-    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarBackgroundColor": "#f6f5f1",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f5f7fa",
+    "backgroundColor": "#f6f5f1",
     "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#8a8f98",
-    "selectedColor": "#ff8a3d",
+    "color": "#8a9289",
+    "selectedColor": "#285c49",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/learning/index",
+        "text": "学习",
+        "iconPath": "assets/tabbar/book.png",
+        "selectedIconPath": "assets/tabbar/book-active.png"
+      },
+      {
+        "pagePath": "pages/classroom/index",
+        "text": "班级",
+        "iconPath": "assets/tabbar/class.png",
+        "selectedIconPath": "assets/tabbar/class-active.png"
       },
       {
         "pagePath": "pages/profile/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "assets/tabbar/user.png",
+        "selectedIconPath": "assets/tabbar/user-active.png"
       }
     ]
   },

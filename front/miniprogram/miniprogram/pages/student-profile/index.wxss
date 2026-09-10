@@ -2,9 +2,9 @@
   display: flex;
   padding: 30rpx;
   align-items: center;
-  background: linear-gradient(135deg, #fff3eb, #ffffff);
-  border: 1rpx solid #ffe3d0;
-  border-radius: 30rpx;
+  background: var(--app-soft);
+  border: 1rpx solid var(--app-line);
+  border-radius: 20rpx;
   gap: 22rpx;
 }
 
@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 20rpx rgba(255, 138, 61, 0.12);
+  border-radius: 20rpx;
+  box-shadow: none;
   font-size: 40rpx;
 }
 
@@ -31,24 +31,24 @@
 
 .student-banner__title {
   font-size: 30rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .student-banner__text {
   margin-top: 8rpx;
-  color: #7b8289;
+  color: var(--app-muted);
   font-size: 22rpx;
 }
 
 .readonly-value,
 .picker-field__value {
-  color: #2d3436;
+  color: var(--app-ink);
   font-size: 30rpx;
 }
 
 .field-hint {
   margin-top: 8rpx;
-  color: #a0a6ad;
+  color: var(--app-muted);
   font-size: 21rpx;
 }
 
@@ -57,7 +57,7 @@
   padding: 24rpx 28rpx;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1rpx solid #f0f2f5;
+  border-bottom: 1rpx solid var(--app-line);
 }
 
 .picker-field--last {

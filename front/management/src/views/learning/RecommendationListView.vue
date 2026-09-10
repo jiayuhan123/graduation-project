@@ -85,7 +85,7 @@ onMounted(() => {
 <template>
   <div>
     <PageHeader
-      eyebrow="RECOMMENDATION"
+      eyebrow="学习巩固"
       title="巩固推荐"
       :description="
         isStudent

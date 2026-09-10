@@ -4,6 +4,7 @@ import { roleLabel, roleOptions } from '../../constants/roles'
 import { resolveAvatarDisplayUrl } from '../../services/avatar'
 import { clearSession, getSession, setActiveRole } from '../../services/session'
 import type { UserProfile } from '../../types/account'
+import { syncTabBar } from '../../utils/navigation'
 
 function formatDate(value: string | null): string {
   if (!value) return '暂无记录'
@@ -35,6 +36,7 @@ Page({
     joinedAt: '',
     lastLoginAt: '',
     loggingOut: false,
+    showAccountInfo: false,
   },
 
   onShow() {
@@ -54,6 +56,7 @@ Page({
         ? activeRole
         : (profile.roles[0] ?? 'student')
       setActiveRole(selectedRole)
+      syncTabBar(selectedRole)
       const displayName = profile.nickname || profile.realName || profile.username
       const avatarUrl = await resolveAvatarDisplayUrl(profile.avatarUrl).catch(() => '')
       this.setData({
@@ -84,7 +87,12 @@ Page({
     if (!role || role === this.data.activeRole) return
     const session = setActiveRole(role)
     if (!session) return
+    syncTabBar(role)
     this.setData({ activeRole: role, activeRoleLabel: roleLabel(role) })
+  },
+
+  toggleAccountInfo() {
+    this.setData({ showAccountInfo: !this.data.showAccountInfo })
   },
 
   openEditProfile() {
@@ -108,7 +116,7 @@ Page({
     const result = await wx.showModal({
       title: '退出登录',
       content: '确定退出当前账号吗？',
-      confirmColor: '#ff8a3d',
+      confirmColor: '#285c49',
     })
     if (!result.confirm) return
 

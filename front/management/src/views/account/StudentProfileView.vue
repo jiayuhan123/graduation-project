@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/AppIcon.vue'
 import { onMounted, reactive, ref } from 'vue'
 import {
   Button as TButton,
@@ -47,7 +48,7 @@ onMounted(loadProfile)
 <template>
   <div>
     <PageHeader
-      eyebrow="STUDENT"
+      eyebrow="个人账号"
       title="学生资料"
       description="年级和学期会用于匹配适合的学习内容。"
     />
@@ -55,7 +56,7 @@ onMounted(loadProfile)
       <div v-if="loading" class="loading-area"><t-loading text="正在加载学生资料" /></div>
       <template v-else>
         <div class="student-card__intro">
-          <span>🎒</span>
+          <AppIcon name="book" :size="28" />
           <div>
             <h2>{{ form.gradeLevel }} 年级 · {{ form.semester === 1 ? '上学期' : '下学期' }}</h2>
             <p>{{ profile?.studentNo ? `学号 ${profile.studentNo}` : '暂未设置学号' }}</p>
@@ -96,9 +97,9 @@ onMounted(loadProfile)
   display: flex;
   padding: 24px;
   align-items: center;
-  background: linear-gradient(135deg, #fff4eb, #fffaf6);
-  border: 1px solid #ffe1cd;
-  border-radius: 22px;
+  background: var(--app-primary-soft);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
   gap: 18px;
 }
 

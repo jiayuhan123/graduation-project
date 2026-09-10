@@ -1,25 +1,280 @@
-<view class="page-shell assignment-page">
-  <view wx:if="{{loading}}" class="page-loading"><t-loading theme="circular" size="52rpx" text="正在加载作业" /></view>
+<view class="app-page page-shell assignment-page">
+  <view wx:if="{{loading}}" class="page-loading">
+    <t-loading theme="circular" size="52rpx" text="正在加载作业" />
+  </view>
   <block wx:else>
-    <view class="assignment-hero"><text class="assignment-hero__eyebrow">ASSIGNMENT</text><text class="assignment-hero__title">{{isTeacher ? '作业管理' : '我的作业'}}</text><text class="assignment-hero__description">{{isTeacher ? '从已发布题库选择题目，布置统一或分层作业。' : '老师发布的作业和你的当前状态都在这里。'}}</text></view>
-    <view wx:if="{{isTeacher}}" class="top-action"><t-button block disabled="{{!classes.length || !candidates.length}}" bind:tap="toggleCreate">{{showCreate ? '收起创建表单' : '快速布置作业'}}</t-button></view>
+    <view class="assignment-hero">
+      <text class="assignment-hero__eyebrow">课堂作业</text>
+      <text class="assignment-hero__title">{{isTeacher ? '作业管理' : '我的作业'}}</text>
+      <text class="assignment-hero__description">
+        {{isTeacher ? '从已发布题库选择题目，布置统一或分层作业。' :
+        '老师发布的作业和你的当前状态都在这里。'}}
+      </text>
+    </view>
+    <view wx:if="{{isTeacher}}" class="top-action">
+      <t-button block disabled="{{!classes.length || !candidates.length}}" bind:tap="toggleCreate">
+        {{showCreate ? '收起创建表单' : '快速布置作业'}}
+      </t-button>
+    </view>
 
     <view wx:if="{{showCreate}}" class="surface-card create-panel">
-      <view class="field"><text class="field__label">班级</text><picker range="{{classes}}" range-key="name" value="{{classIndex}}" bindchange="selectClass"><view class="picker-control">{{classes[classIndex].name || '请选择班级'}}</view></picker></view>
-      <view class="field"><text class="field__label">作业类型</text><picker range="{{assignmentTypeOptions}}" value="{{assignmentType === 'LAYERED' ? 1 : 0}}" bindchange="selectAssignmentType"><view class="picker-control">{{assignmentType === 'LAYERED' ? '分层作业' : '统一作业'}}</view></picker></view>
-      <view class="field"><text class="field__label">作业标题</text><input class="field__control" value="{{title}}" maxlength="128" data-field="title" bindinput="onInput" /></view>
-      <view class="field"><text class="field__label">作业说明（选填）</text><textarea class="field__textarea compact-textarea" value="{{description}}" maxlength="1000" data-field="description" bindinput="onInput" /></view>
-      <view class="time-grid"><view><text>开始日期</text><picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="selectDate"><view>{{startDate}}</view></picker></view><view><text>开始时间</text><picker mode="time" value="{{startTime}}" data-field="startTime" bindchange="selectDate"><view>{{startTime}}</view></picker></view><view><text>截止日期</text><picker mode="date" value="{{dueDate}}" data-field="dueDate" bindchange="selectDate"><view>{{dueDate}}</view></picker></view><view><text>截止时间</text><picker mode="time" value="{{dueTime}}" data-field="dueTime" bindchange="selectDate"><view>{{dueTime}}</view></picker></view></view>
-      <text class="panel-heading">选择题目并设置分值</text><view class="question-list"><view wx:for="{{candidates}}" wx:key="id" class="question-row {{item.selected ? 'question-row--selected' : ''}}"><view class="question-row__head"><view class="question-mark" data-id="{{item.id}}" bind:tap="toggleQuestion">{{item.selected ? '✓' : ''}}</view><view data-id="{{item.id}}" bind:tap="toggleQuestion"><text class="question-stem">{{item.stem}}</text><text class="question-meta">{{item.code}} · 难度 {{item.difficulty}}</text></view></view><view wx:if="{{item.selected}}" class="question-settings"><label><text>层级</text><input value="{{item.layerCode}}" maxlength="32" disabled="{{assignmentType === 'UNIFIED'}}" data-id="{{item.id}}" data-field="layerCode" bindinput="onQuestionInput" /></label><label><text>分值</text><input value="{{item.score}}" type="digit" data-id="{{item.id}}" data-field="score" bindinput="onQuestionInput" /></label></view></view></view>
-      <view class="inner-action"><t-button block loading="{{submitting}}" bind:tap="createAssignment">保存为草稿</t-button></view>
+      <view class="field">
+        <text class="field__label">班级</text>
+        <picker
+          range="{{classes}}"
+          range-key="name"
+          value="{{classIndex}}"
+          bindchange="selectClass"
+        >
+          <view class="picker-control">{{classes[classIndex].name || '请选择班级'}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="field__label">作业类型</text>
+        <picker
+          range="{{assignmentTypeOptions}}"
+          value="{{assignmentType === 'LAYERED' ? 1 : 0}}"
+          bindchange="selectAssignmentType"
+        >
+          <view class="picker-control">
+            {{assignmentType === 'LAYERED' ? '分层作业' : '统一作业'}}
+          </view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="field__label">作业标题</text>
+        <input
+          class="field__control"
+          value="{{title}}"
+          maxlength="128"
+          data-field="title"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="field">
+        <text class="field__label">作业说明（选填）</text>
+        <textarea
+          class="field__textarea compact-textarea"
+          value="{{description}}"
+          maxlength="1000"
+          data-field="description"
+          bindinput="onInput"
+        />
+      </view>
+      <view class="time-grid">
+        <view>
+          <text>开始日期</text>
+          <picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="selectDate">
+            <view>{{startDate}}</view>
+          </picker>
+        </view>
+        <view>
+          <text>开始时间</text>
+          <picker mode="time" value="{{startTime}}" data-field="startTime" bindchange="selectDate">
+            <view>{{startTime}}</view>
+          </picker>
+        </view>
+        <view>
+          <text>截止日期</text>
+          <picker mode="date" value="{{dueDate}}" data-field="dueDate" bindchange="selectDate">
+            <view>{{dueDate}}</view>
+          </picker>
+        </view>
+        <view>
+          <text>截止时间</text>
+          <picker mode="time" value="{{dueTime}}" data-field="dueTime" bindchange="selectDate">
+            <view>{{dueTime}}</view>
+          </picker>
+        </view>
+      </view>
+      <text class="panel-heading">选择题目并设置分值</text>
+      <view class="question-list">
+        <view
+          wx:for="{{candidates}}"
+          wx:key="id"
+          class="question-row {{item.selected ? 'question-row--selected' : ''}}"
+        >
+          <view class="question-row__head">
+            <view class="question-mark" data-id="{{item.id}}" bind:tap="toggleQuestion">
+              {{item.selected ? '✓' : ''}}
+            </view>
+            <view data-id="{{item.id}}" bind:tap="toggleQuestion">
+              <text class="question-stem">{{item.stem}}</text>
+              <text class="question-meta">{{item.code}} · 难度 {{item.difficulty}}</text>
+            </view>
+          </view>
+          <view wx:if="{{item.selected}}" class="question-settings">
+            <label>
+              <text>层级</text>
+              <input
+                value="{{item.layerCode}}"
+                maxlength="32"
+                disabled="{{assignmentType === 'UNIFIED'}}"
+                data-id="{{item.id}}"
+                data-field="layerCode"
+                bindinput="onQuestionInput"
+              />
+            </label>
+            <label>
+              <text>分值</text>
+              <input
+                value="{{item.score}}"
+                type="digit"
+                data-id="{{item.id}}"
+                data-field="score"
+                bindinput="onQuestionInput"
+              />
+            </label>
+          </view>
+        </view>
+      </view>
+      <view class="inner-action">
+        <t-button block loading="{{submitting}}" bind:tap="createAssignment">保存为草稿</t-button>
+      </view>
     </view>
 
     <text class="section-heading">{{isTeacher ? '我创建的作业' : '老师布置的作业'}}</text>
-    <view wx:if="{{isTeacher && assignments.length}}" class="assignment-list"><view wx:for="{{assignments}}" wx:key="id" class="surface-card assignment-card"><view class="assignment-card__top"><t-tag theme="{{item.status === 'PUBLISHED' ? 'success' : item.status === 'DRAFT' ? 'warning' : 'default'}}" variant="light">{{item.status}}</t-tag><text>{{item.assignmentType === 'LAYERED' ? '分层' : '统一'}} · {{item.totalScore}} 分</text></view><text class="assignment-card__title">{{item.title}}</text><text class="assignment-card__date">截止 {{item.dueAt}}</text><view class="assignment-card__actions"><t-button size="small" variant="outline" data-id="{{item.id}}" bind:tap="openDetail">查看</t-button><t-button wx:if="{{item.status === 'DRAFT'}}" size="small" data-id="{{item.id}}" data-version="{{item.version}}" data-type="{{item.assignmentType}}" bind:tap="publish">发布</t-button><t-button wx:if="{{item.status === 'PUBLISHED'}}" size="small" variant="text" data-id="{{item.id}}" data-version="{{item.version}}" data-action="CLOSE" bind:tap="changeStatus">结束</t-button><t-button wx:if="{{item.status === 'DRAFT' || item.status === 'PUBLISHED'}}" size="small" theme="danger" variant="text" data-id="{{item.id}}" data-version="{{item.version}}" data-action="CANCEL" bind:tap="changeStatus">取消</t-button></view></view></view>
-    <view wx:elif="{{!isTeacher && studentAssignments.length}}" class="assignment-list"><view wx:for="{{studentAssignments}}" wx:key="index" class="surface-card assignment-card"><view class="assignment-card__top"><t-tag theme="{{item.submission.status === 'GRADED' ? 'success' : 'warning'}}" variant="light">{{item.submission.status}}</t-tag><text>{{item.submission.layerCode}} 层 · {{item.assignment.totalScore}} 分</text></view><text class="assignment-card__title">{{item.assignment.title}}</text><text class="assignment-card__date">截止 {{item.assignment.dueAt}}</text><view class="assignment-card__actions"><t-button size="small" variant="outline" data-id="{{item.assignment.id}}" bind:tap="openDetail">查看题目</t-button><t-button wx:if="{{item.submission.status !== 'GRADED' && item.submission.status !== 'OVERDUE'}}" size="small" data-id="{{item.assignment.id}}" bind:tap="startStudentAssignment">{{item.submission.status === 'IN_PROGRESS' ? '继续作业' : '开始作业'}}</t-button></view></view></view>
+    <view wx:if="{{isTeacher && assignments.length}}" class="assignment-list">
+      <view wx:for="{{assignments}}" wx:key="id" class="surface-card assignment-card">
+        <view class="assignment-card__top">
+          <t-tag
+            theme="{{item.status === 'PUBLISHED' ? 'success' : item.status === 'DRAFT' ? 'warning' : 'default'}}"
+            variant="light"
+          >
+            {{item.status === 'DRAFT' ? '草稿' : item.status === 'PUBLISHED' ? '已发布' :
+            item.status === 'CLOSED' ? '已结束' : item.status === 'GRADED' ? '已批改' : item.status
+            === 'IN_PROGRESS' ? '进行中' : item.status === 'SUBMITTED' ? '已提交' : item.status ===
+            'OVERDUE' ? '已逾期' : item.status === 'CANCELLED' ? '已取消' : '待完成'}}
+          </t-tag>
+          <text>
+            {{item.assignmentType === 'LAYERED' ? '分层' : '统一'}} · {{item.totalScore}} 分
+          </text>
+        </view>
+        <text class="assignment-card__title">{{item.title}}</text>
+        <text class="assignment-card__date">截止 {{item.dueAt}}</text>
+        <view class="assignment-card__actions">
+          <t-button size="small" variant="outline" data-id="{{item.id}}" bind:tap="openDetail">
+            查看
+          </t-button>
+          <t-button
+            wx:if="{{item.status === 'DRAFT'}}"
+            size="small"
+            data-id="{{item.id}}"
+            data-version="{{item.version}}"
+            data-type="{{item.assignmentType}}"
+            bind:tap="publish"
+          >
+            发布
+          </t-button>
+          <t-button
+            wx:if="{{item.status === 'PUBLISHED'}}"
+            size="small"
+            variant="text"
+            data-id="{{item.id}}"
+            data-version="{{item.version}}"
+            data-action="CLOSE"
+            bind:tap="changeStatus"
+          >
+            结束
+          </t-button>
+          <t-button
+            wx:if="{{item.status === 'DRAFT' || item.status === 'PUBLISHED'}}"
+            size="small"
+            theme="danger"
+            variant="text"
+            data-id="{{item.id}}"
+            data-version="{{item.version}}"
+            data-action="CANCEL"
+            bind:tap="changeStatus"
+          >
+            取消
+          </t-button>
+        </view>
+      </view>
+    </view>
+    <view wx:elif="{{!isTeacher && studentAssignments.length}}" class="assignment-list">
+      <view wx:for="{{studentAssignments}}" wx:key="index" class="surface-card assignment-card">
+        <view class="assignment-card__top">
+          <t-tag
+            theme="{{item.submission.status === 'GRADED' ? 'success' : 'warning'}}"
+            variant="light"
+          >
+            {{item.submission.status === 'DRAFT' ? '草稿' : item.submission.status === 'PUBLISHED' ?
+            '已发布' : item.submission.status === 'CLOSED' ? '已结束' : item.submission.status ===
+            'GRADED' ? '已批改' : item.submission.status === 'IN_PROGRESS' ? '进行中' :
+            item.submission.status === 'SUBMITTED' ? '已提交' : item.submission.status === 'OVERDUE'
+            ? '已逾期' : item.submission.status === 'CANCELLED' ? '已取消' : '待完成'}}
+          </t-tag>
+          <text>{{item.submission.layerCode}} 层 · {{item.assignment.totalScore}} 分</text>
+        </view>
+        <text class="assignment-card__title">{{item.assignment.title}}</text>
+        <text class="assignment-card__date">截止 {{item.assignment.dueAt}}</text>
+        <view class="assignment-card__actions">
+          <t-button
+            size="small"
+            variant="outline"
+            data-id="{{item.assignment.id}}"
+            bind:tap="openDetail"
+          >
+            查看题目
+          </t-button>
+          <t-button
+            wx:if="{{item.submission.status !== 'GRADED' && item.submission.status !== 'OVERDUE'}}"
+            size="small"
+            data-id="{{item.assignment.id}}"
+            bind:tap="startStudentAssignment"
+          >
+            {{item.submission.status === 'IN_PROGRESS' ? '继续作业' : '开始作业'}}
+          </t-button>
+        </view>
+      </view>
+    </view>
     <view wx:else class="surface-card empty-state"><t-empty description="暂无作业" /></view>
 
-    <block wx:if="{{detail}}"><text class="section-heading">{{detail.assignment.title}}</text><view class="detail-list"><view wx:for="{{detail.questions}}" wx:key="id" class="surface-card detail-question"><text class="detail-question__meta">{{item.layerCode}} · 第 {{item.sequenceNo}} 题 · {{item.score}} 分</text><text class="detail-question__stem">{{item.stem}}</text><text wx:if="{{item.standardAnswer}}" class="detail-question__answer">答案：{{item.standardAnswer}}</text><text wx:if="{{item.analysis}}" class="detail-question__answer">解析：{{item.analysis}}</text></view></view><view class="inner-action"><t-button block variant="outline" bind:tap="closeDetail">关闭详情</t-button></view></block>
-    <block wx:if="{{publishTargetId}}"><text class="section-heading">为学生分配层级</text><view class="surface-card layer-panel"><view wx:for="{{publishStudents}}" wx:key="studentId" class="layer-student"><view><text class="layer-student__name">{{item.displayName || item.username || item.studentId}}</text><text class="layer-student__meta">{{item.studentNoInClass || '暂无班内学号'}}</text></view><picker range="{{layerOptions}}" value="{{item.layerIndex}}" data-index="{{index}}" bindchange="selectStudentLayer"><view class="layer-picker">{{layerOptions[item.layerIndex]}} 层</view></picker></view><view class="layer-actions"><t-button variant="outline" bind:tap="cancelLayerPublish">取消</t-button><t-button bind:tap="publishLayered">确认发布</t-button></view></view></block>
+    <block wx:if="{{detail}}">
+      <view id="assignment-detail" class="section-heading">{{detail.assignment.title}}</view>
+      <view class="detail-list">
+        <view wx:for="{{detail.questions}}" wx:key="id" class="surface-card detail-question">
+          <text class="detail-question__meta">
+            {{item.layerCode}} · 第 {{item.sequenceNo}} 题 · {{item.score}} 分
+          </text>
+          <text class="detail-question__stem">{{item.stem}}</text>
+          <text wx:if="{{item.standardAnswer}}" class="detail-question__answer">
+            答案：{{item.standardAnswer}}
+          </text>
+          <text wx:if="{{item.analysis}}" class="detail-question__answer">
+            解析：{{item.analysis}}
+          </text>
+        </view>
+      </view>
+      <view class="inner-action">
+        <t-button block variant="outline" bind:tap="closeDetail">关闭详情</t-button>
+      </view>
+    </block>
+    <block wx:if="{{publishTargetId}}">
+      <text class="section-heading">为学生分配层级</text>
+      <view class="surface-card layer-panel">
+        <view wx:for="{{publishStudents}}" wx:key="studentId" class="layer-student">
+          <view>
+            <text class="layer-student__name">
+              {{item.displayName || item.username || item.studentId}}
+            </text>
+            <text class="layer-student__meta">{{item.studentNoInClass || '暂无班内学号'}}</text>
+          </view>
+          <picker
+            range="{{layerOptions}}"
+            value="{{item.layerIndex}}"
+            data-index="{{index}}"
+            bindchange="selectStudentLayer"
+          >
+            <view class="layer-picker">{{layerOptions[item.layerIndex]}} 层</view>
+          </picker>
+        </view>
+        <view class="layer-actions">
+          <t-button variant="outline" bind:tap="cancelLayerPublish">取消</t-button>
+          <t-button bind:tap="publishLayered">确认发布</t-button>
+        </view>
+      </view>
+    </block>
   </block>
 </view>

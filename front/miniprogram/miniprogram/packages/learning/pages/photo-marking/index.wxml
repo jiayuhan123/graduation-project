@@ -1,8 +1,8 @@
-<view class="page">
+<view class="app-page page">
   <view class="hero">
-    <text class="eyebrow">OCR 作业识别</text>
-    <text class="title">拍一张，先自动批改</text>
-    <text class="description">清晰拍摄整页作业。高可信结果自动进入学习档案，低可信题目由你或老师确认。</text>
+    <text class="eyebrow">拍照批改</text>
+    <text class="title">纸上的练习，也能整理好</text>
+    <text class="description">拍下清晰完整的作业，查看批改结果，也可以手动核对。</text>
     <button class="choose-button" bindtap="chooseImage">拍照或选择图片</button>
   </view>
 
@@ -14,18 +14,38 @@
 
   <view wx:if="{{detail}}" class="detail">
     <view class="section-head">
-      <view><text class="section-title">任务 #{{detail.task.id}}</text><text class="section-tip">{{detail.task.statusText}} · 整体可信度 {{detail.task.confidenceText}}</text></view>
+      <view>
+        <text class="section-title">任务 #{{detail.task.id}}</text>
+        <text class="section-tip">
+          {{detail.task.statusText}} · 整体可信度 {{detail.task.confidenceText}}
+        </text>
+      </view>
       <text class="link" bindtap="closeDetail">收起</text>
     </view>
-    <view wx:if="{{detail.task.status === 'UPLOADED' || detail.task.status === 'PROCESSING'}}" class="surface waiting">
-      <text class="spinner">◌</text><text>正在识别，页面会自动刷新…</text>
+    <view
+      wx:if="{{detail.task.status === 'UPLOADED' || detail.task.status === 'PROCESSING'}}"
+      class="surface waiting"
+    >
+      <text class="spinner">◌</text>
+      <text>正在识别，页面会自动刷新…</text>
     </view>
     <view wx:elif="{{detail.items.length}}" class="item-list">
-      <view wx:for="{{detail.items}}" wx:key="id" class="surface item-card {{item.status === 'REVIEW_REQUIRED' ? 'item-card--review' : ''}}" data-id="{{item.id}}" bindtap="selectItem">
-        <view class="item-head"><text class="item-title">第 {{item.itemNo}} 题</text><text class="status">{{item.statusText}}</text></view>
+      <view
+        wx:for="{{detail.items}}"
+        wx:key="id"
+        class="surface item-card {{item.status === 'REVIEW_REQUIRED' ? 'item-card--review' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectItem"
+      >
+        <view class="item-head">
+          <text class="item-title">第 {{item.itemNo}} 题</text>
+          <text class="status">{{item.statusText}}</text>
+        </view>
         <text class="stem">{{item.recognizedStem}}</text>
         <text class="answer">识别答案：{{item.answerText || '未识别'}}</text>
-        <text class="meta">可信度 {{item.confidenceText}} · 匹配题目 {{item.matchedQuestionId || '待确认'}}</text>
+        <text class="meta">
+          可信度 {{item.confidenceText}} · 匹配题目 {{item.matchedQuestionId || '待确认'}}
+        </text>
       </view>
     </view>
     <view wx:else class="surface waiting">暂无识别明细</view>
@@ -33,20 +53,54 @@
 
   <view wx:if="{{selectedItemId}}" class="surface editor">
     <text class="section-title">确认识别结果</text>
-    <label><text>学生答案</text><textarea value="{{correctedAnswer}}" maxlength="2000" bindinput="onAnswerInput" /></label>
-    <label><text>匹配题目 ID</text><input value="{{matchedQuestionId}}" type="number" bindinput="onQuestionIdInput" /></label>
+    <label>
+      <text>学生答案</text>
+      <textarea value="{{correctedAnswer}}" maxlength="2000" bindinput="onAnswerInput" />
+    </label>
+    <label>
+      <text>匹配题目 ID</text>
+      <input value="{{matchedQuestionId}}" type="number" bindinput="onQuestionIdInput" />
+    </label>
     <view class="actions">
       <button data-decision="APPROVE" loading="{{reviewing}}" bindtap="reviewItem">结果正确</button>
-      <button class="primary-button" data-decision="CORRECT" loading="{{reviewing}}" bindtap="reviewItem">修正并确认</button>
-      <button class="danger-button" data-decision="REJECT" loading="{{reviewing}}" bindtap="reviewItem">忽略此题</button>
+      <button
+        class="primary-button"
+        data-decision="CORRECT"
+        loading="{{reviewing}}"
+        bindtap="reviewItem"
+      >
+        修正并确认
+      </button>
+      <button
+        class="danger-button"
+        data-decision="REJECT"
+        loading="{{reviewing}}"
+        bindtap="reviewItem"
+      >
+        忽略此题
+      </button>
     </view>
   </view>
 
-  <view class="section-head history-head"><view><text class="section-title">识别记录</text><text class="section-tip">点击任务查看明细</text></view></view>
+  <view class="section-head history-head">
+    <view>
+      <text class="section-title">识别记录</text>
+      <text class="section-tip">点击任务查看明细</text>
+    </view>
+  </view>
   <view wx:if="{{loading}}" class="state">正在加载…</view>
   <view wx:elif="{{records.length}}" class="task-list">
-    <view wx:for="{{records}}" wx:key="id" class="surface task-card" data-id="{{item.id}}" bindtap="openTask">
-      <view><text class="task-title">任务 #{{item.id}}</text><text class="meta">{{item.recognizedItemCount}} 题 · 可信度 {{item.confidenceText}}</text></view>
+    <view
+      wx:for="{{records}}"
+      wx:key="id"
+      class="surface task-card"
+      data-id="{{item.id}}"
+      bindtap="openTask"
+    >
+      <view>
+        <text class="task-title">任务 #{{item.id}}</text>
+        <text class="meta">{{item.recognizedItemCount}} 题 · 可信度 {{item.confidenceText}}</text>
+      </view>
       <text class="status">{{item.statusText}} ›</text>
     </view>
   </view>

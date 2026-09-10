@@ -1,8 +1,10 @@
 import { pageErrorsApi } from '../../../../api/learning'
 import type { ErrorRecord } from '../../../../types/learning'
+import { withKnowledgeLabels } from '../../../../services/knowledge-labels'
 
 interface DisplayError extends ErrorRecord {
   statusLabel: string
+  knowledgePointName: string
 }
 
 Page({
@@ -11,6 +13,7 @@ Page({
     status: 'OPEN',
     records: [] as DisplayError[],
   },
+  loadRevision: 0,
 
   onShow() {
     void this.load()
@@ -21,6 +24,7 @@ Page({
   },
 
   async load() {
+    const revision = ++this.loadRevision
     this.setData({ loading: true })
     try {
       const page = await pageErrorsApi({
@@ -33,14 +37,20 @@ Page({
         RETRAINING: '巩固中',
         RESOLVED: '已掌握',
       }
+      if (revision !== this.loadRevision) return
+      const records = page.records.map((item) => ({
+        ...item,
+        knowledgePointName: '正在加载知识点…',
+        statusLabel: labels[item.status] ?? '待更新',
+      }))
+      this.setData({ loading: false, records })
+      const labeled = await withKnowledgeLabels(records)
+      if (revision !== this.loadRevision) return
       this.setData({
-        loading: false,
-        records: page.records.map((item) => ({
-          ...item,
-          statusLabel: labels[item.status] ?? item.status,
-        })),
+        records: labeled,
       })
     } catch (error) {
+      if (revision !== this.loadRevision) return
       this.setData({ loading: false })
       await wx.showToast({
         title: error instanceof Error ? error.message : '错题加载失败',

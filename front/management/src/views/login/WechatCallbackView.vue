@@ -60,7 +60,7 @@ onMounted(async () => {
   display: grid;
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(145deg, #fff8f2, #f5f8fb);
+  background: var(--app-primary-soft);
   place-items: center;
 }
 
@@ -71,8 +71,8 @@ onMounted(async () => {
   align-items: center;
   background: #fff;
   border: 1px solid var(--app-border-color);
-  border-radius: 28px;
-  box-shadow: var(--app-shadow-card);
+  border-radius: 12px;
+  box-shadow: none;
   flex-direction: column;
   text-align: center;
 }
@@ -101,6 +101,6 @@ onMounted(async () => {
   border-radius: 50%;
   color: #d54941;
   font-size: 23px;
-  font-weight: 800;
+  font-weight: 600;
 }
 </style>

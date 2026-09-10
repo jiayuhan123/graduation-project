@@ -1,0 +1,182 @@
+<view class="app-page page-shell hub-page">
+  <view class="page-intro">
+    <text class="page-intro__kicker">
+      {{role === 'teacher' ? '教学工作台' : role === 'admin' ? '平台管理' : '我的学习'}}
+    </text>
+    <text class="page-intro__title">
+      {{role === 'teacher' ? '让每一次练习都有回应。' : role === 'admin' ? '日常管理，清楚有序。' :
+      '学一点，再巩固一点。'}}
+    </text>
+    <text class="page-intro__description">
+      {{role === 'teacher' ? '安排作业，查看提交，给孩子及时的反馈。' : role === 'admin' ?
+      '账号与角色的日常维护都在这里。' : '自主练习、错题复习和学习记录，都在这里。'}}
+    </text>
+  </view>
+  <block wx:if="{{role === 'student'}}">
+    <view class="learning-summary">
+      <view>
+        <text class="learning-summary__value">
+          {{overview ? overview.completedTaskCount : '—'}}
+        </text>
+        <text class="learning-summary__label">完成练习</text>
+      </view>
+      <view>
+        <text class="learning-summary__value">{{accuracy}}</text>
+        <text class="learning-summary__label">作答正确率</text>
+      </view>
+      <view>
+        <text class="learning-summary__value">{{overview ? overview.openErrorCount : '—'}}</text>
+        <text class="learning-summary__label">待巩固错题</text>
+      </view>
+    </view>
+    <view
+      class="learning-start"
+      data-url="/packages/learning/pages/practice/index"
+      bindtap="openPage"
+      hover-class="pressable"
+    >
+      <view>
+        <text class="learning-start__label">按教材练习</text>
+        <text class="learning-start__title">今天，练哪一课？</text>
+        <text class="learning-start__description">选择知识点、难度和题量</text>
+      </view>
+      <view class="learning-start__arrow"><t-icon name="arrow-right" size="42rpx" /></view>
+    </view>
+    <view class="study-tools">
+      <view
+        class="study-tool"
+        data-url="/packages/learning/pages/errors/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <t-icon name="root-list" size="36rpx" />
+        <text>错题本</text>
+      </view>
+      <view
+        class="study-tool"
+        data-url="/packages/learning/pages/mastery/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <t-icon name="chart" size="36rpx" />
+        <text>知识点掌握</text>
+      </view>
+      <view
+        class="study-tool"
+        data-url="/packages/learning/pages/recommendations/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <t-icon name="lightbulb" size="36rpx" />
+        <text>巩固推荐</text>
+      </view>
+    </view>
+    <view class="surface-card">
+      <view
+        class="entry-row"
+        data-url="/packages/learning/pages/photo-marking/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <view class="entry-icon"><t-icon name="camera" size="36rpx" /></view>
+        <view class="entry-main">
+          <text class="entry-title">拍照批改</text>
+          <text class="entry-description">拍下作业，整理批改结果</text>
+        </view>
+        <t-icon class="entry-arrow" name="chevron-right" size="30rpx" />
+      </view>
+    </view>
+  </block>
+  <view wx:elif="{{role === 'teacher'}}" class="surface-card">
+    <view
+      class="entry-row"
+      data-url="/packages/teaching/pages/assignments/index"
+      bindtap="openPage"
+      hover-class="pressable"
+    >
+      <view class="entry-icon"><t-icon name="edit-1" size="36rpx" /></view>
+      <view class="entry-main">
+        <text class="entry-title">布置作业</text>
+        <text class="entry-description">选题、分层，安排本次练习</text>
+      </view>
+      <t-icon class="entry-arrow" name="chevron-right" size="30rpx" />
+    </view>
+    <view
+      class="entry-row"
+      data-url="/packages/teaching/pages/submissions/index"
+      bindtap="openPage"
+      hover-class="pressable"
+    >
+      <view class="entry-icon"><t-icon name="check-circle" size="36rpx" /></view>
+      <view class="entry-main">
+        <text class="entry-title">学生提交与评语</text>
+        <text class="entry-description">查看成绩，记录学习反馈</text>
+      </view>
+      <t-icon class="entry-arrow" name="chevron-right" size="30rpx" />
+    </view>
+  </view>
+  <view wx:elif="{{role === 'admin'}}" class="surface-card">
+    <t-cell
+      wx:if="{{canManageUsers}}"
+      title="用户目录"
+      description="按姓名或账号查找用户"
+      left-icon="usergroup"
+      arrow
+      data-url="/pages/admin-users/index"
+      bind:click="openPage"
+    />
+    <t-cell
+      wx:if="{{canManageRoles}}"
+      title="角色管理"
+      description="查看角色状态与权限分配"
+      left-icon="secured"
+      arrow
+      data-url="/pages/admin-roles/index"
+      bind:click="openPage"
+    />
+    <view wx:if="{{!canManageUsers && !canManageRoles}}" class="quiet-empty">
+      当前账号暂未分配管理权限
+    </view>
+  </view>
+  <view wx:else class="quiet-empty">当前身份暂无学习功能，可在“我的”切换身份。</view>
+  <block wx:if="{{role === 'student' || role === 'teacher'}}">
+    <view class="section-bar">
+      <text class="section-bar__title">{{role === 'teacher' ? '最近的作业' : '最近的练习'}}</text>
+      <text class="entry-description">最近 10 项</text>
+    </view>
+    <view wx:if="{{loadError}}" class="notice-line">
+      <text>{{loadError}}</text>
+      <button class="text-action" bindtap="loadContent">重试</button>
+    </view>
+    <view wx:if="{{loading}}" class="quiet-empty">
+      <t-loading theme="circular" text="正在加载记录" />
+    </view>
+    <view wx:elif="{{records.length}}" class="surface-card">
+      <view
+        wx:for="{{records}}"
+        wx:key="id"
+        class="entry-row recent-row"
+        data-url="{{item.url}}"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <view class="entry-main">
+          <text class="entry-title">{{item.title}}</text>
+          <text class="entry-description">{{item.meta}}</text>
+        </view>
+        <text class="status-label">{{item.status}}</text>
+        <t-icon class="entry-arrow" name="chevron-right" size="26rpx" />
+      </view>
+    </view>
+    <view wx:elif="{{!loadError}}" class="surface-card quiet-empty">
+      <t-icon class="quiet-empty__icon" name="edit-1" size="52rpx" />
+      <text class="quiet-empty__title">
+        {{role === 'teacher' ? '还没有布置作业' : '从第一份练习开始'}}
+      </text>
+      <text>
+        {{role === 'teacher' ? '布置后，可以在这里找到最近的作业。' :
+        '练习会保存在这里，随时回来继续。'}}
+      </text>
+    </view>
+  </block>
+</view>

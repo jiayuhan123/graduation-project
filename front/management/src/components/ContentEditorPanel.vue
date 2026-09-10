@@ -50,9 +50,8 @@ const emit = defineEmits<{
   display: grid;
   padding: 24px;
   overflow-y: auto;
-  background: rgb(31 37 42 / 42%);
+  background: rgb(20 38 68 / 35%);
   place-items: center;
-  backdrop-filter: blur(4px);
 }
 
 .editor-panel {
@@ -60,8 +59,8 @@ const emit = defineEmits<{
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   background: #fff;
-  border-radius: 26px;
-  box-shadow: 0 28px 90px rgb(26 31 35 / 22%);
+  border-radius: 12px;
+  box-shadow: none;
 }
 
 .editor-panel > header {
@@ -74,12 +73,12 @@ const emit = defineEmits<{
   justify-content: space-between;
   background: rgb(255 255 255 / 96%);
   border-bottom: 1px solid var(--app-border-color);
-  backdrop-filter: blur(12px);
 }
 
 h2 {
   color: var(--app-text-strong);
-  font-size: 21px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 header p {
@@ -113,7 +112,6 @@ footer {
   background: rgb(255 255 255 / 96%);
   border-top: 1px solid var(--app-border-color);
   gap: 10px;
-  backdrop-filter: blur(12px);
 }
 
 @media (width <= 640px) {
@@ -124,7 +122,7 @@ footer {
 
   .editor-panel {
     max-height: 92vh;
-    border-radius: 26px 26px 0 0;
+    border-radius: 12px 12px 0 0;
   }
 }
 </style>

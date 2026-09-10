@@ -88,7 +88,7 @@ onMounted(load)
 <template>
   <div>
     <PageHeader
-      eyebrow="OPERATIONS"
+      eyebrow="平台管理"
       title="运营数据总览"
       description="统一查看用户、班级、题库、OCR 和 PK 的关键运行指标。"
     />
@@ -303,7 +303,7 @@ onMounted(load)
 
 .panel.emphasis {
   border-color: #f2bd81;
-  background: linear-gradient(145deg, #fff, #fff8ef);
+  background: var(--app-primary-soft);
 }
 
 .panel header {
@@ -334,7 +334,7 @@ onMounted(load)
 .panel dd {
   margin: 0;
   color: var(--app-text-strong);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .panel p {

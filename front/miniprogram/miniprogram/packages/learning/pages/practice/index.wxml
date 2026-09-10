@@ -1,15 +1,18 @@
-<view class="page">
+<view class="app-page page">
   <view class="hero">
     <text class="eyebrow">自主练习</text>
     <text class="title">今天练什么？</text>
-    <text class="description">从人教版计算知识点中选择内容，系统会从固定题库中组合练习。</text>
+    <text class="description">选一个知识点，按自己的节奏练一练。</text>
   </view>
 
   <view wx:if="{{loading}}" class="state">正在加载你的教材目录…</view>
   <block wx:else>
     <view class="card">
-      <text class="section-title">{{gradeLevel}} 年级 · {{semester === 1 ? '上册' : '下册'}}</text>
-      <scroll-view scroll-x class="chips">
+      <text class="section-title">
+        <text class="step-number">01</text>
+        {{gradeLevel}} 年级 · {{semester === 1 ? '上册' : '下册'}}
+      </text>
+      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="chips">
         <view class="chip-row">
           <button
             wx:for="{{modules}}"
@@ -17,13 +20,18 @@
             class="chip {{selectedModuleId === item.id ? 'chip--active' : ''}}"
             data-id="{{item.id}}"
             bindtap="selectModule"
-          >{{item.name}}</button>
+          >
+            {{item.name}}
+          </button>
         </view>
       </scroll-view>
     </view>
 
     <view class="card">
-      <text class="section-title">选择知识点</text>
+      <text class="section-title">
+        <text class="step-number">02</text>
+        选择知识点
+      </text>
       <view wx:if="{{loadingPoints}}" class="inline-state">正在加载…</view>
       <view wx:elif="{{knowledgePoints.length}}" class="point-list">
         <button
@@ -42,7 +50,10 @@
     </view>
 
     <view class="card option-card">
-      <text class="section-title">练习设置</text>
+      <text class="section-title">
+        <text class="step-number">03</text>
+        练习设置
+      </text>
       <text class="option-label">难度</text>
       <view class="chip-row">
         <button
@@ -51,7 +62,9 @@
           class="number-chip {{difficulty === item ? 'chip--active' : ''}}"
           data-value="{{item}}"
           bindtap="selectDifficulty"
-        >{{item}}</button>
+        >
+          {{item}}
+        </button>
       </view>
       <text class="option-label">题量</text>
       <view class="chip-row">
@@ -61,15 +74,36 @@
           class="number-chip {{questionCount === item ? 'chip--active' : ''}}"
           data-value="{{item}}"
           bindtap="selectQuestionCount"
-        >{{item}} 题</button>
+        >
+          {{item}} 题
+        </button>
       </view>
       <text class="option-label">模式</text>
       <view class="chip-row">
-        <button class="mode-chip {{mode === 'NORMAL' ? 'chip--active' : ''}}" data-value="NORMAL" bindtap="selectMode">普通练习</button>
-        <button class="mode-chip {{mode === 'TIMED' ? 'chip--active' : ''}}" data-value="TIMED" bindtap="selectMode">限时练习</button>
+        <button
+          class="mode-chip {{mode === 'NORMAL' ? 'chip--active' : ''}}"
+          data-value="NORMAL"
+          bindtap="selectMode"
+        >
+          普通练习
+        </button>
+        <button
+          class="mode-chip {{mode === 'TIMED' ? 'chip--active' : ''}}"
+          data-value="TIMED"
+          bindtap="selectMode"
+        >
+          限时练习
+        </button>
       </view>
     </view>
 
-    <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="startPractice">开始练习</button>
+    <button
+      class="primary-button"
+      loading="{{submitting}}"
+      disabled="{{submitting || loadingPoints || !selectedKnowledgePointId}}"
+      bindtap="startPractice"
+    >
+      开始练习
+    </button>
   </block>
 </view>

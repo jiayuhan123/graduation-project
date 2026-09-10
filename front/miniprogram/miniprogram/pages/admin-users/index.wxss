@@ -3,9 +3,9 @@
   padding: 30rpx;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #fff3eb, #ffffff);
-  border: 1rpx solid #ffe3d0;
-  border-radius: 30rpx;
+  background: var(--app-soft);
+  border: 1rpx solid var(--app-line);
+  border-radius: 20rpx;
 }
 
 .directory-summary__title,
@@ -15,12 +15,12 @@
 
 .directory-summary__title {
   font-size: 34rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .directory-summary__text {
   margin-top: 8rpx;
-  color: #7b8289;
+  color: var(--app-muted);
   font-size: 23rpx;
 }
 
@@ -31,7 +31,7 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
   font-size: 38rpx;
 }
 
@@ -50,8 +50,8 @@
   flex: 1;
   align-items: center;
   background: #ffffff;
-  border: 1rpx solid #eceff2;
-  border-radius: 24rpx;
+  border: 1rpx solid var(--app-line);
+  border-radius: 20rpx;
   gap: 12rpx;
 }
 
@@ -67,8 +67,8 @@
   padding: 0 20rpx;
   align-items: center;
   background: #ffffff;
-  border: 1rpx solid #eceff2;
-  border-radius: 24rpx;
+  border: 1rpx solid var(--app-line);
+  border-radius: 20rpx;
   color: #636e72;
   font-size: 23rpx;
   gap: 6rpx;
@@ -93,8 +93,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffad73, #ff7a2a);
-  border-radius: 25rpx;
+  background: var(--app-primary);
+  border-radius: 20rpx;
   color: #ffffff;
   font-size: 31rpx;
   font-weight: 700;
@@ -131,7 +131,7 @@
   display: block;
   margin-top: 6rpx;
   overflow: hidden;
-  color: #8a8f98;
+  color: var(--app-muted);
   font-size: 22rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -160,7 +160,7 @@
 .list-end {
   display: block;
   padding: 24rpx 0;
-  color: #a0a6ad;
+  color: var(--app-muted);
   font-size: 22rpx;
   text-align: center;
 }

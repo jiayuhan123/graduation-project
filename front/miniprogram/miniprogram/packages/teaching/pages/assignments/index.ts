@@ -68,12 +68,23 @@ Page({
     publishTargetVersion: 0,
     layerOptions: [] as string[],
     publishStudents: [] as PublishStudent[],
+    initialAssignmentId: '',
+  },
+
+  onLoad(options: Record<string, string | undefined>) {
+    this.setData({ initialAssignmentId: options.assignmentId ?? '' })
   },
 
   onShow() {
     const isTeacher = getSession()?.activeRole === 'teacher'
     this.setData({ isTeacher, detail: null, showCreate: false })
-    void this.load()
+    void this.load().then(() => {
+      const id = this.data.initialAssignmentId
+      if (id) {
+        this.setData({ initialAssignmentId: '' })
+        void this.showAssignment(id)
+      }
+    })
   },
 
   onPullDownRefresh() {
@@ -265,6 +276,10 @@ Page({
 
   async openDetail(event: WechatMiniprogram.BaseEvent) {
     const id = String(event.currentTarget.dataset.id ?? '')
+    await this.showAssignment(id)
+  },
+
+  async showAssignment(id: string) {
     if (!id) return
     try {
       this.setData({
@@ -272,6 +287,9 @@ Page({
           ? await getAssignmentApi(id)
           : await getStudentAssignmentApi(id),
         showCreate: false,
+      })
+      void wx.nextTick(() => {
+        void wx.pageScrollTo({ selector: '#assignment-detail', duration: 240 })
       })
     } catch (error) {
       await this.showError(error, '作业详情加载失败')

@@ -1,11 +1,21 @@
-<view class="page">
-  <view class="hero"><text class="title">知识点掌握</text><text class="description">掌握度会根据每次真实作答逐步更新。</text></view>
+<view class="app-page page">
+  <view class="hero">
+    <text class="title">知识点掌握</text>
+    <text class="description">每一次练习，都能看见一点进步。</text>
+  </view>
   <view wx:if="{{loading}}" class="state">正在计算学习进度…</view>
   <view wx:elif="{{records.length}}" class="list">
     <view wx:for="{{records}}" wx:key="id" class="card">
-      <view class="head"><text class="point">知识点 #{{item.knowledgePointId}}</text><text class="score">{{item.masteryPercent}}%</text></view>
+      <view class="head">
+        <text class="point">{{item.knowledgePointName}}</text>
+        <text class="score">{{item.masteryPercent}}%</text>
+      </view>
       <view class="track"><view class="fill" style="width: {{item.masteryPercent}}%"></view></view>
-      <view class="metrics"><text>正确率 {{item.accuracyPercent}}%</text><text>作答 {{item.totalAnswerCount}} 次</text><text>复习 {{item.reviewText}}</text></view>
+      <view class="metrics">
+        <text>正确率 {{item.accuracyPercent}}%</text>
+        <text>作答 {{item.totalAnswerCount}} 次</text>
+        <text>复习 {{item.reviewText}}</text>
+      </view>
     </view>
   </view>
   <view wx:else class="state">完成练习后，这里会生成掌握度记录</view>

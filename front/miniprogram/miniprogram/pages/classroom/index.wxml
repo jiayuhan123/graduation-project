@@ -1,0 +1,144 @@
+<view class="app-page page-shell classroom-page">
+  <view class="page-intro">
+    <text class="page-intro__kicker">{{role === 'admin' ? '角色与权限' : '我的班级'}}</text>
+    <text class="page-intro__title">
+      {{role === 'admin' ? '每个身份，各有分工。' : role === 'teacher' ? '一起学习，一起成长。' :
+      '和同学们，一起向前。'}}
+    </text>
+    <text class="page-intro__description">
+      {{role === 'admin' ? '查看当前账号的权限与平台角色。' : role === 'teacher' ?
+      '班级信息、作业安排和学生名单，一目了然。' : '找到你的班级，跟上每一次课堂练习。'}}
+    </text>
+  </view>
+  <block wx:if="{{role === 'admin'}}">
+    <view wx:if="{{canManageRoles}}" class="surface-card">
+      <t-cell
+        title="平台角色"
+        description="查看内置角色与权限分配"
+        left-icon="secured"
+        arrow
+        data-url="/pages/admin-roles/index"
+        bind:click="openPage"
+      />
+    </view>
+    <text class="section-heading">当前账号权限 · {{permissions.length}}</text>
+    <view class="surface-card permissions-panel">
+      <text wx:for="{{permissions}}" wx:key="*this" class="permission-item">{{item}}</text>
+      <view wx:if="{{!permissions.length}}" class="quiet-empty">暂未分配权限</view>
+    </view>
+  </block>
+  <block wx:elif="{{role === 'student' || role === 'teacher'}}">
+    <view class="classroom-actions">
+      <view
+        data-url="/packages/teaching/pages/assignments/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <t-icon name="edit-1" size="38rpx" />
+        <text>{{role === 'teacher' ? '作业管理' : '我的作业'}}</text>
+      </view>
+      <view
+        data-url="/packages/teaching/pages/submissions/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <t-icon name="check-circle" size="38rpx" />
+        <text>{{role === 'teacher' ? '学生提交' : '提交记录'}}</text>
+      </view>
+    </view>
+    <view wx:if="{{loadError}}" class="notice-line">
+      <text>{{loadError}}</text>
+      <button class="text-action" bindtap="loadContent">重试</button>
+    </view>
+    <view class="section-bar">
+      <text class="section-bar__title">
+        {{role === 'teacher' ? '我任教的班级' : '已加入的班级'}}
+      </text>
+      <button
+        class="text-action"
+        data-url="/packages/teaching/pages/classes/index"
+        bindtap="openPage"
+      >
+        {{role === 'teacher' ? '管理班级' : '加入 / 管理'}}
+        <t-icon name="chevron-right" size="26rpx" />
+      </button>
+    </view>
+    <view wx:if="{{loading}}" class="quiet-empty">
+      <t-loading theme="circular" text="正在加载班级" />
+    </view>
+    <block wx:elif="{{classes.length}}">
+      <view
+        wx:for="{{classes}}"
+        wx:key="classId"
+        class="classroom-card"
+        data-url="/packages/teaching/pages/classes/index"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <view class="classroom-card__heading">
+          <view class="classroom-card__icon"><t-icon name="usergroup" size="40rpx" /></view>
+          <text class="classroom-card__term">
+            {{item.gradeLevel}} 年级 · {{item.semester === 1 ? '上学期' : '下学期'}}
+          </text>
+        </view>
+        <text class="classroom-card__name">{{item.name}}</text>
+        <text wx:if="{{item.schoolName}}" class="classroom-card__school">{{item.schoolName}}</text>
+        <view class="classroom-card__footer">
+          <text>{{item.academicYear}} 学年</text>
+          <text>查看班级 ›</text>
+        </view>
+      </view>
+    </block>
+    <view wx:elif="{{!loadError}}" class="surface-card quiet-empty">
+      <t-icon class="quiet-empty__icon" name="usergroup" size="56rpx" />
+      <text class="quiet-empty__title">
+        {{role === 'teacher' ? '创建你的第一个班级' : '还没有加入班级'}}
+      </text>
+      <text>
+        {{role === 'teacher' ? '创建后，把班级码分享给学生。' : '向老师获取班级码，就可以加入了。'}}
+      </text>
+      <button
+        class="text-action"
+        data-url="/packages/teaching/pages/classes/index"
+        bindtap="openPage"
+      >
+        {{role === 'teacher' ? '创建班级' : '输入班级码'}}
+        <t-icon name="arrow-right" size="28rpx" />
+      </button>
+    </view>
+    <view class="section-bar">
+      <text class="section-bar__title">最近的作业</text>
+      <button
+        class="text-action"
+        data-url="/packages/teaching/pages/assignments/index"
+        bindtap="openPage"
+      >
+        全部作业
+        <t-icon name="chevron-right" size="26rpx" />
+      </button>
+    </view>
+    <view wx:if="{{!loading && assignments.length}}" class="surface-card">
+      <view
+        wx:for="{{assignments}}"
+        wx:key="id"
+        class="entry-row"
+        data-url="/packages/teaching/pages/assignments/index?assignmentId={{item.id}}"
+        bindtap="openPage"
+        hover-class="pressable"
+      >
+        <view class="entry-main">
+          <text class="entry-title">{{item.title}}</text>
+          <text class="entry-description">截止 {{item.date}}</text>
+        </view>
+        <text class="status-label">{{item.status}}</text>
+      </view>
+    </view>
+    <view wx:elif="{{!loading && !loadError}}" class="surface-card quiet-empty">
+      <text class="quiet-empty__title">暂时没有作业</text>
+      <text>
+        {{role === 'teacher' ? '布置一份练习，开始新的课堂。' : '老师发布作业后，会显示在这里。'}}
+      </text>
+    </view>
+  </block>
+  <view wx:else class="quiet-empty">当前身份暂无班级功能，可在“我的”切换身份。</view>
+</view>

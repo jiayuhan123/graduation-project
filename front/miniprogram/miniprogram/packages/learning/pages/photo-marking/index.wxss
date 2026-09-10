@@ -1,17 +1,17 @@
 .page {
   min-height: 100vh;
   padding: 28rpx;
-  background: #f5f7f8;
+  background: var(--app-bg);
   box-sizing: border-box;
 }
 .hero {
   display: flex;
   padding: 38rpx 32rpx;
   flex-direction: column;
-  background: linear-gradient(145deg, #16324f, #255b78);
-  border-radius: 28rpx;
+  background: var(--app-primary);
+  border-radius: 20rpx;
   color: #fff;
-  box-shadow: 0 16rpx 38rpx rgba(22, 50, 79, 0.18);
+  box-shadow: none;
 }
 .eyebrow {
   color: #9fe7d7;
@@ -22,7 +22,7 @@
 .title {
   margin-top: 14rpx;
   font-size: 42rpx;
-  font-weight: 800;
+  font-weight: 600;
 }
 .description {
   margin-top: 14rpx;
@@ -31,9 +31,12 @@
   line-height: 1.65;
 }
 button {
+  min-height: 88rpx;
   margin: 0;
-  border-radius: 999rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 12rpx;
   font-size: 25rpx;
+  line-height: 1.6;
 }
 button::after {
   border: 0;
@@ -42,7 +45,7 @@ button::after {
   width: 100%;
   margin-top: 28rpx;
   background: #fff;
-  color: #19415d;
+  color: var(--app-primary);
   font-weight: 700;
 }
 .surface {
@@ -65,7 +68,7 @@ button::after {
   border-radius: 16rpx;
 }
 .primary-button {
-  background: #17a085;
+  background: var(--app-primary);
   color: #fff;
 }
 .detail,
@@ -84,7 +87,7 @@ button::after {
 .section-title {
   color: #273238;
   font-size: 29rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 .section-tip,
 .meta {
@@ -93,7 +96,7 @@ button::after {
   font-size: 21rpx;
 }
 .link {
-  color: #168c77;
+  color: var(--app-primary);
   font-size: 24rpx;
 }
 .waiting {
@@ -106,7 +109,7 @@ button::after {
   gap: 10rpx;
 }
 .spinner {
-  color: #17a085;
+  color: var(--app-primary);
   font-size: 38rpx;
 }
 .item-list,
@@ -121,7 +124,7 @@ button::after {
 }
 .item-card--review {
   border-color: #f1b77c;
-  box-shadow: 0 5rpx 18rpx rgba(224, 137, 47, 0.08);
+  box-shadow: none;
 }
 .item-head,
 .task-card {
@@ -137,7 +140,7 @@ button::after {
   font-weight: 700;
 }
 .status {
-  color: #168c77;
+  color: var(--app-primary);
   font-size: 22rpx;
 }
 .stem {
@@ -168,7 +171,7 @@ button::after {
   width: 100%;
   min-height: 76rpx;
   padding: 15rpx;
-  background: #f5f7f8;
+  background: var(--app-bg);
   border-radius: 12rpx;
   box-sizing: border-box;
   color: #273238;
@@ -193,13 +196,25 @@ button::after {
 .task-card {
   padding: 23rpx;
 }
+.task-card > view,
+.section-head > view {
+  min-width: 0;
+  flex: 1;
+}
+.task-title,
+.section-title {
+  overflow-wrap: anywhere;
+}
+.task-card .status {
+  flex-shrink: 0;
+}
 .task-card text {
   display: block;
 }
 .state {
   display: grid;
   min-height: 260rpx;
-  color: #92999e;
+  color: var(--app-muted);
   place-items: center;
 }
 .state--small {

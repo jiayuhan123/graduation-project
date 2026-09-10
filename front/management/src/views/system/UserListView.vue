@@ -71,9 +71,9 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="ADMIN"
+      eyebrow="平台管理"
       title="用户目录"
-      :description="`当前共 ${total} 个账号，数据来自用户服务。`"
+      :description="`当前共 ${total} 个账号，可按角色或账号信息查找。`"
     />
 
     <section class="surface-card directory-card">
@@ -171,23 +171,23 @@ onMounted(async () => {
 
 .user-row {
   display: grid;
-  min-height: 88px;
+  min-height: 78px;
   padding: 16px 4px;
   align-items: center;
   border-bottom: 1px solid #eff1f3;
-  grid-template-columns: 52px minmax(150px, 1.1fr) minmax(150px, 0.8fr) minmax(190px, 1fr);
+  grid-template-columns: 42px minmax(150px, 1.1fr) minmax(150px, 0.8fr) minmax(190px, 1fr);
   gap: 14px;
 }
 
 .user-avatar {
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffad73, #ff7a2a);
-  border-radius: 15px;
-  color: #fff;
+  background: var(--app-primary-soft);
+  border-radius: 50%;
+  color: var(--app-primary);
   font-size: 17px;
   font-weight: 700;
 }
@@ -228,7 +228,7 @@ onMounted(async () => {
   border-radius: 7px;
   color: #079848;
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .user-main > span,

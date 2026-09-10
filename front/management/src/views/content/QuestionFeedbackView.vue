@@ -107,7 +107,7 @@ onMounted(load)
 <template>
   <div>
     <PageHeader
-      eyebrow="CONTENT QUALITY"
+      eyebrow="教学内容"
       title="题目错误反馈"
       :description="`共收到 ${total} 条题目问题反馈，可跟进、解决、驳回或联动下架题目。`"
     />
@@ -219,12 +219,13 @@ onMounted(load)
 
 .filters {
   display: grid;
-  grid-template-columns: 180px 180px minmax(160px, 1fr) auto;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(120px, 0.8fr) minmax(0, 1fr) auto;
   gap: 10px;
 }
 
 .filters select,
 .filters input {
+  min-width: 0;
   min-height: 38px;
   padding: 8px 10px;
   border: 1px solid var(--app-border-color);
@@ -287,7 +288,7 @@ onMounted(load)
 .description {
   padding: 11px 13px;
   border-radius: 9px;
-  background: #fff8ef;
+  background: var(--app-primary-soft);
   line-height: 1.6;
 }
 

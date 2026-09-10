@@ -1,10 +1,10 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view wx:if="{{loading}}" class="page-loading">
     <t-loading theme="circular" size="52rpx" text="正在加载个人资料" />
   </view>
 
   <block wx:elif="{{profile}}">
-    <view class="surface-card profile-card">
+    <view class="profile-card">
       <view class="profile-card__avatar">
         <image
           wx:if="{{avatarUrl}}"
@@ -17,7 +17,7 @@
       <view class="profile-card__main">
         <view class="profile-card__name-row">
           <text class="profile-card__name">{{displayName}}</text>
-          <t-tag theme="primary" variant="light" shape="round" size="small">
+          <t-tag theme="primary" variant="light" shape="square" size="small">
             {{activeRoleLabel}}
           </t-tag>
         </view>
@@ -26,8 +26,14 @@
           {{profile.wechatBound ? '微信身份已绑定' : '微信身份未绑定'}}
         </text>
       </view>
-      <view class="profile-card__edit" bindtap="openEditProfile">
-        <t-icon name="edit-1" size="36rpx" color="#ff8a3d" />
+      <view
+        class="profile-card__edit"
+        bindtap="openEditProfile"
+        hover-class="pressable"
+        aria-role="button"
+        aria-label="编辑资料"
+      >
+        <t-icon name="chevron-right" size="36rpx" color="#285c49" />
       </view>
     </view>
 
@@ -41,7 +47,7 @@
           data-role="{{item.code}}"
           bindtap="switchRole"
         >
-          <text>{{item.icon}}</text>
+          <t-icon name="{{item.icon}}" size="28rpx" />
           <text>{{item.label}}</text>
         </view>
       </scroll-view>
@@ -69,16 +75,22 @@
       </block>
       <block wx:elif="{{activeRole === 'admin'}}">
         <view class="admin-identity">
-          <view class="admin-identity__icon">🛡️</view>
+          <view class="admin-identity__icon">
+            <t-icon name="secured" size="40rpx" color="#52705f" />
+          </view>
           <view>
             <text class="admin-identity__title">平台管理员</text>
-            <text class="admin-identity__description">当前账号拥有 {{profile.permissions.length}} 项有效权限</text>
+            <text class="admin-identity__description">
+              当前账号拥有 {{profile.permissions.length}} 项有效权限
+            </text>
           </view>
         </view>
       </block>
       <block wx:else>
         <view class="admin-identity">
-          <view class="admin-identity__icon">👤</view>
+          <view class="admin-identity__icon">
+            <t-icon name="user" size="40rpx" color="#52705f" />
+          </view>
           <view>
             <text class="admin-identity__title">{{activeRoleLabel}}</text>
             <text class="admin-identity__description">自定义角色身份</text>
@@ -87,8 +99,14 @@
       </block>
     </view>
 
-    <text class="section-heading">账号信息</text>
-    <view class="surface-card">
+    <view class="section-bar">
+      <text class="section-bar__title">账号信息</text>
+      <button class="text-action" bindtap="toggleAccountInfo">
+        {{showAccountInfo ? '收起' : '查看详情'}}
+        <t-icon name="{{showAccountInfo ? 'chevron-up' : 'chevron-down'}}" size="28rpx" />
+      </button>
+    </view>
+    <view wx:if="{{showAccountInfo}}" class="surface-card">
       <t-cell title="姓名" note="{{profile.realName || '未填写'}}" />
       <t-cell title="手机号" note="{{profile.phone || '未绑定'}}" />
       <t-cell title="邮箱" note="{{profile.email || '未绑定'}}" />
@@ -105,9 +123,9 @@
     <view class="logout-action">
       <t-button
         block
-        theme="danger"
-        variant="outline"
-        shape="round"
+        theme="default"
+        variant="base"
+        shape="rectangle"
         loading="{{loggingOut}}"
         bind:tap="handleLogout"
       >

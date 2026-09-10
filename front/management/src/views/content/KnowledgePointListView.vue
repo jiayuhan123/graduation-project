@@ -161,7 +161,7 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="CONTENT"
+      eyebrow="教学内容"
       title="知识点"
       description="维护模块内的知识层级、基础难度和展示顺序。"
     >

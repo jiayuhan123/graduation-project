@@ -1,14 +1,35 @@
-<view class="page">
-  <view class="hero"><text class="title">为你推荐</text><text class="description">推荐来自真实错题和掌握度变化，只使用已经入库的固定题目。</text></view>
+<view class="app-page page">
+  <view class="hero">
+    <text class="title">为你推荐</text>
+    <text class="description">从还不熟练的地方开始，每次进步一点。</text>
+  </view>
   <view wx:if="{{loading}}" class="state">正在生成学习建议…</view>
   <view wx:elif="{{records.length}}" class="list">
     <view wx:for="{{records}}" wx:key="id" class="card">
-      <view class="head"><text class="badge">优先级 {{item.priority}}</text><text>{{item.recommendedQuestionCount}} 题</text></view>
-      <text class="point">知识点 #{{item.knowledgePointId}}</text>
+      <view class="head">
+        <text class="badge">巩固练习</text>
+        <text>{{item.recommendedQuestionCount}} 题</text>
+      </view>
+      <text class="point">{{item.knowledgePointName}}</text>
       <text class="reason">{{item.reasonText}}</text>
       <view class="actions">
-        <button class="quiet" data-id="{{item.id}}" disabled="{{operatingId === item.id}}" bindtap="dismiss">暂时忽略</button>
-        <button class="primary" data-id="{{item.id}}" loading="{{operatingId === item.id}}" disabled="{{operatingId === item.id}}" bindtap="accept">开始巩固</button>
+        <button
+          class="quiet"
+          data-id="{{item.id}}"
+          disabled="{{operatingId === item.id}}"
+          bindtap="dismiss"
+        >
+          暂时忽略
+        </button>
+        <button
+          class="primary"
+          data-id="{{item.id}}"
+          loading="{{operatingId === item.id}}"
+          disabled="{{operatingId === item.id}}"
+          bindtap="accept"
+        >
+          开始巩固
+        </button>
       </view>
     </view>
   </view>

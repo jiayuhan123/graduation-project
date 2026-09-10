@@ -33,14 +33,14 @@ defineProps<{
   color: var(--app-primary);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 h1 {
   color: var(--app-text-strong);
-  font-size: clamp(26px, 3vw, 36px);
-  font-weight: 800;
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 

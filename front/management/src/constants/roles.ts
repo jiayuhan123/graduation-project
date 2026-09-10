@@ -8,21 +8,21 @@ export interface RoleMeta {
 const ROLE_META: Record<string, RoleMeta> = {
   student: {
     label: '学生',
-    icon: '🎒',
-    description: '练习、成长档案与数学闯关',
-    accent: '#ff8a3d',
+    icon: 'book',
+    description: '练习、作业与学习档案',
+    accent: '#3567c8',
   },
   teacher: {
     label: '教师',
-    icon: '📐',
+    icon: 'edit',
     description: '班级、作业与学习反馈',
-    accent: '#4dabf7',
+    accent: '#4b80cf',
   },
   admin: {
     label: '管理员',
-    icon: '🛡️',
+    icon: 'shield',
     description: '用户、角色与平台权限',
-    accent: '#7c6bf2',
+    accent: '#315387',
   },
 }
 
@@ -30,7 +30,7 @@ export function roleMeta(role: string): RoleMeta {
   return (
     ROLE_META[role] ?? {
       label: role,
-      icon: '👤',
+      icon: 'user',
       description: '使用该角色对应的功能',
       accent: '#7b8289',
     }

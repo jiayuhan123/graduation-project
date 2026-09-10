@@ -1,6 +1,6 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view class="role-banner">
-    <view class="role-banner__icon">🛡️</view>
+    <view class="role-banner__icon"><t-icon name="secured" size="40rpx" color="#52705f" /></view>
     <view>
       <text class="role-banner__title">角色与权限</text>
       <text class="role-banner__text">账号可以同时拥有多个角色，权限自动合并</text>
@@ -17,8 +17,14 @@
         <view>
           <view class="role-card__name-row">
             <text class="role-card__name">{{item.name}}</text>
-            <t-tag wx:if="{{item.builtIn}}" theme="primary" variant="light" size="small">内置</t-tag>
-            <t-tag theme="{{item.status === 1 ? 'success' : 'danger'}}" variant="light" size="small">
+            <t-tag wx:if="{{item.builtIn}}" theme="primary" variant="light" size="small">
+              内置
+            </t-tag>
+            <t-tag
+              theme="{{item.status === 1 ? 'success' : 'danger'}}"
+              variant="light"
+              size="small"
+            >
               {{item.status === 1 ? '启用' : '停用'}}
             </t-tag>
           </view>
@@ -28,7 +34,12 @@
       </view>
       <text class="role-card__description">{{item.description || '暂无角色说明'}}</text>
       <view class="permission-list">
-        <view wx:for="{{item.permissions}}" wx:for-item="permission" wx:key="code" class="permission-pill">
+        <view
+          wx:for="{{item.permissions}}"
+          wx:for-item="permission"
+          wx:key="code"
+          class="permission-pill"
+        >
           {{permission.name}}
         </view>
         <text wx:if="{{!item.permissions.length}}" class="role-card__empty">暂未配置权限</text>

@@ -87,7 +87,7 @@ Page({
         title: '密码设置成功',
         content: '为了账号安全，请重新登录。',
         showCancel: false,
-        confirmColor: '#ff8a3d',
+        confirmColor: '#285c49',
       })
       await wx.reLaunch({ url: '/pages/login/index' })
     } catch (error) {

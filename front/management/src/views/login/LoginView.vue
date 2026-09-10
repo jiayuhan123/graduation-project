@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/AppIcon.vue'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -73,57 +74,78 @@ async function handleWechatLogin() {
 
 <template>
   <main class="login-page">
-    <span class="orb orb--orange" aria-hidden="true" />
-    <span class="orb orb--blue" aria-hidden="true" />
-
     <section class="login-intro">
       <BrandLogo />
       <div class="login-intro__copy">
-        <p class="eyebrow">ONE ACCOUNT · EVERY ROLE</p>
-        <h1>让每一次数学成长<br />都有迹可循</h1>
-        <p>Web 与微信小程序共享同一账号。学生、教师和管理员登录后，只看到当前角色对应的空间。</p>
+        <p class="eyebrow">数学成长空间</p>
+        <h1>学有方法，<br /><span>进步有迹可循。</span></h1>
+        <p>让练习更有方向，让教学更有依据。<br />在每一次思考中，积累一点新的收获。</p>
+      </div>
+      <div class="math-sheet" aria-hidden="true">
+        <div class="math-sheet__heading">
+          <span>探索 · 理解 · 应用</span><span>MATHEMATICS</span>
+        </div>
+        <svg viewBox="0 0 460 220" fill="none">
+          <defs>
+            <pattern id="math-grid" width="22" height="22" patternUnits="userSpaceOnUse">
+              <path d="M22 0H0v22" stroke="#e8eef9" stroke-width="1" />
+            </pattern>
+          </defs>
+          <rect width="460" height="220" fill="url(#math-grid)" />
+          <path d="M34 176h226M56 192V30" stroke="#acbdd9" />
+          <path d="m58 172 55-106 117 106Z" fill="#edf3fe" stroke="#3567c8" stroke-width="2" />
+          <path d="M113 66v106" stroke="#3567c8" stroke-dasharray="5 5" />
+          <path d="M113 162h10v10" stroke="#3567c8" />
+          <circle cx="113" cy="66" r="4" fill="#3567c8" />
+          <circle cx="58" cy="172" r="4" fill="#3567c8" />
+          <circle cx="230" cy="172" r="4" fill="#3567c8" />
+          <text x="102" y="48" fill="#3567c8" font-size="14" font-family="Georgia">A</text>
+          <text x="40" y="174" fill="#3567c8" font-size="14" font-family="Georgia">B</text>
+          <text x="240" y="175" fill="#3567c8" font-size="14" font-family="Georgia">C</text>
+          <text x="295" y="93" fill="#20304b" font-size="24" font-family="Georgia">S = ½ ah</text>
+          <path d="M296 111h116" stroke="#c6d6f3" />
+          <text x="295" y="141" fill="#7b889b" font-size="11">从理解开始</text>
+        </svg>
+        <div class="math-sheet__foot">
+          <span>把问题想明白，把知识学扎实。</span><AppIcon name="arrow" :size="18" />
+        </div>
       </div>
       <div class="role-preview" aria-label="支持的角色">
-        <div><span>🎒</span><strong>学生</strong><small>练习与成长</small></div>
-        <div><span>📐</span><strong>教师</strong><small>教学与反馈</small></div>
-        <div><span>🛡️</span><strong>管理员</strong><small>用户与权限</small></div>
+        <span><AppIcon name="book" :size="16" />学生学习</span
+        ><span><AppIcon name="edit" :size="16" />教师教学</span
+        ><span><AppIcon name="shield" :size="16" />平台管理</span>
       </div>
     </section>
 
     <section class="login-panel">
       <div class="login-panel__heading">
-        <span class="welcome-badge">欢迎回来</span>
-        <h2>登录数学成长空间</h2>
-        <p>同一个账号可以拥有并切换多个角色</p>
+        <p class="welcome-label">欢迎回来</p>
+        <h2>登录你的账号</h2>
+        <p>使用小程序账号，继续学习与教学</p>
       </div>
 
-      <div class="mode-switch" role="tablist" aria-label="登录方式">
+      <div class="mode-switch" role="group" aria-label="登录方式">
         <button
           type="button"
-          role="tab"
-          :aria-selected="loginMode === 'wechat'"
-          :class="{ active: loginMode === 'wechat' }"
-          @click="loginMode = 'wechat'"
-        >
-          微信扫码 <span v-if="!wechatLoginAvailable" class="mode-status">未开放</span>
-        </button>
-        <button
-          type="button"
-          role="tab"
-          :aria-selected="loginMode === 'password'"
+          :aria-pressed="loginMode === 'password'"
           :class="{ active: loginMode === 'password' }"
           @click="loginMode = 'password'"
         >
           账号密码
         </button>
+        <button
+          type="button"
+          :aria-pressed="loginMode === 'wechat'"
+          :class="{ active: loginMode === 'wechat' }"
+          @click="loginMode = 'wechat'"
+        >
+          微信扫码 <span v-if="!wechatLoginAvailable" class="mode-status">未开放</span>
+        </button>
       </div>
 
       <div v-if="loginMode === 'wechat'" class="wechat-login">
         <div class="wechat-visual">
-          <div class="qr-frame" aria-hidden="true">
-            <div class="qr-pattern">▦</div>
-            <span class="wechat-mark">微</span>
-          </div>
+          <span class="wechat-icon"><AppIcon name="camera" :size="28" /></span>
           <div>
             <strong>{{
               wechatLoginAvailable ? '使用微信扫码登录' : '微信扫码登录暂未开放'
@@ -131,7 +153,7 @@ async function handleWechatLogin() {
             <p v-if="wechatLoginAvailable">
               点击下方按钮打开微信官方二维码，手机扫码确认后会自动返回。
             </p>
-            <p v-else>网站部署并完成微信开放平台审核后开放，请先使用账号密码登录。</p>
+            <p v-else>暂时无法使用微信扫码，请切换到账号密码登录。</p>
           </div>
         </div>
 
@@ -162,13 +184,15 @@ async function handleWechatLogin() {
           {{ wechatLoginAvailable ? '打开微信登录二维码' : '功能暂未开放' }}
         </t-button>
         <p v-if="wechatLoginAvailable" class="privacy-note">
-          仅接收微信用于识别账号的 OpenID / UnionID，不保存微信访问令牌。
+          在微信中确认登录后，将自动返回你的工作空间。
         </p>
       </div>
 
       <t-form
         v-else
         class="password-form"
+        :colon="false"
+        label-align="top"
         :data="passwordForm"
         :rules="passwordRules"
         @submit="handlePasswordLogin"
@@ -194,11 +218,9 @@ async function handleWechatLogin() {
             clearable
           />
         </t-form-item>
-        <t-form-item>
-          <t-button theme="primary" type="submit" size="large" :loading="passwordLoading" block>
-            登录
-          </t-button>
-        </t-form-item>
+        <t-button theme="primary" type="submit" size="large" :loading="passwordLoading" block>
+          登录
+        </t-button>
         <div class="registration-guide">
           <strong>还没有账号？</strong>
           <p>请先前往微信小程序完成注册，再进入“账号安全”设置登录账号和密码。</p>
@@ -211,240 +233,232 @@ async function handleWechatLogin() {
 
 <style scoped lang="scss">
 .login-page {
-  position: relative;
   display: grid;
   min-height: 100vh;
-  padding: clamp(28px, 6vw, 80px);
-  overflow: hidden;
-  background: linear-gradient(135deg, #fff9f4 0%, #f8f9fb 48%, #f2f7fb 100%);
-  grid-template-columns: minmax(320px, 1fr) minmax(380px, 500px);
-  gap: clamp(48px, 9vw, 140px);
-  place-items: center;
-}
-
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(4px);
-  pointer-events: none;
-}
-
-.orb--orange {
-  top: -170px;
-  right: 28%;
-  width: 420px;
-  height: 420px;
-  background: rgb(255 138 61 / 11%);
-}
-
-.orb--blue {
-  bottom: -220px;
-  left: 8%;
-  width: 460px;
-  height: 460px;
-  background: rgb(77 171 247 / 9%);
-}
-
-.login-intro,
-.login-panel {
-  position: relative;
-  z-index: 1;
+  background: #fff;
+  grid-template-columns: 1.1fr 1fr;
 }
 
 .login-intro {
-  width: min(100%, 620px);
+  display: flex;
+  padding: 36px clamp(32px, 5vw, 80px);
+  background: #edf3fe;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-intro > .brand {
+  margin-bottom: auto;
 }
 
 .login-intro__copy {
-  margin-top: clamp(58px, 9vh, 110px);
+  margin-top: 48px;
 }
 
 .eyebrow {
   color: var(--app-primary);
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.14em;
 }
 
 .login-intro h1 {
   margin-top: 18px;
-  color: #252b30;
-  font-size: clamp(42px, 5.2vw, 72px);
-  font-weight: 850;
-  letter-spacing: -0.055em;
-  line-height: 1.13;
+  color: var(--app-text-strong);
+  font-size: clamp(32px, 3.2vw, 48px);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.035em;
+}
+
+.login-intro h1 span {
+  color: var(--app-primary);
 }
 
 .login-intro__copy > p:last-child {
-  max-width: 530px;
-  margin-top: 26px;
-  color: #747c83;
-  font-size: 16px;
+  margin-top: 20px;
+  color: #687e9e;
+  font-size: 14px;
   line-height: 1.9;
 }
 
-.role-preview {
-  display: grid;
-  max-width: 560px;
-  margin-top: 54px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.math-sheet {
+  max-width: 520px;
+  margin-top: 36px;
+  padding: 18px 22px 0;
+  background: rgb(255 255 255 / 85%);
+  border: 1px solid #d7e3f7;
+  border-radius: 8px;
+}
+
+.math-sheet__heading {
+  display: flex;
+  padding-bottom: 15px;
+  align-items: center;
+  justify-content: space-between;
+  color: #687e9e;
   gap: 12px;
+  font-size: 11px;
 }
 
-.role-preview > div {
-  display: grid;
-  padding: 17px;
-  background: rgb(255 255 255 / 70%);
-  border: 1px solid rgb(232 234 237 / 90%);
-  border-radius: 18px;
-  grid-template-columns: auto 1fr;
-  column-gap: 10px;
+.math-sheet__heading > span:last-child {
+  font-size: 9px;
+  letter-spacing: 0.12em;
 }
 
-.role-preview span {
-  grid-row: 1 / 3;
-  font-size: 25px;
+.math-sheet svg:not(.app-icon) {
+  display: block;
+  width: 100%;
 }
 
-.role-preview strong {
-  color: #3f474d;
-  font-size: 13px;
+.math-sheet__foot {
+  display: flex;
+  padding: 15px 0;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--app-border-color);
+  color: #687e9e;
+  font-size: 11px;
 }
 
-.role-preview small {
-  margin-top: 3px;
-  color: #9aa0a6;
-  font-size: 10px;
+.role-preview {
+  display: flex;
+  margin-top: auto;
+  padding-top: 30px;
+  flex-wrap: wrap;
+  gap: 24px;
+  color: #687e9e;
+  font-size: 11px;
+}
+
+.role-preview > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .login-panel {
-  width: 100%;
-  padding: clamp(28px, 4vw, 44px);
-  background: rgb(255 255 255 / 94%);
-  border: 1px solid rgb(229 232 235 / 95%);
-  border-radius: 32px;
-  box-shadow: 0 30px 90px rgb(45 52 54 / 13%);
-  backdrop-filter: blur(18px);
+  width: min(100%, 460px);
+  margin: auto;
+  padding: 56px 36px;
 }
 
-.welcome-badge {
-  display: inline-flex;
-  padding: 6px 10px;
-  background: #fff1e8;
-  border-radius: 999px;
-  color: #d9651d;
-  font-size: 11px;
-  font-weight: 700;
+.welcome-label {
+  color: var(--app-text-muted);
+  font-size: 13px;
 }
 
 .login-panel__heading h2 {
-  margin-top: 15px;
+  margin-top: 12px;
   color: var(--app-text-strong);
-  font-size: 26px;
+  font-size: 28px;
+  font-weight: 600;
 }
 
-.login-panel__heading p {
-  margin-top: 8px;
+.login-panel__heading > p:last-child {
+  margin-top: 10px;
   color: var(--app-text-muted);
+  font-size: 13px;
 }
 
 .mode-switch {
   display: flex;
-  margin-top: 28px;
-  padding: 5px;
-  background: #f2f3f5;
-  border-radius: 999px;
+  margin-top: 32px;
+  border-bottom: 1px solid var(--app-border-color);
+  gap: 26px;
 }
 
 .mode-switch button {
-  width: 50%;
-  padding: 10px 14px;
+  position: relative;
+  padding: 14px 0;
   background: transparent;
   border: 0;
-  border-radius: 999px;
-  color: #7d858c;
+  color: var(--app-text-muted);
   cursor: pointer;
   font: inherit;
+  font-size: 13px;
 }
 
 .mode-switch button.active {
-  background: #fff;
-  box-shadow: 0 5px 15px rgb(45 52 54 / 8%);
-  color: #d9651d;
-  font-weight: 700;
+  color: var(--app-primary);
+  font-weight: 600;
+}
+
+.mode-switch button.active::after {
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--app-primary);
+  content: '';
 }
 
 .mode-status {
-  display: inline-flex;
-  margin-left: 4px;
-  padding: 2px 6px;
-  background: #eceff1;
-  border-radius: 999px;
-  color: #8d959b;
+  margin-left: 3px;
+  padding: 2px 4px;
+  background: #f2f4f7;
+  border-radius: 3px;
+  color: var(--app-text-muted);
   font-size: 9px;
-  line-height: 1.4;
-  vertical-align: 1px;
+  font-weight: 400;
 }
 
 .wechat-login,
 .password-form {
-  margin-top: 26px;
+  margin-top: 28px;
+}
+
+.password-form :deep(.t-form__label) {
+  padding-bottom: 8px;
+  color: var(--app-text);
+  font-size: 12px;
+}
+
+.password-form :deep(.t-input) {
+  min-height: 44px;
+  border-radius: 6px;
+}
+
+.password-form :deep(.t-button) {
+  height: 44px;
+  border-radius: 6px;
+}
+
+.password-form :deep(.t-form__item) {
+  margin-bottom: 22px;
 }
 
 .wechat-visual {
   display: flex;
-  padding: 18px;
-  align-items: center;
-  background: #f2faf5;
-  border: 1px solid #dcefe3;
-  border-radius: 20px;
-  gap: 17px;
+  margin-bottom: 22px;
+  padding: 20px;
+  align-items: flex-start;
+  background: #f5f7fb;
+  border: 1px solid var(--app-border-color);
+  border-radius: 8px;
+  gap: 16px;
 }
 
-.qr-frame {
-  position: relative;
+.wechat-icon {
   display: grid;
-  width: 76px;
-  height: 76px;
+  width: 44px;
+  height: 44px;
   flex: none;
   place-items: center;
   background: #fff;
-  border: 7px solid #fff;
-  border-radius: 15px;
-  box-shadow: 0 6px 18px rgb(19 112 58 / 10%);
-}
-
-.qr-pattern {
-  color: #2f3c35;
-  font-family: monospace;
-  font-size: 55px;
-  line-height: 1;
-}
-
-.wechat-mark {
-  position: absolute;
-  display: grid;
-  width: 25px;
-  height: 25px;
-  place-items: center;
-  background: #07c160;
-  border: 2px solid #fff;
-  border-radius: 7px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
+  border-radius: 8px;
+  color: var(--app-primary);
 }
 
 .wechat-visual strong {
-  color: #33443a;
-  font-size: 15px;
+  color: var(--app-text-strong);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .wechat-visual p {
-  margin-top: 6px;
-  color: #748078;
+  margin-top: 8px;
+  color: var(--app-text-muted);
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .first-login-fields {
@@ -452,106 +466,113 @@ async function handleWechatLogin() {
 }
 
 .first-login-fields > p {
-  margin-bottom: 10px;
-  color: #555e64;
+  color: var(--app-text);
   font-size: 12px;
-  font-weight: 700;
 }
 
 .first-login-fields > p span {
-  margin-left: 6px;
-  color: #a0a6ad;
-  font-weight: 400;
+  display: block;
+  margin-top: 5px;
+  color: var(--app-text-muted);
+  font-size: 11px;
 }
 
 .two-column {
   display: grid;
-  margin-top: 10px;
-  grid-template-columns: 1fr 1fr;
+  margin-top: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
 }
 
 .privacy-note,
 .password-note {
-  margin-top: 14px;
-  color: #a0a6ad;
+  margin-top: 18px;
+  color: var(--app-text-muted);
   font-size: 11px;
-  line-height: 1.6;
-  text-align: center;
+  line-height: 1.8;
 }
 
 .registration-guide {
-  margin-top: 18px;
-  padding: 14px 16px;
-  background: #fff8f2;
-  border: 1px solid #ffe1cc;
-  border-radius: 15px;
-  color: #6d5748;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--app-border-color);
   font-size: 12px;
-  line-height: 1.65;
+  line-height: 1.8;
 }
 
 .registration-guide strong {
-  color: #cb6423;
+  color: var(--app-text);
+  font-weight: 500;
 }
 
 .registration-guide p {
-  margin-top: 3px;
+  margin-top: 6px;
+  color: var(--app-text-muted);
 }
 
 @media (width <= 980px) {
-  .login-page {
-    display: block;
-    padding: 28px 20px 50px;
-  }
-
   .login-intro {
-    margin: 0 auto;
-  }
-
-  .login-intro__copy {
-    margin-top: 44px;
-    text-align: center;
-  }
-
-  .login-intro h1 {
-    font-size: clamp(38px, 9vw, 58px);
-  }
-
-  .login-intro__copy > p:last-child {
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .role-preview {
-    margin: 30px auto 36px;
+    padding: 32px;
   }
 
   .login-panel {
-    max-width: 520px;
-    margin: 0 auto;
+    padding: 40px 28px;
+  }
+
+  .math-sheet {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .role-preview {
+    gap: 16px;
   }
 }
 
-@media (width <= 560px) {
+@media (width <= 720px) {
+  .login-page {
+    display: block;
+  }
+
+  .login-intro {
+    padding: 22px 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--app-border-color);
+  }
+
+  .login-intro__copy,
+  .math-sheet,
   .role-preview {
     display: none;
   }
 
-  .login-intro__copy {
-    margin: 38px 0 28px;
+  .login-panel {
+    max-width: 460px;
+    padding: 40px 24px;
   }
 
-  .login-intro__copy > p:last-child {
-    font-size: 14px;
+  .login-panel__heading h2 {
+    font-size: 26px;
+  }
+}
+
+@media (width <= 360px) {
+  .login-intro {
+    padding-right: 20px;
+    padding-left: 20px;
   }
 
   .login-panel {
-    border-radius: 24px;
+    padding: 32px 20px;
   }
 
-  .two-column {
-    grid-template-columns: 1fr;
+  .mode-switch {
+    gap: 22px;
+  }
+
+  .wechat-visual {
+    padding: 14px;
+    gap: 10px;
   }
 }
 </style>

@@ -2,9 +2,9 @@
   display: flex;
   padding: 30rpx;
   align-items: center;
-  background: linear-gradient(135deg, #f2f7ff, #ffffff);
+  background: var(--app-soft);
   border: 1rpx solid #dfeaff;
-  border-radius: 30rpx;
+  border-radius: 20rpx;
   gap: 22rpx;
 }
 
@@ -16,7 +16,7 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
   font-size: 38rpx;
 }
 
@@ -30,12 +30,12 @@
 
 .role-banner__title {
   font-size: 32rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .role-banner__text {
   margin-top: 8rpx;
-  color: #7b8289;
+  color: var(--app-muted);
   font-size: 22rpx;
 }
 
@@ -56,25 +56,29 @@
 
 .role-card__heading {
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .role-card__name-row {
   gap: 10rpx;
+  flex-wrap: wrap;
 }
 
 .role-card__name {
+  overflow-wrap: anywhere;
   font-size: 30rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .role-card__code {
   margin-top: 6rpx;
-  color: #9aa0a6;
+  color: var(--app-muted);
   font-size: 21rpx;
 }
 
 .role-card__count {
-  color: #ff8a3d;
+  color: var(--app-primary);
   font-size: 22rpx;
   font-weight: 650;
 }
@@ -96,12 +100,12 @@
 .permission-pill {
   padding: 10rpx 16rpx;
   background: #f6f7f9;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   color: #596168;
   font-size: 21rpx;
 }
 
 .role-card__empty {
-  color: #a0a6ad;
+  color: var(--app-muted);
   font-size: 22rpx;
 }

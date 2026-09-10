@@ -35,7 +35,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'dashboard',
         name: 'dashboard',
         component: () => import('@/views/dashboard/DashboardView.vue'),
-        meta: { title: '控制台', requiresAuth: true },
+        meta: { title: '工作台', requiresAuth: true },
       },
       ...accountRoutes,
       ...teachingRoutes,

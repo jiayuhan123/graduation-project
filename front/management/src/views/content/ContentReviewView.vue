@@ -64,7 +64,7 @@ onMounted(loadDrafts)
 <template>
   <div>
     <PageHeader
-      eyebrow="QUALITY"
+      eyebrow="教学内容"
       title="内容审核"
       :description="`当前有 ${questions.length} 道草稿题等待核对，审核动作会进入审计日志。`"
     />
@@ -158,8 +158,8 @@ onMounted(loadDrafts)
   padding: 19px;
   align-items: center;
   justify-content: space-between;
-  background: #fffaf6;
-  border: 1px solid #ffe5d3;
+  background: var(--app-primary-soft);
+  border: 1px solid var(--app-border-color);
   border-radius: 18px;
   gap: 20px;
 }

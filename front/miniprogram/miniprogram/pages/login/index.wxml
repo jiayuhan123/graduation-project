@@ -1,20 +1,16 @@
-<view class="login-page">
-  <view class="orb orb--one"></view>
-  <view class="orb orb--two"></view>
-
+<view class="app-page login-page">
   <view class="login-hero">
     <view class="brand-mark">
       <text class="brand-mark__symbol">π</text>
-      <view class="brand-mark__dot">+</view>
     </view>
     <text class="login-hero__title">数学成长空间</text>
-    <text class="login-hero__subtitle">一个账号，连接学生、教师与管理员身份</text>
+    <text class="login-hero__subtitle">每天，学会一点点。</text>
   </view>
 
   <view class="surface-card login-card">
     <view class="login-card__heading">
       <text class="login-card__title">登录账号</text>
-      <text class="login-card__description">同一个账号可以拥有并切换多个角色</text>
+      <text class="login-card__description">欢迎回来，继续你的数学学习。</text>
     </view>
 
     <view class="login-mode">
@@ -121,7 +117,7 @@
     <t-button
       block
       size="large"
-      shape="round"
+      shape="rectangle"
       theme="primary"
       loading="{{submitting}}"
       bind:tap="handleLogin"
@@ -132,7 +128,6 @@
 
   <view class="login-notes">
     <text wx:if="{{loginMode === 'wechat'}}">首次微信登录会自动创建学生身份</text>
-    <text wx:else>教师和管理员可先使用后台创建的账号登录</text>
-    <text>测试阶段后端地址由本地开发配置提供</text>
+    <text wx:else>教师和管理员请使用已分配的账号</text>
   </view>
 </view>

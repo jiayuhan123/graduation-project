@@ -1,0 +1,75 @@
+.classroom-actions {
+  display: flex;
+  padding: 10rpx 0 30rpx;
+  border-bottom: 1rpx solid var(--app-line);
+}
+.classroom-actions > view {
+  display: flex;
+  width: 50%;
+  min-height: 92rpx;
+  align-items: center;
+  justify-content: center;
+  gap: 18rpx;
+  color: var(--app-primary);
+  font-size: 28rpx;
+}
+.classroom-actions > view + view {
+  border-left: 1rpx solid var(--app-line);
+}
+.classroom-card {
+  margin-bottom: 18rpx;
+  padding: 30rpx;
+  background: #e9ede2;
+  border: 1rpx solid #dce3d5;
+  border-radius: 20rpx;
+}
+.classroom-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+.classroom-card__icon {
+  color: #567051;
+}
+.classroom-card__term {
+  color: #65775f;
+  font-size: 23rpx;
+}
+.classroom-card__name {
+  display: block;
+  margin-top: 24rpx;
+  color: var(--app-ink);
+  font-size: 35rpx;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.classroom-card__school {
+  display: block;
+  margin-top: 10rpx;
+  color: #74806e;
+  font-size: 24rpx;
+}
+.classroom-card__footer {
+  display: flex;
+  margin-top: 26rpx;
+  padding-top: 22rpx;
+  justify-content: space-between;
+  gap: 16rpx;
+  border-top: 1rpx solid #d6decd;
+  color: #65775f;
+  font-size: 23rpx;
+}
+.permissions-panel {
+  padding: 12rpx 28rpx;
+}
+.permission-item {
+  display: block;
+  padding: 20rpx 0;
+  overflow-wrap: anywhere;
+  color: var(--app-muted);
+  font-size: 24rpx;
+}
+.permission-item + .permission-item {
+  border-top: 1rpx solid var(--app-line);
+}

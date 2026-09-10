@@ -104,7 +104,7 @@ onMounted(load)
 <template>
   <div>
     <PageHeader
-      eyebrow="TEACHING"
+      eyebrow="教学与班级"
       :title="isTeacher ? '学生提交' : '提交记录'"
       :description="
         isTeacher
@@ -263,7 +263,7 @@ onMounted(load)
 
 .teacher-comment {
   padding: 10px;
-  background: #fff6ef;
+  background: var(--app-primary-soft);
   border-radius: 10px;
   color: #8f4a1e;
   grid-column: 1 / -1;

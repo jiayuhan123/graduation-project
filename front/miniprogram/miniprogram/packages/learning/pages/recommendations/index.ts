@@ -4,9 +4,15 @@ import {
   pageRecommendationsApi,
 } from '../../../../api/learning'
 import type { RecommendationItem } from '../../../../types/learning'
+import { withKnowledgeLabels } from '../../../../services/knowledge-labels'
 
 Page({
-  data: { loading: true, operatingId: '', records: [] as RecommendationItem[] },
+  data: {
+    loading: true,
+    operatingId: '',
+    records: [] as (RecommendationItem & { knowledgePointName: string })[],
+  },
+  loadRevision: 0,
   onShow() {
     void this.load()
   },
@@ -14,11 +20,20 @@ Page({
     void this.load().finally(() => wx.stopPullDownRefresh())
   },
   async load() {
+    const revision = ++this.loadRevision
     this.setData({ loading: true })
     try {
       const page = await pageRecommendationsApi({ page: 1, size: 100, status: 'PENDING' })
-      this.setData({ loading: false, records: page.records })
+      if (revision !== this.loadRevision) return
+      const records = page.records.map((item) => ({
+        ...item,
+        knowledgePointName: '正在加载知识点…',
+      }))
+      this.setData({ loading: false, records })
+      const labeled = await withKnowledgeLabels(records)
+      if (revision === this.loadRevision) this.setData({ records: labeled })
     } catch (error) {
+      if (revision !== this.loadRevision) return
       this.setData({ loading: false })
       await this.showError(error, '推荐加载失败')
     }

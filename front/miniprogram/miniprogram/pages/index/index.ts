@@ -3,6 +3,7 @@ import { roleLabel, roleOptions } from '../../constants/roles'
 import { resolveAvatarDisplayUrl } from '../../services/avatar'
 import { getSession, setActiveRole } from '../../services/session'
 import type { UserProfile } from '../../types/account'
+import { syncTabBar } from '../../utils/navigation'
 
 function identityDescription(profile: UserProfile, role: string): string {
   if (role === 'student' && profile.studentProfile) {
@@ -14,12 +15,14 @@ function identityDescription(profile: UserProfile, role: string): string {
     return [title, teacherNo].filter(Boolean).join(' · ') || '教师资料待完善'
   }
   if (role === 'admin') return `拥有 ${profile.permissions.length} 项账号权限`
-  return '当前角色资料已连接'
+  return '欢迎来到数学成长空间'
 }
 
 Page({
   data: {
     loading: true,
+    dateLabel: '',
+    greeting: '',
     displayName: '用户',
     username: '',
     avatarUrl: '',
@@ -42,6 +45,11 @@ Page({
   },
 
   onShow() {
+    const now = new Date()
+    this.setData({
+      dateLabel: `${now.getMonth() + 1} 月 ${now.getDate()} 日`,
+      greeting: now.getHours() < 12 ? '上午好' : now.getHours() < 18 ? '下午好' : '晚上好',
+    })
     const session = getSession()
     if (!session) {
       void wx.reLaunch({ url: '/pages/login/index' })
@@ -58,6 +66,7 @@ Page({
         ? activeRole
         : (profile.roles[0] ?? 'student')
       setActiveRole(selectedRole)
+      syncTabBar(selectedRole)
       const displayName = profile.nickname || profile.realName || profile.username
       const avatarUrl = await resolveAvatarDisplayUrl(profile.avatarUrl).catch(() => '')
       this.setData({
@@ -102,6 +111,14 @@ Page({
 
   openProfile() {
     void wx.switchTab({ url: '/pages/profile/index' })
+  },
+
+  openLearning() {
+    void wx.switchTab({ url: '/pages/learning/index' })
+  },
+
+  openClassroom() {
+    void wx.switchTab({ url: '/pages/classroom/index' })
   },
 
   openStudentProfile() {

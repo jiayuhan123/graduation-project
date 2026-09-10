@@ -1,20 +1,40 @@
 :root {
-  --app-sidebar-width: 264px;
-  --app-page-bg: #f7f8fa;
+  --app-sidebar-width: 236px;
+  --app-page-bg: #f5f7fb;
   --app-surface: #fff;
-  --app-primary: #ff7a2a;
-  --app-primary-soft: #fff1e8;
-  --app-blue: #4dabf7;
-  --app-text-strong: #2d3436;
-  --app-text: #4d555b;
-  --app-text-muted: #838b92;
-  --app-border-color: #e9ebee;
-  --app-shadow-soft: 0 8px 26px rgb(45 52 54 / 7%);
-  --app-shadow-card: 0 18px 50px rgb(45 52 54 / 7.5%);
-  --td-brand-color: #ff7a2a;
-  --td-brand-color-hover: #ed6c1f;
-  --td-brand-color-active: #d95f16;
-  --td-brand-color-focus: rgb(255 122 42 / 18%);
+  --app-primary: #3567c8;
+  --app-primary-soft: #edf3fe;
+  --app-blue: #3567c8;
+  --app-text-strong: #20304b;
+  --app-text: #4d5d73;
+  --app-text-muted: #7b889b;
+  --app-border-color: #e3e9f2;
+  --app-shadow-soft: 0 2px 8px rgb(32 48 75 / 3%);
+  --app-shadow-card: none;
+  --td-brand-color: #3567c8;
+  --td-brand-color-1: #edf3fe;
+  --td-brand-color-2: #dce8fb;
+  --td-brand-color-3: #bdd0f3;
+  --td-brand-color-4: #94b2e9;
+  --td-brand-color-5: #6c94df;
+  --td-brand-color-6: #4c7bd3;
+  --td-brand-color-7: #3567c8;
+  --td-brand-color-8: #2953a6;
+  --td-brand-color-9: #244687;
+  --td-brand-color-10: #203c6d;
+  --td-brand-color-hover: #4c7bd3;
+  --td-brand-color-active: #2953a6;
+  --td-brand-color-focus: #dce8fb;
+  --td-brand-color-light: #edf3fe;
+  --td-brand-color-light-hover: #dce8fb;
+  --td-text-color-primary: #20304b;
+  --td-text-color-secondary: #68798f;
+  --td-bg-color-page: #f5f7fb;
+  --td-bg-color-container: #fff;
+  --td-component-border: #dce3ed;
+  --td-radius-default: 6px;
+  --td-radius-medium: 8px;
+  --td-radius-large: 12px;
 }
 
 * {
@@ -35,9 +55,7 @@ body,
 
 body {
   color: var(--app-text);
-  background:
-    radial-gradient(circle at 83% 8%, rgb(255 138 61 / 8%), transparent 26%),
-    radial-gradient(circle at 36% 92%, rgb(77 171 247 / 7%), transparent 24%), var(--app-page-bg);
+  background: var(--app-page-bg);
   font-family:
     'PingFang SC',
     'Microsoft YaHei',
@@ -56,15 +74,15 @@ input,
 textarea,
 select {
   &:focus-visible {
-    outline: 2px solid rgb(255 122 42 / 55%);
+    outline: 2px solid #3567c8;
     outline-offset: 2px;
   }
 }
 
 .surface-card {
-  background: rgb(255 255 255 / 96%);
+  background: var(--app-surface);
   border: 1px solid var(--app-border-color);
-  border-radius: 24px;
+  border-radius: 12px;
   box-shadow: var(--app-shadow-card);
 }
 
@@ -100,7 +118,7 @@ select {
   padding: 9px 12px;
   background: #fff;
   border: 1px solid #dfe3e7;
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--app-text-strong);
   font: inherit;
 }
@@ -136,16 +154,15 @@ select {
 .content-list {
   display: grid;
   padding: 0 22px 22px;
-  gap: 12px;
+  gap: 0;
 }
 
 .content-row {
   display: grid;
-  padding: 18px;
+  padding: 18px 4px;
   align-items: center;
   background: #fff;
-  border: 1px solid #eceef0;
-  border-radius: 17px;
+  border-bottom: 1px solid var(--app-border-color);
   grid-template-columns: minmax(220px, 1fr) minmax(150px, 0.7fr) auto;
   gap: 16px;
 }
@@ -212,7 +229,13 @@ select {
   }
 
   .content-row__meta {
-    display: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .content-row__actions {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 
@@ -230,6 +253,17 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .content-row__meta,
+  .content-row__actions {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .content-row__main strong {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
   .content-row__actions {
     justify-content: flex-start;
   }
@@ -237,10 +271,41 @@ select {
 
 @media (width <= 640px) {
   .surface-card {
-    border-radius: 20px;
+    border-radius: 10px;
   }
 
   .page-grid {
     gap: 14px;
+  }
+}
+
+.t-button {
+  font-weight: 500;
+}
+
+.t-table {
+  --td-bg-color-secondarycontainer: #f5f7fb;
+}
+
+.t-tag {
+  border-radius: 4px;
+}
+
+.content-toolbar {
+  border-bottom: 1px solid var(--app-border-color);
+  margin-bottom: 4px;
+}
+
+.content-row:hover {
+  background: #f9fbff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
   }
 }

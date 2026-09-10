@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppIcon from '@/components/AppIcon.vue'
 import { onMounted, reactive, ref } from 'vue'
 import {
   Button as TButton,
@@ -49,12 +50,16 @@ onMounted(loadProfile)
 
 <template>
   <div>
-    <PageHeader eyebrow="TEACHER" title="教师资料" description="维护展示给学生和家长的教学身份。" />
+    <PageHeader
+      eyebrow="个人账号"
+      title="教师资料"
+      description="维护展示给学生和家长的教学身份。"
+    />
     <section class="surface-card teacher-card">
       <div v-if="loading" class="loading-area"><t-loading text="正在加载教师资料" /></div>
       <template v-else>
         <div class="teacher-card__intro">
-          <span>📐</span>
+          <AppIcon name="edit" :size="28" />
           <div>
             <h2>{{ form.title || '教师资料待完善' }}</h2>
             <p>{{ profile?.teacherNo ? `教师工号 ${profile.teacherNo}` : '暂未设置教师工号' }}</p>
@@ -95,9 +100,9 @@ onMounted(loadProfile)
   display: flex;
   padding: 24px;
   align-items: center;
-  background: linear-gradient(135deg, #edf7ff, #f8fcff);
+  background: var(--app-primary-soft);
   border: 1px solid #d8ebfa;
-  border-radius: 22px;
+  border-radius: 12px;
   gap: 18px;
 }
 

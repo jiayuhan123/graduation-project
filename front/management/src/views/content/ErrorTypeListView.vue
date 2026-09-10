@@ -155,7 +155,7 @@ onMounted(loadErrorTypes)
 
 <template>
   <div>
-    <PageHeader eyebrow="CONTENT" title="错因字典" description="维护可解释错因和针对性补救提示。">
+    <PageHeader eyebrow="教学内容" title="错因字典" description="维护可解释错因和针对性补救提示。">
       <template #actions><t-button @click="openCreate">新建错因</t-button></template>
     </PageHeader>
 

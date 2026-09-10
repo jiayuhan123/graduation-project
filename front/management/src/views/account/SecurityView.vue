@@ -78,7 +78,7 @@ async function submit(context: SubmitContext) {
 <template>
   <div>
     <PageHeader
-      eyebrow="SECURITY"
+      eyebrow="个人账号"
       title="账号安全"
       description="密码变更后会撤销当前账号的全部登录会话。"
     />
@@ -189,9 +189,9 @@ async function submit(context: SubmitContext) {
   width: 52px;
   height: 52px;
   place-items: center;
-  background: #fff1e8;
+  background: var(--app-primary-soft);
   border-radius: 16px;
-  color: #dd6a23;
+  color: var(--app-primary);
   font-size: 23px;
 }
 
@@ -225,7 +225,7 @@ async function submit(context: SubmitContext) {
   border-radius: 13px;
   color: #596168;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .status-item__icon--wechat {

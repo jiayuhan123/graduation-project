@@ -1,18 +1,35 @@
-<view class="page">
+<view class="app-page page">
   <view class="hero">
     <text class="title">错题本</text>
-    <text class="description">错误作答会自动归档；同一道题重新答对后自动标记为已掌握。</text>
+    <text class="description">把没弄懂的地方留下来，下次再想一想。</text>
   </view>
   <view class="filters">
-    <button class="filter {{status === 'OPEN' ? 'active' : ''}}" data-status="OPEN" bindtap="selectStatus">待巩固</button>
-    <button class="filter {{status === 'RESOLVED' ? 'active' : ''}}" data-status="RESOLVED" bindtap="selectStatus">已掌握</button>
-    <button class="filter {{status === '' ? 'active' : ''}}" data-status="" bindtap="selectStatus">全部</button>
+    <button
+      class="filter {{status === 'OPEN' ? 'active' : ''}}"
+      data-status="OPEN"
+      bindtap="selectStatus"
+    >
+      待巩固
+    </button>
+    <button
+      class="filter {{status === 'RESOLVED' ? 'active' : ''}}"
+      data-status="RESOLVED"
+      bindtap="selectStatus"
+    >
+      已掌握
+    </button>
+    <button class="filter {{status === '' ? 'active' : ''}}" data-status="" bindtap="selectStatus">
+      全部
+    </button>
   </view>
   <view wx:if="{{loading}}" class="state">正在加载错题…</view>
   <view wx:elif="{{records.length}}" class="list">
     <view wx:for="{{records}}" wx:key="id" class="card">
-      <view class="card-head"><text>题目 #{{item.questionId}}</text><text class="status">{{item.statusLabel}}</text></view>
-      <text class="meta">知识点 #{{item.knowledgePointId}}</text>
+      <view class="card-head">
+        <text>{{item.knowledgePointName}}</text>
+        <text class="status">{{item.statusLabel}}</text>
+      </view>
+      <text class="meta">错题 {{index + 1}}</text>
       <text class="diagnosis">{{item.diagnosis || '本次答案与标准答案不一致。'}}</text>
     </view>
   </view>

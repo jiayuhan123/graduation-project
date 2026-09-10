@@ -1,11 +1,13 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view wx:if="{{loading}}" class="page-loading">
     <t-loading theme="circular" size="52rpx" text="正在加载教师资料" />
   </view>
 
   <block wx:else>
     <view class="teacher-banner">
-      <view class="teacher-banner__icon">📐</view>
+      <view class="teacher-banner__icon">
+        <t-icon name="edit-1" size="40rpx" color="#52705f" />
+      </view>
       <view>
         <text class="teacher-banner__title">教师公开资料</text>
         <text class="teacher-banner__text">资料会在班级和作业场景中展示</text>
@@ -44,7 +46,14 @@
     </view>
 
     <view class="form-actions">
-      <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+      <t-button
+        block
+        size="large"
+        shape="rectangle"
+        theme="primary"
+        loading="{{saving}}"
+        bind:tap="handleSave"
+      >
         保存教师资料
       </t-button>
     </view>

@@ -114,7 +114,7 @@ onMounted(initialize)
 <template>
   <div>
     <PageHeader
-      eyebrow="CLASS INSIGHT"
+      eyebrow="班级学情"
       title="班级学情看板"
       description="从班级整体发现薄弱知识点和异常学生，并直接生成针对练习或作业。"
     />
@@ -437,7 +437,7 @@ header span {
   display: block;
   width: 100%;
   border-radius: 999px;
-  background: linear-gradient(#ff9b5d, #e96f24);
+  background: var(--app-primary);
 }
 
 .trend-day strong {
@@ -482,8 +482,8 @@ header span {
   height: 28px;
   place-items: center;
   border-radius: 9px;
-  background: #fff2e8;
-  color: #d96722;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
 }
 
 .rank-list article > div:nth-child(2),
@@ -522,7 +522,7 @@ header span {
 }
 
 .compact-list article > b {
-  color: #df6d28;
+  color: var(--app-primary);
 }
 
 .student-panel {
@@ -556,7 +556,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: #fff8f2;
+  background: var(--app-primary-soft);
 }
 
 .empty,

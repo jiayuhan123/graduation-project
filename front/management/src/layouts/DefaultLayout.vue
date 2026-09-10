@@ -1,41 +1,105 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Button as TButton, MessagePlugin } from 'tdesign-vue-next'
-import { hasAccess } from '@/auth/permission'
+import { MessagePlugin } from 'tdesign-vue-next'
+import AppIcon from '@/components/AppIcon.vue'
 import BrandLogo from '@/components/BrandLogo.vue'
 import { roleMeta } from '@/constants/roles'
-import { navigationGroups } from '@/router/navigation'
+import { getVisibleNavigationGroups } from '@/router/navigation'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-
-const accessSubject = computed(() => ({
-  roles: userStore.activeRole ? [userStore.activeRole] : userStore.roles,
-  permissions: userStore.permissions,
-}))
-
+const mobileOpen = ref(false)
+const isMobile = ref(false)
+const sidebar = ref<HTMLElement>()
+const menuButton = ref<HTMLButtonElement>()
+const closeButton = ref<HTMLButtonElement>()
+let mediaQuery: MediaQueryList | undefined
+let previousOverflow = ''
 const visibleNavigationGroups = computed(() =>
-  navigationGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => hasAccess(accessSubject.value, item)),
-    }))
-    .filter((group) => group.items.length > 0),
+  getVisibleNavigationGroups({
+    roles: userStore.activeRole ? [userStore.activeRole] : userStore.roles,
+    permissions: userStore.permissions,
+  }),
 )
-
 const currentRole = computed(() =>
   roleMeta(userStore.activeRole || userStore.roles[0] || 'student'),
 )
+const pageTitle = computed(
+  () =>
+    visibleNavigationGroups.value
+      .flatMap((group) => group.items)
+      .find((item) => item.path === route.path)?.title ||
+    route.meta.title ||
+    '数学成长空间',
+)
+const activeGroup = computed(
+  () =>
+    visibleNavigationGroups.value.find((group) =>
+      group.items.some((item) => item.path === route.path),
+    )?.title,
+)
 
-function switchRole(role: string) {
+function updateViewport() {
+  isMobile.value = mediaQuery?.matches ?? false
+  if (!isMobile.value) mobileOpen.value = false
+}
+function closeMenu() {
+  mobileOpen.value = false
+}
+function handleSidebarKeydown(event: KeyboardEvent) {
+  if (!mobileOpen.value) return
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeMenu()
+    return
+  }
+  if (event.key !== 'Tab') return
+  const elements = Array.from(
+    sidebar.value?.querySelectorAll<HTMLElement>('a, button, select') ?? [],
+  ).filter((element) => element.getClientRects().length && !element.hasAttribute('disabled'))
+  const first = elements[0]
+  const last = elements[elements.length - 1]
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last?.focus()
+  }
+  if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first?.focus()
+  }
+}
+watch(mobileOpen, async (open) => {
+  if (open) {
+    previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    await nextTick()
+    closeButton.value?.focus()
+  } else {
+    document.body.style.overflow = previousOverflow
+    await nextTick()
+    if (isMobile.value) menuButton.value?.focus()
+  }
+})
+watch(() => route.fullPath, closeMenu)
+onMounted(() => {
+  mediaQuery = window.matchMedia('(max-width: 820px)')
+  updateViewport()
+  mediaQuery.addEventListener('change', updateViewport)
+})
+onBeforeUnmount(() => {
+  mediaQuery?.removeEventListener('change', updateViewport)
+  if (mobileOpen.value) document.body.style.overflow = previousOverflow
+})
+function switchRole(event: Event) {
+  const role = (event.target as HTMLSelectElement).value
   if (role === userStore.activeRole) return
   userStore.setActiveRole(role)
+  closeMenu()
   void router.push({ name: 'dashboard' })
 }
-
 async function handleLogout() {
   const serverLoggedOut = await userStore.logout()
   if (serverLoggedOut) void MessagePlugin.success('已退出登录')
@@ -46,85 +110,118 @@ async function handleLogout() {
 
 <template>
   <div class="app-shell">
-    <aside class="sidebar">
-      <BrandLogo />
-
-      <section class="identity-card">
-        <div class="identity-card__top">
-          <span class="identity-card__icon">{{ currentRole.icon }}</span>
-          <span>
-            <small>当前身份</small>
-            <strong>{{ currentRole.label }}</strong>
-          </span>
-        </div>
-        <p>{{ currentRole.description }}</p>
-        <div v-if="userStore.roles.length > 1" class="role-list" aria-label="切换身份">
-          <button
-            v-for="role in userStore.roles"
-            :key="role"
-            type="button"
-            :class="{ active: role === userStore.activeRole }"
-            @click="switchRole(role)"
-          >
-            {{ roleMeta(role).icon }} {{ roleMeta(role).label }}
-          </button>
-        </div>
-      </section>
-
+    <div v-if="mobileOpen" class="sidebar-backdrop" aria-hidden="true" @click="closeMenu" />
+    <aside
+      id="app-navigation"
+      ref="sidebar"
+      class="sidebar"
+      :class="{ 'sidebar--open': mobileOpen }"
+      :inert="isMobile && !mobileOpen"
+      :role="isMobile ? 'dialog' : undefined"
+      :aria-modal="isMobile && mobileOpen ? true : undefined"
+      aria-label="工作空间导航"
+      @keydown="handleSidebarKeydown"
+    >
+      <div class="sidebar__brand">
+        <RouterLink to="/dashboard" aria-label="数学成长空间工作台" @click="closeMenu"
+          ><BrandLogo
+        /></RouterLink>
+        <button
+          ref="closeButton"
+          class="icon-button sidebar__close"
+          type="button"
+          aria-label="关闭导航"
+          @click="closeMenu"
+        >
+          <AppIcon name="close" />
+        </button>
+      </div>
+      <div class="workspace-identity">
+        <AppIcon :name="currentRole.icon" :size="18" />
+        <select
+          v-if="userStore.roles.length > 1"
+          :value="userStore.activeRole"
+          aria-label="切换身份"
+          @change="switchRole"
+        >
+          <option v-for="role in userStore.roles" :key="role" :value="role">
+            {{ roleMeta(role).label }}工作空间
+          </option>
+        </select>
+        <span v-else>{{ currentRole.label }}工作空间</span>
+      </div>
       <nav class="sidebar__nav" aria-label="主导航">
         <section v-for="group in visibleNavigationGroups" :key="group.title">
-          <p class="nav-group-title">{{ group.title }}</p>
+          <p v-if="group.title !== '工作台'" class="nav-group-title">{{ group.title }}</p>
           <RouterLink
             v-for="item in group.items"
             :key="item.path"
             :to="item.path"
             class="nav-link"
             :class="{ active: route.path === item.path }"
+            :aria-current="route.path === item.path ? 'page' : undefined"
+            @click="closeMenu"
           >
-            <span class="nav-link__icon">{{ item.icon }}</span>
-            <span>{{ item.title }}</span>
+            <AppIcon :name="item.icon" :size="18" /><span>{{ item.title }}</span>
           </RouterLink>
         </section>
       </nav>
-
       <footer class="sidebar__footer">
-        <div class="avatar">
-          <img v-if="userStore.userInfo?.avatarUrl" :src="userStore.userInfo.avatarUrl" alt="" />
-          <span v-else>{{ userStore.displayName.slice(0, 1) }}</span>
-        </div>
-        <div class="sidebar__user">
-          <strong>{{ userStore.displayName }}</strong>
-          <small>@{{ userStore.userInfo?.username }}</small>
-        </div>
-        <t-button variant="text" shape="circle" title="退出登录" @click="handleLogout">↗</t-button>
+        <RouterLink to="/account/profile" class="sidebar__account" @click="closeMenu">
+          <span class="avatar"
+            ><img
+              v-if="userStore.userInfo?.avatarUrl"
+              :src="userStore.userInfo.avatarUrl"
+              alt=""
+            /><span v-else>{{ userStore.displayName.slice(0, 1) }}</span></span
+          >
+          <span class="sidebar__user"
+            ><strong>{{ userStore.displayName }}</strong
+            ><small>个人账号</small></span
+          >
+        </RouterLink>
+        <button
+          class="icon-button"
+          type="button"
+          aria-label="退出登录"
+          title="退出登录"
+          @click="handleLogout"
+        >
+          <AppIcon name="logout" :size="18" />
+        </button>
       </footer>
     </aside>
-
-    <header class="mobile-header">
-      <BrandLogo compact />
-      <div class="mobile-header__identity">
-        <span>{{ currentRole.icon }}</span>
-        <strong>{{ userStore.displayName }}</strong>
-      </div>
-    </header>
-
-    <main class="main-content">
-      <RouterView />
-    </main>
-
-    <nav class="mobile-nav" aria-label="移动端导航">
-      <template v-for="group in visibleNavigationGroups" :key="group.title">
-        <RouterLink
-          v-for="item in group.items"
-          :key="item.path"
-          :to="item.path"
-          :class="{ active: route.path === item.path }"
+    <div class="workspace" :inert="mobileOpen">
+      <header class="workspace-header">
+        <button
+          ref="menuButton"
+          class="icon-button menu-button"
+          type="button"
+          aria-label="打开导航"
+          aria-controls="app-navigation"
+          :aria-expanded="mobileOpen"
+          @click="mobileOpen = true"
         >
-          <span>{{ item.icon }}</span>
-          <small>{{ item.title }}</small>
-        </RouterLink>
-      </template>
-    </nav>
+          <AppIcon name="menu" />
+        </button>
+        <div class="breadcrumb">
+          <span v-if="activeGroup && activeGroup !== pageTitle">{{ activeGroup }}</span
+          ><AppIcon
+            v-if="activeGroup && activeGroup !== pageTitle"
+            name="chevron"
+            :size="12"
+          /><strong>{{ pageTitle }}</strong>
+        </div>
+        <RouterLink class="header-account" to="/account/profile"
+          ><span class="role-label">{{ currentRole.label }}</span
+          ><span>{{ userStore.displayName }}</span
+          ><AppIcon name="user" :size="17"
+        /></RouterLink>
+      </header>
+      <main id="main-content" class="main-content">
+        <div class="page-container"><RouterView /></div>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -135,158 +232,120 @@ async function handleLogout() {
 
 .sidebar {
   position: fixed;
-  z-index: 10;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  z-index: 30;
+  inset: 0 auto 0 0;
   display: flex;
   width: var(--app-sidebar-width);
-  padding: 24px 20px 18px;
-  overflow-y: auto;
-  background: rgb(255 255 255 / 94%);
+  background: #fff;
   border-right: 1px solid var(--app-border-color);
   flex-direction: column;
-  backdrop-filter: blur(18px);
 }
 
-.identity-card {
-  margin-top: 28px;
-  padding: 17px;
-  background: linear-gradient(145deg, #fff7f1, #fff);
-  border: 1px solid #ffe3d0;
-  border-radius: 22px;
-}
-
-.identity-card__top {
+.sidebar__brand {
   display: flex;
+  min-height: 80px;
+  padding: 20px 18px;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
 }
 
-.identity-card__icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: var(--app-shadow-soft);
-  font-size: 21px;
+.sidebar__brand a {
+  text-decoration: none;
 }
 
-.identity-card small,
-.identity-card strong {
-  display: block;
-}
-
-.identity-card small {
-  color: var(--app-text-muted);
-  font-size: 11px;
-}
-
-.identity-card strong {
-  margin-top: 2px;
-  color: var(--app-text-strong);
-  font-size: 17px;
-}
-
-.identity-card p {
-  margin-top: 12px;
-  color: var(--app-text-muted);
-  font-size: 12px;
-  line-height: 1.55;
-}
-
-.role-list {
+.workspace-identity {
   display: flex;
-  margin-top: 14px;
-  flex-wrap: wrap;
-  gap: 6px;
+  min-height: 40px;
+  margin: 0 16px 18px;
+  padding: 9px 12px;
+  align-items: center;
+  background: #f5f7fb;
+  border: 1px solid var(--app-border-color);
+  border-radius: 6px;
+  color: var(--app-text);
+  gap: 9px;
+  font-size: 12px;
 }
 
-.role-list button {
-  padding: 6px 9px;
-  background: #f5f6f8;
+.workspace-identity select {
+  min-width: 0;
+  width: 100%;
+  background: transparent;
   border: 0;
-  border-radius: 999px;
-  color: #727980;
+  color: inherit;
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
-}
-
-.role-list button.active {
-  background: #fff0e6;
-  color: #d9651d;
-  font-weight: 700;
 }
 
 .sidebar__nav {
   display: flex;
-  margin-top: 22px;
+  min-height: 0;
+  padding: 0 12px 24px;
+  overflow-y: auto;
   flex: 1;
   flex-direction: column;
-  gap: 17px;
+  gap: 24px;
+  scrollbar-width: thin;
 }
 
 .nav-group-title {
-  margin: 0 12px 7px;
-  color: #adb2b8;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  margin: 0 14px 8px;
+  color: var(--app-text-muted);
+  font-size: 11px;
 }
 
 .nav-link {
   display: flex;
-  min-height: 42px;
-  padding: 9px 12px;
+  min-height: 40px;
+  margin-top: 3px;
+  padding: 9px 14px;
   align-items: center;
-  border-radius: 13px;
-  color: #616970;
-  gap: 11px;
+  border-radius: 6px;
+  color: var(--app-text);
+  gap: 12px;
   text-decoration: none;
-  transition: 160ms ease;
+  font-size: 13px;
+  transition: background 150ms;
 }
 
 .nav-link:hover {
-  background: #f7f8fa;
-  color: var(--app-text-strong);
+  background: #f5f7fb;
 }
 
 .nav-link.active {
-  background: #fff1e8;
-  color: #d9651d;
-  font-weight: 700;
-}
-
-.nav-link__icon {
-  display: grid;
-  width: 25px;
-  height: 25px;
-  place-items: center;
-  font-size: 17px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+  font-weight: 600;
 }
 
 .sidebar__footer {
   display: flex;
-  padding-top: 16px;
+  padding: 16px;
   align-items: center;
-  border-top: 1px solid #f0f1f3;
+  border-top: 1px solid var(--app-border-color);
+  gap: 6px;
+}
+
+.sidebar__account {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex: 1;
   gap: 10px;
+  text-decoration: none;
 }
 
 .avatar {
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   flex: none;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffad73, #ff7a2a);
-  border-radius: 13px;
-  color: #fff;
-  font-weight: 700;
+  background: var(--app-primary-soft);
+  border-radius: 50%;
+  color: var(--app-primary);
+  font-weight: 600;
 }
 
 .avatar img {
@@ -298,111 +357,175 @@ async function handleLogout() {
 .sidebar__user {
   display: flex;
   min-width: 0;
-  flex: 1;
   flex-direction: column;
+  gap: 3px;
 }
 
-.sidebar__user strong,
+.sidebar__user strong {
+  overflow: hidden;
+  color: var(--app-text-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .sidebar__user small {
+  color: var(--app-text-muted);
+  font-size: 10px;
+}
+
+.icon-button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.workspace {
+  min-width: 0;
+  margin-left: var(--app-sidebar-width);
+}
+
+.workspace-header {
+  display: flex;
+  min-height: 64px;
+  padding: 0 clamp(24px, 3vw, 48px);
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid var(--app-border-color);
+  gap: 12px;
+}
+
+.breadcrumb {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  color: var(--app-text-muted);
+  gap: 12px;
+  font-size: 12px;
+}
+
+.breadcrumb strong {
+  overflow: hidden;
+  color: var(--app-text);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-account {
+  display: flex;
+  max-width: 45%;
+  margin-left: auto;
+  align-items: center;
+  color: var(--app-text);
+  gap: 12px;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.header-account > span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.sidebar__user strong {
-  font-size: 13px;
-}
-
-.sidebar__user small {
-  margin-top: 2px;
-  color: #9aa0a6;
-  font-size: 10px;
+.role-label {
+  padding: 3px 8px;
+  background: #f5f7fb;
+  border-radius: 4px;
+  color: var(--app-text-muted);
+  font-size: 11px;
 }
 
 .main-content {
-  min-height: 100vh;
-  margin-left: var(--app-sidebar-width);
-  padding: 40px clamp(24px, 5vw, 72px) 60px;
+  padding: 32px clamp(24px, 3vw, 48px) 56px;
 }
 
-.mobile-header,
-.mobile-nav {
+.page-container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.menu-button,
+.sidebar__close,
+.sidebar-backdrop {
   display: none;
 }
 
 @media (width <= 820px) {
   .sidebar {
+    width: min(288px, calc(100vw - 40px));
+    visibility: hidden;
+    transform: translateX(-100%);
+  }
+
+  .sidebar--open {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  .sidebar__brand {
+    padding: 20px 16px;
+  }
+
+  .menu-button,
+  .sidebar__close {
+    display: inline-flex;
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    z-index: 25;
+    inset: 0;
+    display: block;
+    background: rgb(20 38 68 / 35%);
+  }
+
+  .workspace {
+    margin-left: 0;
+  }
+
+  .workspace-header {
+    min-height: 60px;
+    padding: 0 16px;
+  }
+
+  .breadcrumb > span,
+  .breadcrumb > .app-icon,
+  .header-account .role-label {
     display: none;
   }
 
-  .mobile-header {
-    position: sticky;
-    z-index: 10;
-    top: 0;
-    display: flex;
-    height: 66px;
-    padding: 0 20px;
-    align-items: center;
-    justify-content: space-between;
-    background: rgb(255 255 255 / 90%);
-    border-bottom: 1px solid var(--app-border-color);
-    backdrop-filter: blur(16px);
-  }
-
-  .mobile-header__identity {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 13px;
-  }
-
   .main-content {
-    margin-left: 0;
-    padding: 24px 18px 100px;
+    padding: 24px 18px 40px;
+  }
+}
+
+@media (width <= 380px) {
+  .main-content {
+    padding-right: 14px;
+    padding-left: 14px;
   }
 
-  .mobile-nav {
-    position: fixed;
-    z-index: 20;
-    right: 12px;
-    bottom: 12px;
-    left: 12px;
-    display: flex;
-    max-width: calc(100vw - 24px);
-    padding: 7px;
-    overflow-x: auto;
-    background: rgb(255 255 255 / 96%);
-    border: 1px solid rgb(225 228 232 / 90%);
-    border-radius: 20px;
-    box-shadow: 0 16px 44px rgb(45 52 54 / 14%);
-    backdrop-filter: blur(18px);
-  }
-
-  .mobile-nav a {
-    display: flex;
-    min-width: 66px;
-    padding: 7px 8px;
-    align-items: center;
-    border-radius: 14px;
-    color: #858c93;
-    flex-direction: column;
-    gap: 3px;
-    text-decoration: none;
-  }
-
-  .mobile-nav a > span {
-    font-size: 17px;
-  }
-
-  .mobile-nav a small {
-    font-size: 10px;
-    white-space: nowrap;
-  }
-
-  .mobile-nav a.active {
-    background: #fff1e8;
-    color: #d9651d;
-    font-weight: 700;
+  .workspace-header {
+    padding-right: 14px;
+    padding-left: 10px;
+    gap: 6px;
   }
 }
 </style>

@@ -255,7 +255,7 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="CONTENT"
+      eyebrow="教学内容"
       title="题库管理"
       :description="`固定题与模板题统一维护，当前共 ${total} 道题。`"
     >

@@ -69,7 +69,7 @@ onMounted(() => {
 <template>
   <div>
     <PageHeader
-      eyebrow="LEARNING RECORD"
+      eyebrow="学习记录"
       title="学习档案"
       :description="
         isStudent
@@ -93,7 +93,7 @@ onMounted(() => {
           <strong>{{ report.displayName }}</strong>
           <small>@{{ report.username }} · ID {{ report.studentId }}</small>
         </div>
-        <t-tag theme="success" variant="light">学习档案已连接</t-tag>
+        <t-tag theme="default" variant="light">累计学习记录</t-tag>
       </section>
 
       <section class="overview-grid">

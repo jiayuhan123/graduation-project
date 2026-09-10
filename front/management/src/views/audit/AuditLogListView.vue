@@ -84,7 +84,7 @@ onMounted(load)
 <template>
   <div>
     <PageHeader
-      eyebrow="AUDIT"
+      eyebrow="平台管理"
       title="关键数据审计"
       :description="`跨服务查询用户操作和关键数据变更，目前共 ${total} 条记录。`"
     />
@@ -97,8 +97,10 @@ onMounted(load)
         <input v-model="query.targetId" placeholder="对象 ID" />
         <input v-model="query.occurredFrom" type="datetime-local" title="开始时间" />
         <input v-model="query.occurredTo" type="datetime-local" title="结束时间" />
-        <t-button variant="outline" @click="reset">重置</t-button>
-        <t-button @click="search">查询</t-button>
+        <div class="filter-actions">
+          <t-button variant="outline" @click="reset">重置</t-button>
+          <t-button @click="search">查询</t-button>
+        </div>
       </div>
 
       <div v-if="loading" class="loading"><t-loading text="正在查询审计记录" /></div>
@@ -162,7 +164,14 @@ onMounted(load)
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(5, minmax(130px, 1fr)) repeat(2, minmax(190px, 1.25fr)) auto auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -233,7 +242,7 @@ td small {
 
 @media (width <= 1250px) {
   .filters {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

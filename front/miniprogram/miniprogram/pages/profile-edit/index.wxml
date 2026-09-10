@@ -1,4 +1,4 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view wx:if="{{loading}}" class="page-loading">
     <t-loading theme="circular" size="52rpx" text="正在加载" />
   </view>
@@ -7,10 +7,17 @@
     <view class="avatar-preview">
       <button class="avatar-selector" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <view class="avatar-preview__circle">
-          <image wx:if="{{avatarUrl}}" class="avatar-preview__image" src="{{avatarUrl}}" mode="aspectFill" />
+          <image
+            wx:if="{{avatarUrl}}"
+            class="avatar-preview__image"
+            src="{{avatarUrl}}"
+            mode="aspectFill"
+          />
           <text wx:else>{{avatarText}}</text>
         </view>
-        <view class="avatar-preview__badge">📷</view>
+        <view class="avatar-preview__badge">
+          <t-icon name="camera" size="40rpx" color="#52705f" />
+        </view>
       </button>
       <text class="avatar-preview__tip">点击头像选择新图片，保存资料后生效</text>
     </view>
@@ -70,7 +77,14 @@
     </view>
 
     <view class="form-actions">
-      <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+      <t-button
+        block
+        size="large"
+        shape="rectangle"
+        theme="primary"
+        loading="{{saving}}"
+        bind:tap="handleSave"
+      >
         保存资料
       </t-button>
     </view>

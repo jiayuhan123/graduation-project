@@ -166,7 +166,7 @@ onMounted(loadModules)
 <template>
   <div>
     <PageHeader
-      eyebrow="CONTENT"
+      eyebrow="教学内容"
       title="内容模块"
       :description="`按年级、学期和学习主题维护内容目录，当前共 ${total} 条。`"
     >

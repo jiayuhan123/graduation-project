@@ -1,1 +1,8 @@
-<t-empty description="通知页面样板已就绪" />
+<view class="app-page page-shell">
+  <view class="page-intro"><text class="page-intro__title">消息通知</text></view>
+  <view class="surface-card quiet-empty">
+    <t-icon class="quiet-empty__icon" name="notification" size="56rpx" />
+    <text class="quiet-empty__title">通知功能暂未开放</text>
+    <text>班级作业请前往“班级”查看。</text>
+  </view>
+</view>

@@ -178,9 +178,9 @@ onMounted(async () => {
 <template>
   <div>
     <PageHeader
-      eyebrow="LEARNING"
+      eyebrow="自主学习"
       title="个性练习"
-      description="按教材知识点从固定题库组题；自主练习逐题反馈，可重新作答。"
+      description="选择教材和知识点，按自己的节奏完成练习与回顾。"
     />
 
     <div v-if="loading" class="surface-card loading-card">
@@ -188,6 +188,10 @@ onMounted(async () => {
     </div>
 
     <section v-else-if="!detail" class="practice-setup surface-card">
+      <div class="setup-heading">
+        <h2>设置一组练习</h2>
+        <p>先选学习内容，再确定难度和题量。</p>
+      </div>
       <label
         ><span>教材模块</span
         ><select v-model="moduleId" @change="loadKnowledgePoints">
@@ -309,6 +313,47 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
+.setup-heading {
+  grid-column: 1 / -1;
+  margin-bottom: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--app-border-color);
+}
+
+.setup-heading h2 {
+  color: var(--app-text-strong);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.setup-heading p {
+  margin-top: 8px;
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.practice-start {
+  display: flex;
+  grid-column: 1 / -1;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--app-border-color);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.practice-start .practice-action {
+  min-width: 140px;
+  height: 40px;
+}
+
+.practice-start p {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .loading-card {
   display: grid;
   min-height: 280px;
@@ -379,7 +424,7 @@ onMounted(async () => {
 .question-number {
   color: var(--app-primary);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.08em;
 }
 

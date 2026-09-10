@@ -27,13 +27,13 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffad73, #ff7a2a);
+  background: var(--app-primary);
   border: 8rpx solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 14rpx 32rpx rgba(255, 122, 42, 0.24);
+  box-shadow: none;
   color: #ffffff;
   font-size: 50rpx;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .avatar-preview__image {
@@ -51,14 +51,14 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border: 2rpx solid #ffe0ca;
+  border: 2rpx solid var(--app-line);
   border-radius: 50%;
-  box-shadow: 0 6rpx 16rpx rgba(45, 52, 54, 0.14);
+  box-shadow: none;
   font-size: 22rpx;
 }
 
 .avatar-preview__tip {
   margin-top: 20rpx;
-  color: #9aa0a6;
+  color: var(--app-muted);
   font-size: 22rpx;
 }

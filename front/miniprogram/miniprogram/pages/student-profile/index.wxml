@@ -1,11 +1,13 @@
-<view class="page-shell">
+<view class="app-page page-shell">
   <view wx:if="{{loading}}" class="page-loading">
     <t-loading theme="circular" size="52rpx" text="正在加载学生资料" />
   </view>
 
   <block wx:else>
     <view class="student-banner">
-      <view class="student-banner__icon">🎒</view>
+      <view class="student-banner__icon">
+        <t-icon name="education" size="40rpx" color="#52705f" />
+      </view>
       <view>
         <text class="student-banner__title">学生身份资料</text>
         <text class="student-banner__text">年级和学期会影响后续的学习内容推荐</text>
@@ -45,7 +47,14 @@
     </view>
 
     <view class="form-actions">
-      <t-button block size="large" shape="round" theme="primary" loading="{{saving}}" bind:tap="handleSave">
+      <t-button
+        block
+        size="large"
+        shape="rectangle"
+        theme="primary"
+        loading="{{saving}}"
+        bind:tap="handleSave"
+      >
         保存学生资料
       </t-button>
     </view>
