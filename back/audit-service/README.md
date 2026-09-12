@@ -1,6 +1,6 @@
 # Audit Service 通用审计服务
 
-`audit-service`（默认端口 8004）异步消费用户注册和用户管理/RBAC 操作事件，将不含敏感信息的记录写入独立 `audit_db`。
+`audit-service` 是单体内的审计领域模块，不单独启动或占用端口。它异步消费用户注册和用户管理/RBAC 操作事件，将不含敏感信息的记录写入 `monolith_db.audit_log`。
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |

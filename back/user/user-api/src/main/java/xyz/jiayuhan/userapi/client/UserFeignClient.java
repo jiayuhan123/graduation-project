@@ -17,7 +17,7 @@ import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 
 import java.util.List;
 
-/** 通过 Nacos 服务发现直连用户服务的内部目录客户端。 */
+/** 用户目录模块契约；当前由单体本地适配器实现，Feign 注解仅为未来拆分保留。 */
 @FeignClient(
         name = UserApiConstants.SERVICE_NAME,
         contextId = "userFeignClient",

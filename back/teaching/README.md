@@ -1,11 +1,11 @@
 # Teaching 教学领域
 
-`teaching` 是教学领域的 Maven 聚合模块，本身不运行，也不注册到 Nacos。
+`teaching` 是模块化单体中的教学领域，本身不独立运行。API 契约用于保持模块边界，当前由 `monolith-app` 的进程内适配器实现；所有表统一位于 `monolith_db`。下文旧独立库升级命令仅保留作迁移历史，不用于当前开发。
 
 ```text
 teaching
-├─ teaching-api      跨服务 HTTP 契约、DTO 与稳定路径常量
-└─ teaching-service  教学服务，默认端口 8007，使用 teaching_db
+├─ teaching-api      模块契约、DTO 与稳定路径常量
+└─ teaching-service  教学业务实现，由 monolith-app 统一装配
 ```
 
 当前已提供：

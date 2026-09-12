@@ -20,7 +20,7 @@ import xyz.jiayuhan.contentservice.service.ContentCatalogService;
 
 import java.util.List;
 
-/** 仅供受信任微服务调用的内容查询契约。 */
+/** 为模块边界和未来拆分保留的受信任内容查询契约。 */
 @RestController
 @RequestMapping(ContentApiConstants.INTERNAL_PATH)
 @RequiredArgsConstructor

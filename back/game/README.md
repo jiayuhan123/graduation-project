@@ -1,11 +1,11 @@
 # Game 游戏闯关领域
 
-`game` 是游戏闯关领域的 Maven 聚合模块，本身不运行，也不注册到 Nacos。
+`game` 是模块化单体中的游戏领域，本身不独立运行。API 契约用于保持模块边界，当前由 `monolith-app` 的进程内适配器实现；所有表统一位于 `monolith_db`。下文旧独立库升级命令仅保留作迁移历史，不用于当前开发。
 
 ```text
 game
-├─ game-api      跨服务 HTTP 契约、DTO 与稳定路径常量
-└─ game-service  游戏闯关服务，默认端口 8008，使用 game_db
+├─ game-api      模块契约、DTO 与稳定路径常量
+└─ game-service  游戏业务实现，由 monolith-app 统一装配
 ```
 
 当前数据库基线同时面向单人闯关和双人 PK：

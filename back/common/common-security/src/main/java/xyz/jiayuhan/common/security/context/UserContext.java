@@ -6,7 +6,7 @@ import xyz.jiayuhan.common.core.exception.ResultCode;
 /**
  * 当前请求用户上下文。
  *
- * <p>上下文由网关身份头拦截器写入并在请求完成后清理，只能在当前 Servlet 请求线程中使用。</p>
+ * <p>上下文由单体 Sa-Token 认证拦截器写入并在请求完成后清理，只能在当前 Servlet 请求线程中使用。</p>
  */
 public final class UserContext {
 

@@ -1,6 +1,6 @@
 # User 用户领域
 
-`user` 是用户领域的 Maven 聚合目录，与 `common` 聚合目录采用相同结构，本身不运行也不注册到 Nacos。
+`user` 是模块化单体中的用户领域，本身不独立运行。`user-api` 保持模块调用契约，`user-service` 提供领域实现，两者均由 `monolith-app` 统一装配并使用 `monolith_db`。
 
 ```text
 user

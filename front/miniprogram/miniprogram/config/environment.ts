@@ -7,7 +7,7 @@ export interface AppConfig {
 }
 
 const API_BASE_URLS: Record<EnvironmentVersion, string> = {
-  develop: 'http://127.0.0.1:10000',
+  develop: 'http://122.51.234.113:10000',
   trial: '',
   release: '',
 }

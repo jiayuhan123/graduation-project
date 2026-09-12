@@ -13,7 +13,7 @@ export interface NavigationGroup {
   items: readonly NavigationItem[]
 }
 
-/** 单一 Web 端导航；未完成微服务的入口暂不注册。 */
+/** 单一 Web 端导航；尚未完成业务闭环的入口暂不注册。 */
 export const navigationGroups: readonly NavigationGroup[] = [
   {
     title: '工作台',

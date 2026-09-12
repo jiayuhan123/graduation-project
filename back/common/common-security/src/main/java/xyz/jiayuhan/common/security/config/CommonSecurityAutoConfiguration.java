@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import xyz.jiayuhan.common.security.interceptor.GatewayUserInterceptor;
 import xyz.jiayuhan.common.security.interceptor.InternalApiAuthenticationInterceptor;
 
-/** 在 Servlet 业务服务中自动注册网关身份头拦截器。 */
+/** 为模块化单体的内部 HTTP 端点注册共享令牌校验。 */
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties(InternalApiProperties.class)
@@ -22,7 +21,6 @@ public class CommonSecurityAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new GatewayUserInterceptor()).addPathPatterns("/**").order(-100);
         registry.addInterceptor(new InternalApiAuthenticationInterceptor(internalApiProperties))
                 .addPathPatterns("/internal/**")
                 .order(-50);

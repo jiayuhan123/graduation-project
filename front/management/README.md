@@ -24,7 +24,7 @@
 
 - Node.js `^20.19.0 || >=22.12.0`
 - npm（使用仓库中的 `package-lock.json`）
-- 本地 Gateway 默认运行在 `http://localhost:10000`
+- 开发环境统一访问服务器模块化单体 `http://122.51.234.113:10000`
 
 ## 启动
 
@@ -36,7 +36,7 @@ npm run dev
 
 `.env.local` 不提交到 Git。所有 `VITE_` 变量都会进入浏览器构建产物，禁止写入密码、Token、微信 AppSecret 或 AccessKey。
 
-开发环境通过 Vite 把 `/api` 代理到 Gateway。生产环境建议让 Web 静态资源和 `/api` 使用同一站点，这样微信扫码登录的 HttpOnly state Cookie 可以稳定工作。
+开发环境通过 Vite 把 `/api` 代理到服务器模块化单体。生产环境建议让 Web 静态资源和 `/api` 使用同一站点，这样微信扫码登录的 HttpOnly state Cookie 可以稳定工作。
 
 ## 微信扫码登录前置条件
 
@@ -46,7 +46,7 @@ npm run dev
 2. 把 `WECHAT_WEB_REDIRECT_URI` 的域名配置为网站应用授权回调域；
 3. 后端环境注入 `WECHAT_WEB_APP_ID` 和 `WECHAT_WEB_APP_SECRET`，前端不得保存 Secret；
 4. 执行用户库迁移，增加网站 OpenID 和 UnionID 字段；
-5. Gateway/Nacos 的匿名白名单包含 `/api/user/login/wechat/web/**`。
+5. 模块化单体的匿名白名单包含 `/api/user/login/wechat/web/**`。
 
 Web 与小程序必须绑定到同一微信开放平台账号，后端才能通过 UnionID 识别同一用户。
 升级前已经存在、但尚未保存 UnionID 的小程序账号，应先在新版小程序完成一次登录以回填 UnionID，再使用 Web 扫码，避免首次跨端识别不到原账号。

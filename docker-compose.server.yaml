@@ -30,19 +30,6 @@ services:
       - allkeys-lru
     logging: *server-logging
 
-  nacos:
-    mem_limit: 512m
-    environment:
-      # 服务器环境强制开启 Nacos 默认鉴权；令牌必须是大于 32 字符原文的 Base64 编码值。
-      NACOS_AUTH_ENABLE: "true"
-      NACOS_AUTH_SYSTEM_TYPE: "nacos"
-      NACOS_AUTH_ADMIN_ENABLE: "true"
-      NACOS_AUTH_CONSOLE_ENABLE: "true"
-      NACOS_AUTH_IDENTITY_KEY: "${NACOS_AUTH_IDENTITY_KEY:?请在服务器 .env 中设置 NACOS_AUTH_IDENTITY_KEY}"
-      NACOS_AUTH_IDENTITY_VALUE: "${NACOS_AUTH_IDENTITY_VALUE:?请在服务器 .env 中设置 NACOS_AUTH_IDENTITY_VALUE}"
-      NACOS_AUTH_TOKEN: "${NACOS_AUTH_TOKEN:?请在服务器 .env 中设置 NACOS_AUTH_TOKEN}"
-    logging: *server-logging
-
   rabbitmq:
     mem_limit: 320m
     environment:

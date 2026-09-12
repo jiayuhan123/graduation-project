@@ -11,16 +11,15 @@
     </parent>
 
     <groupId>xyz.jiayuhan</groupId>
-    <artifactId>graduation-project-parent</artifactId>
+    <artifactId>graduation-project-monomer-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>graduation-project-parent</name>
-    <description>毕业设计微服务基础框架 - 后端父工程（聚合与版本统一管理）</description>
+    <name>graduation-project-monomer-parent</name>
+    <description>毕业设计模块化单体后端 - 聚合与版本统一管理</description>
 
     <modules>
         <module>common</module>
-        <module>gateway</module>
         <module>user</module>
         <module>content</module>
         <module>learning</module>
@@ -29,6 +28,7 @@
         <module>file-service</module>
         <module>notification-service</module>
         <module>audit-service</module>
+        <module>monolith-app</module>
     </modules>
 
     <properties>
@@ -37,12 +37,10 @@
 
         <!-- Spring 生态版本（Boot 由上方 parent 管控） -->
         <spring-cloud.version>2025.1.1</spring-cloud.version>
-        <spring-cloud-alibaba.version>2025.1.0.0</spring-cloud-alibaba.version>
 
         <!-- 第三方组件版本 -->
         <sa-token.version>1.39.0</sa-token.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
-        <knife4j.version>4.5.0</knife4j.version>
         <springdoc.version>3.0.3</springdoc.version>
         <lombok.version>1.18.30</lombok.version>
         <spring-security.version>7.0.2</spring-security.version>
@@ -60,14 +58,6 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Spring Cloud Alibaba BOM（Nacos 等） -->
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -138,18 +128,52 @@
                 <artifactId>game-api</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>user-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>content-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>learning-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>teaching-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>game-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>file-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>notification-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>audit-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
             <!-- ==================== 第三方组件 ==================== -->
             <!-- Sa-Token 权限认证（Servlet 版） -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <!-- Sa-Token 权限认证（Gateway 响应式版） -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
                 <version>${sa-token.version}</version>
             </dependency>
             <!-- Sa-Token 整合 Redis（Jackson 序列化） -->
@@ -169,12 +193,6 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
-            </dependency>
-            <!-- Knife4j 网关聚合接口文档 -->
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
-                <version>${knife4j.version}</version>
             </dependency>
             <!-- Spring Boot 4 使用 springdoc-openapi 3.x -->
             <dependency>

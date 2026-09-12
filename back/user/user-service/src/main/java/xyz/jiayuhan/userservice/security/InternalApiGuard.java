@@ -10,7 +10,7 @@ import xyz.jiayuhan.userservice.config.InternalApiProperties;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-/** 用常量时间比较保护仅供微服务直连的内部用户目录接口。 */
+/** 用常量时间比较保护仅供受信任内部调用方使用的用户目录接口。 */
 @Component
 @RequiredArgsConstructor
 public class InternalApiGuard {

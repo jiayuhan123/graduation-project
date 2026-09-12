@@ -5,16 +5,14 @@ services:
     image: postgres:18
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-root}
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-111111}"
-      POSTGRES_DB: user_db
+      POSTGRES_USER: ${DB_USERNAME:?请设置 DB_USERNAME}
+      POSTGRES_PASSWORD: "${DB_PASSWORD:?请设置 DB_PASSWORD}"
+      POSTGRES_DB: ${MONOLITH_DB_NAME:-monolith_db}
       TZ: ${TZ:-Asia/Shanghai}
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql
-      # 仅在数据目录首次初始化时创建各微服务数据库。
-      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -31,7 +29,7 @@ services:
     command:
       - redis-server
       - --requirepass
-      - "${REDIS_PASSWORD:-111111}"
+      - "${REDIS_PASSWORD:?请设置 REDIS_PASSWORD}"
       - --appendonly
       - "yes"
       - --maxmemory
@@ -43,7 +41,7 @@ services:
     volumes:
       - ./data/redis:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a '${REDIS_PASSWORD:-111111}' ping | grep -q PONG"]
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a '${REDIS_PASSWORD:?请设置 REDIS_PASSWORD}' ping | grep -q PONG"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -51,41 +49,12 @@ services:
     networks:
       - local-net
 
-  nacos:
-    image: nacos/nacos-server:v3.2.2
-    restart: unless-stopped
-    environment:
-      MODE: standalone
-      # 本地默认关闭，服务器覆盖文件会强制开启，并要求提供独立密钥。
-      NACOS_AUTH_ENABLE: "${NACOS_AUTH_ENABLE:-false}"
-      NACOS_AUTH_SYSTEM_TYPE: "${NACOS_AUTH_SYSTEM_TYPE:-nacos}"
-      NACOS_AUTH_ADMIN_ENABLE: "${NACOS_AUTH_ADMIN_ENABLE:-true}"
-      NACOS_AUTH_CONSOLE_ENABLE: "${NACOS_AUTH_CONSOLE_ENABLE:-true}"
-      NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-nacos_identity_project}
-      NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-nacos_identity_value_111111}
-      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-SecretKey012345678901234567890123456789012345678901234567890123456789}
-      JVM_XMS: ${NACOS_JVM_XMS:-256m}
-      JVM_XMX: ${NACOS_JVM_XMX:-256m}
-      JVM_XMN: ${NACOS_JVM_XMN:-128m}
-      TZ: ${TZ:-Asia/Shanghai}
-    ports:
-      - "127.0.0.1:${NACOS_SERVER_PORT:-8848}:8848"
-      - "127.0.0.1:${NACOS_CONSOLE_PORT:-8847}:8080"
-      - "127.0.0.1:${NACOS_GRPC_PORT:-9848}:9848"
-      - "127.0.0.1:${NACOS_GRPC_CLIENT_PORT:-9849}:9849"
-    volumes:
-      - ./data/nacos/logs:/home/nacos/logs
-      - ./data/nacos/data:/home/nacos/data
-    mem_limit: 512m
-    networks:
-      - local-net
-
   rabbitmq:
     image: rabbitmq:4.3.4-management
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-root}
-      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:-111111}"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:?请设置 RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:?请设置 RABBITMQ_PASSWORD}"
       TZ: ${TZ:-Asia/Shanghai}
     ports:
       - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
@@ -128,7 +97,7 @@ services:
       - prometheus
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?请设置 GRAFANA_ADMIN_PASSWORD}
       GF_USERS_ALLOW_SIGN_UP: "false"
       TZ: ${TZ:-Asia/Shanghai}
     ports:
@@ -153,7 +122,7 @@ services:
       JAVA_OPTS: "${JENKINS_JAVA_OPTS:--Xms128m -Xmx320m -XX:MaxMetaspaceSize=160m -Djava.awt.headless=true} -Djenkins.install.runSetupWizard=false"
       CASC_JENKINS_CONFIG: /var/jenkins_config/casc.yaml
       JENKINS_ADMIN_USERNAME: "${JENKINS_ADMIN_USERNAME:-admin}"
-      JENKINS_ADMIN_PASSWORD: "${JENKINS_ADMIN_PASSWORD:-change-me-before-production}"
+      JENKINS_ADMIN_PASSWORD: "${JENKINS_ADMIN_PASSWORD:?请设置 JENKINS_ADMIN_PASSWORD}"
       TZ: ${TZ:-Asia/Shanghai}
     # 使用 Docker socket 所属组，而非让 Jenkins 主进程以 root 身份运行。
     # 服务器必须将 DOCKER_GID 设为 `stat -c '%g' /var/run/docker.sock` 的输出。

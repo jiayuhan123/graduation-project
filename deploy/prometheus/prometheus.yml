@@ -9,43 +9,11 @@ scrape_configs:
       - targets:
           - localhost:9090
 
-  # 后端服务当前直接运行在宿主机，Prometheus 运行在 Docker Desktop 中。
+  # 模块化单体当前直接运行在宿主机，Prometheus 从容器内抓取统一入口。
   - job_name: primary-math-platform
     metrics_path: /actuator/prometheus
     static_configs:
       - targets:
           - host.docker.internal:10000
         labels:
-          service: gateway
-      - targets:
-          - host.docker.internal:8001
-        labels:
-          service: user-service
-      - targets:
-          - host.docker.internal:8002
-        labels:
-          service: file-service
-      - targets:
-          - host.docker.internal:8003
-        labels:
-          service: notification-service
-      - targets:
-          - host.docker.internal:8004
-        labels:
-          service: audit-service
-      - targets:
-          - host.docker.internal:8005
-        labels:
-          service: content-service
-      - targets:
-          - host.docker.internal:8006
-        labels:
-          service: learning-service
-      - targets:
-          - host.docker.internal:8007
-        labels:
-          service: teaching-service
-      - targets:
-          - host.docker.internal:8008
-        labels:
-          service: game-service
+          service: monolith-app

@@ -77,20 +77,24 @@
 
 ### 后端
 
-- Java 21、Spring Boot 4、Spring Cloud 2025、PostgreSQL、MyBatis-Plus、Sa-Token、RabbitMQ、Nacos。
-- 多模块微服务包含 Gateway、用户、内容、学习、教学、游戏、文件、通知和审计服务。
-- 游戏与教学跨服务写入均使用事务发件箱，避免本地事务成功而消息丢失。
+- Java 21、Spring Boot 4、PostgreSQL、MyBatis-Plus、Sa-Token、Redis 和 RabbitMQ。
+- `back` 是默认且唯一维护的模块化单体后端；`monolith-app` 是唯一启动入口，统一提供 `10000` 端口。
+- 用户、内容、学习、教学、游戏、文件、通知和审计仍按 Maven 模块隔离，但运行在同一个 JVM、共享服务器 `monolith_db`。
+- 模块间同步调用使用进程内适配器，事件链路与事务发件箱继续通过 RabbitMQ 保证可靠性；当前运行不依赖 Gateway、Nacos 或服务发现。
+- 微服务实现已从当前分支移除；如答辩后需要重新拆分，以 Git 历史中的 `dev` 分支和保留的 API 契约为基础进行。
 
 ### 前端
 
 - Vue 3 + TypeScript + TDesign Vue Next 管理端，覆盖学生练习、教师教学、学情查看、内容和系统管理、OCR 复核。
 - 原生 TypeScript 微信小程序，覆盖练习、作业、学习档案、OCR 上传与确认、双人 PK。
 
-## 本地验证
+## 开发验证
+
+开发和联调默认使用服务器 PostgreSQL、Redis、RabbitMQ 与单体 API，不在开发机启动本地基础设施。
 
 ```powershell
 cd back
-.\mvnw.cmd test
+.\mvnw.cmd clean verify
 
 cd ..\front\management
 npm run check

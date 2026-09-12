@@ -6,8 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.openapi")
 public class OpenApiProperties {
 
-    private String title = "微服务 API";
-    private String description = "微服务接口文档";
+    private String title = "模块化单体 API";
+    private String description = "模块化单体接口文档";
     private String version = "1.0.0";
 
     public String getTitle() {

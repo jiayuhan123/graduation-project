@@ -6,7 +6,7 @@ import xyz.jiayuhan.userapi.model.response.UserValidationResponse;
 
 import java.util.List;
 
-/** 供其他微服务进行跨库用户引用校验和展示信息解析。 */
+/** 供其他领域模块进行用户引用校验和展示信息解析。 */
 public interface UserDirectoryService {
 
     UserSummaryResponse summary(Long userId);

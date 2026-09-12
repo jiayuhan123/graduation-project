@@ -33,7 +33,7 @@ Value 使用带类型信息的 JSON 序列化。不要在同一批 Key 上混用
 </dependency>
 ```
 
-服务还需要在 `application.yml`、环境变量或配置中心提供 Redis 连接信息：
+单体入口需要在 `application.yml` 或环境变量中提供 Redis 连接信息：
 
 ```yaml
 spring:
@@ -51,6 +51,6 @@ spring:
 
 ## 使用边界
 
-- 本模块面向 Servlet 业务服务。
-- Gateway 基于 WebFlux，不应引用该模块；网关在自身模块中单独引入响应式 Sa-Token 与 Redis 依赖。
-- Redis 凭据不应提交到仓库，生产环境应从环境变量或 Nacos 注入。
+- 本模块面向单体中的 Servlet 业务模块。
+- Redis 与 Sa-Token 由 `monolith-app` 统一装配。
+- Redis 凭据不应提交到仓库，服务器环境应从环境变量注入。

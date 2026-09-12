@@ -118,7 +118,7 @@ public enum ResultCode {
     private final String message;
 
     /**
-     * 对应的 HTTP 状态码。业务码用于客户端精确判断，HTTP 状态用于网关、客户端和监控识别错误类型。
+     * 对应的 HTTP 状态码。业务码用于客户端精确判断，HTTP 状态用于前端、调用方和监控识别错误类型。
      */
     private final Integer httpStatus;
 

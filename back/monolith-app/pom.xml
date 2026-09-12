@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>xyz.jiayuhan</groupId>
+        <artifactId>graduation-project-monomer-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>monolith-app</artifactId>
+    <name>monolith-app</name>
+    <description>小学数学个性化学习平台模块化单体应用</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>user-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>content-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>learning-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>teaching-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>game-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>file-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>notification-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xyz.jiayuhan</groupId>
+            <artifactId>audit-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

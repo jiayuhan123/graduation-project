@@ -5,15 +5,15 @@
 | 子模块 | 能力 | 典型使用方 |
 | --- | --- | --- |
 | `common-core` | `Result`、`PageResult`、错误码、业务异常 | 全部模块 |
-| `common-web` | Spring MVC、Jakarta Validation、统一异常处理 | Servlet 服务 |
-| `common-security` | `X-User-ID` 解析、`UserContext` 与 `/internal/**` 共享令牌校验 | 受网关保护的 Servlet 服务 |
-| `common-data` | PostgreSQL 分页、JSONB、实体审计基类、乐观锁和 UTC 时间填充 | MyBatis-Plus 服务 |
-| `common-redis` | Redis JSON 序列化 | 需要 Redis 的服务 |
-| `common-openapi` | 每个服务的 OpenAPI 元数据自动配置 | HTTP 业务服务 |
-| `common-observability` | `X-Trace-ID` 校验、MDC 与响应头 | Servlet 服务 |
+| `common-web` | Spring MVC、Jakarta Validation、统一异常处理 | Web 领域模块 |
+| `common-security` | Sa-Token、`UserContext` 与 `/internal/**` 共享令牌校验 | 单体入口与领域模块 |
+| `common-data` | PostgreSQL 分页、JSONB、实体审计基类、乐观锁和 UTC 时间填充 | MyBatis-Plus 领域模块 |
+| `common-redis` | Redis JSON 序列化 | 需要 Redis 的模块 |
+| `common-openapi` | 单体 OpenAPI 元数据自动配置 | `monolith-app` |
+| `common-observability` | `X-Trace-ID` 校验、MDC 与响应头 | `monolith-app` |
 | `common-mq` | 交换机、事件契约、Jackson 3 转换器、可靠发布器 | MQ 生产者/消费者 |
 
-依赖保持单向、能力保持可选。Gateway 是 WebFlux，不能引用 `common-web`、`common-security` 或其他 Servlet 专用模块。事件交换机由 `common-mq` 声明；队列、绑定和死信队列由消费者服务拥有。
+依赖保持单向、能力保持可选。HTTP 鉴权和追踪统一由 `monolith-app` 入口处理；事件交换机由 `common-mq` 声明，队列、绑定和死信队列仍由对应消费模块拥有。
 
 ```powershell
 cd back

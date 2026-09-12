@@ -1,6 +1,6 @@
 # User Service 用户与身份服务
 
-`user-service` 是学生、教师和管理员共用的统一身份中心。它负责账号凭证、Sa-Token 会话、微信身份、学生/教师资料、RBAC、内部用户目录和用户生命周期事件；班级、作业、练习、游戏等领域数据由对应微服务保存。
+`user-service` 是单体内的统一身份领域模块，不单独启动或占用端口。它负责账号凭证、Sa-Token 会话、微信身份、学生/教师资料、RBAC、内部用户目录和用户生命周期事件；其他业务数据由对应领域模块维护并统一存入 `monolith_db`。
 
 ## 已实现能力
 
@@ -17,7 +17,7 @@
 - 一个账号可同时拥有学生、教师、管理员等多个角色，分配角色前校验对应 Profile；
 - 数据库存储的 RBAC 角色/权限，并接入 Sa-Token 注解鉴权；
 - 受内部 Token 保护的用户摘要、批量目录和用户/角色有效性校验；
-- 独立 `user-api` 契约模块，提供 Nacos + OpenFeign + LoadBalancer 调用客户端；
+- 独立 `user-api` 契约模块，由单体进程内适配器实现，保留未来拆分能力；
 - Transactional Outbox、RabbitMQ Publisher Confirm、审计事件和用户生命周期事件；
 - PostgreSQL `TIMESTAMPTZ` 对应 Java `OffsetDateTime`，统一按 UTC 写入；
 - OpenAPI、Actuator、Prometheus 和自动化测试。
@@ -64,7 +64,7 @@
 
 ### 内部用户目录
 
-内部接口不经过 Gateway 路由，只允许服务发现直连，并要求请求头 `X-Internal-Token`：
+内部接口不对普通前端开放，仅允许受信任的 OCR 工作器等调用方携带 `X-Internal-Token`：
 
 - `GET /internal/users/{id}`；
 - `POST /internal/users/batch`；
@@ -114,11 +114,11 @@ HTTP 入参统一以 `Request` 结尾，HTTP 出参统一以 `Response` 结尾�
 | `BOOTSTRAP_ADMIN_USERNAME` | 初始管理员用户名 |
 | `BOOTSTRAP_ADMIN_PASSWORD` | 初始管理员密码，必须由环境注入 |
 
-数据库、Redis、RabbitMQ 和 Nacos 连接配置位于 `application-local.yml`、`application-prod.yml`。
+数据库、Redis 和 RabbitMQ 连接由 `monolith-app` 的 `application-server.yml` 与服务器环境变量统一配置。
 
 ## 当前数据库说明
 
-Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。服务当前不执行自动数据库迁移，正式启动前必须按项目建表文档手工创建并核对 `user_db` 结构。已有数据库可执行 `src/main/resources/db/seed.sql` 中幂等的 `ALTER TABLE` 与索引语句，新增 `wechat_web_openid` 和 `wechat_unionid`。
+Java 代码已经按目标表 `t_user`、`sys_student_profile`、`sys_teacher_profile`、RBAC 和发件箱模型编写。当前结构由 `back/database/init-schema.sql` 统一创建到 `monolith_db`，种子数据由 `back/database/seed-data.sql` 统一管理。
 
 历史小程序账号的 UnionID 无法仅凭已有 OpenID 离线推导。上线后应先让这些用户通过新版小程序登录一次完成 UnionID 回填，再开放 Web 扫码登录。
 

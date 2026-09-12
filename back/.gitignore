@@ -1,0 +1,4 @@
+**/target/
+.env
+*.log
+database/tools/*.class

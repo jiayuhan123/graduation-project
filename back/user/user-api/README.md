@@ -1,6 +1,6 @@
 # User API 用户服务调用契约
 
-`user-api` 是用户服务与调用方共享的内部 HTTP 契约模块，不保存业务状态，也不注册为 Nacos 服务。
+`user-api` 是用户领域与其他模块共享的调用契约，不保存业务状态，也不独立运行。
 
 ## 包结构
 
@@ -18,28 +18,11 @@ xyz.jiayuhan.userapi
       └─ UserValidationResponse.java
 ```
 
-调用方只依赖本模块，不依赖 `user-service` 的 Controller、Service、Entity 或 Mapper。`UserFeignClient` 使用 Nacos 中的 `user-service` 服务名，并由 Spring Cloud LoadBalancer 选择实例。
+调用方只依赖本模块，不依赖 `user-service` 的 Controller、Service、Entity 或 Mapper。接口名和 Feign 注解为答辩后重新拆分保留；当前单体不启用 `@EnableFeignClients`，由 `monolith-app` 中的 `LocalUserClient` 直接调用用户领域服务。
 
-## 调用方接入
+## 当前单体接入
 
-在调用方启动类启用指定客户端：
-
-```java
-@EnableFeignClients(clients = UserFeignClient.class)
-@SpringBootApplication
-public class LearningServiceApplication {
-}
-```
-
-配置与用户服务相同的内部 Token：
-
-```yaml
-app:
-  internal-api:
-    token: ${INTERNAL_API_TOKEN:}
-```
-
-调用时直接注入客户端：
+单体入口集中注册本地适配器，业务模块仍按契约注入：
 
 ```java
 @Service
@@ -54,4 +37,4 @@ public class StudentReferenceService {
 }
 ```
 
-`UserFeignConfiguration` 会统一写入 `X-Internal-Token`；未配置 Token 时会在发起请求前明确报错。内部调用不经过 Gateway。
+当前调用不经过 HTTP、Gateway、Nacos 或负载均衡。`UserFeignConfiguration` 仅作为未来重新拆分时的兼容代码保留，不参与单体运行。

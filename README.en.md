@@ -27,8 +27,10 @@ Version 1 uses the compact structure `content module -> knowledge point -> quest
 
 ## Current codebase
 
-- Java 21 / Spring Boot 4 multi-module backend.
-- Existing Gateway, user, file, notification, audit, and shared capability modules.
+- Java 21 / Spring Boot 4 modular monolith in `back`.
+- `monolith-app` is the only runnable backend and exposes all APIs on port `10000`.
+- User, content, learning, teaching, game, file, notification, and audit boundaries remain separate Maven modules in one JVM and one PostgreSQL database.
+- Redis, RabbitMQ, transactional outboxes, and the future extraction contracts remain available; the active runtime does not depend on Gateway, Nacos, or service discovery.
 - Vue 3 management frontend foundation.
 - The student experience is planned as a WeChat mini program.
 

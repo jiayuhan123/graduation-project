@@ -11,4 +11,4 @@
 
 用户身份已独立到 `common-security`，TraceId 已独立到 `common-observability`。需要这些能力的服务应显式引用相应模块，避免 `common-web` 变成不可裁剪的聚合包。
 
-Gateway 基于 WebFlux，不得引用本模块。
+该模块由 `monolith-app` 统一引入，各领域模块不需要重复声明 Web 自动配置。
