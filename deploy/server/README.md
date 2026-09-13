@@ -1,18 +1,19 @@
 # 4C / 4G 单机服务器部署
 
-当前默认架构是一个模块化单体后端。服务器运行 PostgreSQL、Redis、RabbitMQ、Prometheus、Grafana 和 Jenkins；Java 业务只运行 `back/monolith-app`，不再运行 Gateway、Nacos 或八个独立 Java 进程。
+当前默认架构是一个模块化单体后端加独立 FastAPI Agent 服务。服务器运行 PostgreSQL、Redis、RabbitMQ、Prometheus、Grafana、Jenkins 和 `agent-service`；Java 业务只运行 `back/monolith-app`，不再运行 Gateway、Nacos 或八个独立 Java 进程。
 
 ## 资源预算
 
 | 组件 | 内存上限 | 说明 |
 | --- | ---: | --- |
-| PostgreSQL | 256 MB | 单体数据库 `monolith_db` |
+| PostgreSQL + pgvector | 256 MB | 单体数据库与 Agent 向量索引 |
 | Redis | 128 MB | Sa-Token 会话与业务缓存 |
 | RabbitMQ | 320 MB | 领域事件、重试和死信 |
 | Prometheus | 192 MB | 单体指标采集 |
 | Grafana | 160 MB | 指标展示 |
 | Jenkins 控制器 | 640 MB | CI/CD 控制器 |
-| Compose 服务合计 | 1,696 MB | 不含 Java 单体进程 |
+| FastAPI Agent | 512 MB | 模型编排、RAG、记忆与指标 |
+| Compose 服务合计 | 2,208 MB | 不含 Java 单体进程 |
 
 单体 Java 进程在当前低流量阶段建议使用 `-Xms256m -Xmx640m`，数据库连接池默认最大 5。相比原微服务方案，默认运行链路减少了 Nacos、Gateway 和八个独立 JVM，适合当前 4 GB 服务器。
 
@@ -39,6 +40,16 @@ psql -v ON_ERROR_STOP=1 -d monolith_db -f database/seed-data.sql
 ```
 
 当前服务器数据库已在 2026-09-11 完成八库数据迁入，47 张表共 788 行；不要在已有数据的服务器上重复执行迁移或初始化脚本。
+
+PostgreSQL 容器使用与 PostgreSQL 18 兼容的固定版 pgvector 镜像。已有数据库升级时只重建容器，不得删除 `./data/postgres`；FastAPI 首次就绪前会幂等创建 `vector` 扩展和 `ai_*` 表，并使用迁移校验和阻止历史脚本漂移。
+
+教学 Agent 启用前还必须配置 `AI_MODEL_NAME`、`AI_EMBEDDING_MODEL`、模型 API Key、桥接令牌和至少 32 字符的工具签名密钥：
+
+```bash
+docker compose --env-file .env -f docker-compose.yaml -f docker-compose.server.yaml up -d postgres redis agent-service
+curl -fsS http://127.0.0.1:8100/ready
+curl -fsS http://127.0.0.1:8100/metrics >/dev/null
+```
 
 ## 构建并启动单体
 

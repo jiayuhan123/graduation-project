@@ -14,7 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "xyz.jiayuhan.gameservice",
         "xyz.jiayuhan.fileservice",
         "xyz.jiayuhan.notificationservice",
-        "xyz.jiayuhan.auditservice"
+        "xyz.jiayuhan.auditservice",
+        "xyz.jiayuhan.aiservice"
 })
 @MapperScan({
         "xyz.jiayuhan.userservice.mapper",

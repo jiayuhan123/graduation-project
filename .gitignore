@@ -6,6 +6,12 @@ bin-release/
 target/
 dist/
 node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+*.py[cod]
+/agent-service/build/
 
 # IDE and local environment
 .idea/

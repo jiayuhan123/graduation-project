@@ -17,3 +17,11 @@ scrape_configs:
           - host.docker.internal:10000
         labels:
           service: monolith-app
+
+  - job_name: primary-math-agent
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - agent-service:8100
+        labels:
+          service: agent-service

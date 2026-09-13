@@ -29,7 +29,8 @@ Version 1 uses the compact structure `content module -> knowledge point -> quest
 
 - Java 21 / Spring Boot 4 modular monolith in `back`.
 - `monolith-app` is the only runnable backend and exposes all APIs on port `10000`.
-- User, content, learning, teaching, game, file, notification, and audit boundaries remain separate Maven modules in one JVM and one PostgreSQL database.
+- User, content, learning, teaching, game, file, notification, audit, and AI integration boundaries remain separate Maven modules in one JVM and one PostgreSQL database.
+- A standalone FastAPI Agent service performs multi-round model orchestration and calls only signed Java tools. It now includes pgvector-backed hybrid RAG with citations, Redis short-term memory, isolated semantic long-term memory, run/tool traces, explicit feedback, rate limits, Prometheus metrics, and offline evaluation cases. Java remains responsible for identity, authorization, question constraints, confirmation, and domain writes; student alert identities are pseudonymized before model calls, and common credentials are redacted from traces and long-term memory.
 - Redis, RabbitMQ, transactional outboxes, and the future extraction contracts remain available; the active runtime does not depend on Gateway, Nacos, or service discovery.
 - Vue 3 management frontend foundation.
 - The student experience is planned as a WeChat mini program.

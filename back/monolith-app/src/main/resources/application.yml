@@ -79,8 +79,17 @@ app:
     token: ${INTERNAL_API_TOKEN:}
   openapi:
     title: 小学数学个性化学习平台 API
-    description: 用户、内容、学习、教学、游戏、文件、通知与审计模块化单体接口
+    description: 用户、内容、学习、教学、游戏、文件、通知、审计与 AI Agent 模块化单体接口
     version: 1.0.0
+  ai:
+    enabled: ${AI_ENABLED:false}
+    agent-base-url: ${AI_AGENT_BASE_URL:http://localhost:8100}
+    bridge-token: ${AI_AGENT_BRIDGE_TOKEN:}
+    tool-signing-secret: ${AI_TOOL_SIGNING_SECRET:}
+    tool-token-ttl: ${AI_TOOL_TOKEN_TTL:5m}
+    action-token-ttl: ${AI_ACTION_TOKEN_TTL:15m}
+    stream-timeout: ${AI_STREAM_TIMEOUT:120s}
+    connect-timeout: ${AI_CONNECT_TIMEOUT:5s}
   mq:
     confirm-timeout: ${MQ_CONFIRM_TIMEOUT:5s}
     outbox:

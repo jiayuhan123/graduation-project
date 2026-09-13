@@ -2,6 +2,17 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const teachingRoutes: RouteRecordRaw[] = [
   {
+    path: 'ai/teaching-agent',
+    name: 'teaching-agent',
+    component: () => import('@/views/ai/TeachingAgentView.vue'),
+    meta: {
+      title: '教学 Agent',
+      requiresAuth: true,
+      roles: ['teacher', 'admin'],
+      permissions: ['teaching:report:query'],
+    },
+  },
+  {
     path: 'teaching/classes',
     name: 'teaching-classes',
     component: () => import('@/views/teaching/ClassListView.vue'),

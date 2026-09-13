@@ -2,6 +2,17 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const contentRoutes: RouteRecordRaw[] = [
   {
+    path: 'ai/knowledge-base',
+    name: 'ai-knowledge-base',
+    component: () => import('@/views/ai/AgentKnowledgeView.vue'),
+    meta: {
+      title: 'Agent 知识库',
+      requiresAuth: true,
+      roles: ['admin'],
+      permissions: ['content:manage'],
+    },
+  },
+  {
     path: 'content/modules',
     name: 'content-modules',
     component: () => import('@/views/content/ModuleListView.vue'),

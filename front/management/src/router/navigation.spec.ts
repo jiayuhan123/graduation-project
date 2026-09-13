@@ -32,6 +32,17 @@ describe('工作空间入口', () => {
     expect(paths).not.toContain('/account/student')
   })
 
+  it('教学 Agent 只对具有学情权限的教师开放', () => {
+    expect(pathsFor(['teacher'], ['teaching:report:query'])).toContain('/ai/teaching-agent')
+    expect(pathsFor(['teacher'], ['teaching:class:manage'])).not.toContain('/ai/teaching-agent')
+  })
+
+  it('Agent 知识库只向具有内容管理权限的管理员开放', () => {
+    expect(pathsFor(['admin'], ['content:manage'])).toContain('/ai/knowledge-base')
+    expect(pathsFor(['admin'], ['teaching:report:query'])).not.toContain('/ai/knowledge-base')
+    expect(pathsFor(['teacher'], ['content:manage'])).not.toContain('/ai/knowledge-base')
+  })
+
   it('保留按权限开放的内容管理，并将账号设置放在末尾', () => {
     const groups = getVisibleNavigationGroups({
       roles: ['teacher'],

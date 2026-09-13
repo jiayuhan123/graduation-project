@@ -28,6 +28,7 @@
         <module>file-service</module>
         <module>notification-service</module>
         <module>audit-service</module>
+        <module>ai</module>
         <module>monolith-app</module>
     </modules>
 
@@ -166,6 +167,16 @@
             <dependency>
                 <groupId>xyz.jiayuhan</groupId>
                 <artifactId>audit-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>ai-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>xyz.jiayuhan</groupId>
+                <artifactId>ai-service</artifactId>
                 <version>${revision}</version>
             </dependency>
 

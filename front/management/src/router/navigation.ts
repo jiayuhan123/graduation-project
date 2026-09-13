@@ -35,6 +35,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
     title: '教学工作',
     items: [
       {
+        title: '教学 Agent',
+        path: '/ai/teaching-agent',
+        icon: 'target',
+        roles: ['teacher'],
+        permissions: ['teaching:report:query'],
+      },
+      {
         title: '班级管理',
         path: '/teaching/classes',
         icon: 'users',
@@ -89,11 +96,25 @@ export const navigationGroups: readonly NavigationGroup[] = [
     title: '平台管理',
     items: [
       {
+        title: '教学 Agent',
+        path: '/ai/teaching-agent',
+        icon: 'target',
+        roles: ['admin'],
+        permissions: ['teaching:report:query'],
+      },
+      {
         title: '运营总览',
         path: '/system/operations',
         icon: 'document',
         roles: ['admin'],
         permissions: ['teaching:report:query'],
+      },
+      {
+        title: 'Agent 知识库',
+        path: '/ai/knowledge-base',
+        icon: 'book',
+        roles: ['admin'],
+        permissions: ['content:manage'],
       },
       {
         title: '内容模块',
