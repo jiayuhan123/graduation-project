@@ -1,7 +1,11 @@
 FROM python:3.12-slim
 
+ARG PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PIP_DEFAULT_TIMEOUT=180 \
+    PIP_RETRIES=10
 
 WORKDIR /app
 
