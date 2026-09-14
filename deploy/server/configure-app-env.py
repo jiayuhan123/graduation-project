@@ -55,7 +55,7 @@ def main() -> None:
         "AI_ENABLED": "true",
         "AI_AGENT_BRIDGE_TOKEN": keep_or_create("AI_AGENT_BRIDGE_TOKEN"),
         "AI_TOOL_SIGNING_SECRET": keep_or_create("AI_TOOL_SIGNING_SECRET"),
-        "AI_MODEL_BASE_URL": "https://ws-jdiax7uwwausz7gi.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+        "AI_MODEL_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
         "AI_MODEL_API_KEY": api_key,
         "AI_MODEL_NAME": "qwen3.7-plus",
         "AI_EMBEDDING_MODEL": "qwen3.7-text-embedding",
