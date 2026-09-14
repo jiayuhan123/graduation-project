@@ -19,7 +19,7 @@ COPY ai ai
 COPY monolith-app monolith-app
 
 RUN chmod +x mvnw \
-    && ./mvnw -B -ntp -pl monolith-app -am -DskipTests package
+    && ./mvnw -B -ntp -s .mvn/settings-docker.xml -pl monolith-app -am -DskipTests package
 
 FROM eclipse-temurin:21-jre-jammy
 
