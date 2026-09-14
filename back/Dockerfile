@@ -18,7 +18,8 @@ COPY audit-service audit-service
 COPY ai ai
 COPY monolith-app monolith-app
 
-RUN chmod +x mvnw \
+RUN sed -i 's/\r$//' mvnw \
+    && chmod +x mvnw \
     && ./mvnw -B -ntp -s .mvn/settings-docker.xml -pl monolith-app -am -DskipTests package
 
 FROM eclipse-temurin:21-jre-jammy
