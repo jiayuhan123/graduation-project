@@ -66,6 +66,13 @@ def main() -> None:
         "AI_MAX_CONCURRENT_RUNS": "12",
         "AI_DOCS_ENABLED": "false",
         "JAVA_OPTS": "-Xms256m -Xmx640m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError",
+        # Non-empty placeholders let the demo start without an OSS account.
+        # Replace these five values before demonstrating file uploads.
+        "OSS_REGION": current.get("OSS_REGION") or "cn-beijing",
+        "OSS_ENDPOINT": current.get("OSS_ENDPOINT") or "https://oss-cn-beijing.aliyuncs.com",
+        "OSS_ACCESS_KEY_ID": current.get("OSS_ACCESS_KEY_ID") or "demo-disabled",
+        "OSS_ACCESS_KEY_SECRET": current.get("OSS_ACCESS_KEY_SECRET") or "demo-disabled",
+        "OSS_BUCKET": current.get("OSS_BUCKET") or "demo-disabled",
     }
 
     if ENV_PATH.exists():
