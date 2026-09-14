@@ -14,7 +14,7 @@ import xyz.jiayuhan.notificationservice.entity.Notification;
 import xyz.jiayuhan.notificationservice.mapper.NotificationMapper;
 import xyz.jiayuhan.notificationservice.model.NotificationVO;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /** PostgreSQL 站内通知实现，并以来源事件 ID 保证 RabbitMQ 消费幂等。 */
@@ -58,7 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .eq(Notification::getId, notificationId)
                 .eq(Notification::getUserId, userId)
                 .set(Notification::getRead, true)
-                .set(Notification::getReadAt, LocalDateTime.now()));
+                .set(Notification::getReadAt, OffsetDateTime.now()));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .eq(Notification::getUserId, userId)
                 .eq(Notification::getRead, false)
                 .set(Notification::getRead, true)
-                .set(Notification::getReadAt, LocalDateTime.now()));
+                .set(Notification::getReadAt, OffsetDateTime.now()));
     }
 
     @Override

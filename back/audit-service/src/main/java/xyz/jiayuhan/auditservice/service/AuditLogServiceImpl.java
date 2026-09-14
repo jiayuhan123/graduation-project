@@ -13,7 +13,7 @@ import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.common.mq.event.AuditLogEvent;
 import xyz.jiayuhan.common.mq.event.UserRegisteredEvent;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
@@ -35,7 +35,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 "USER",
                 String.valueOf(event.userId()),
                 "username=" + event.username(),
-                LocalDateTime.ofInstant(event.occurredAt(), ZoneId.systemDefault()));
+                OffsetDateTime.ofInstant(event.occurredAt(), ZoneId.systemDefault()));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 event.targetType(),
                 event.targetId(),
                 event.detail(),
-                LocalDateTime.ofInstant(event.occurredAt(), ZoneId.systemDefault()));
+                OffsetDateTime.ofInstant(event.occurredAt(), ZoneId.systemDefault()));
     }
 
     @Override
@@ -81,8 +81,8 @@ public class AuditLogServiceImpl implements AuditLogService {
             String action,
             String targetType,
             String targetId,
-            LocalDateTime occurredFrom,
-            LocalDateTime occurredTo) {
+            OffsetDateTime occurredFrom,
+            OffsetDateTime occurredTo) {
         Page<AuditLog> result = auditLogMapper.selectPage(
                 new Page<>(page, size),
                 new LambdaQueryWrapper<AuditLog>()
@@ -108,7 +108,7 @@ public class AuditLogServiceImpl implements AuditLogService {
             String targetType,
             String targetId,
             String detail,
-            LocalDateTime occurredAt) {
+            OffsetDateTime occurredAt) {
         boolean consumed = auditLogMapper.exists(
                 new LambdaQueryWrapper<AuditLog>().eq(AuditLog::getEventId, eventId));
         if (consumed) {

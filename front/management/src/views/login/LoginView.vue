@@ -28,8 +28,10 @@ const userStore = useUserStore()
 
 const loginMode = ref<'wechat' | 'password'>('password')
 const passwordLoading = ref(false)
+const demoLoading = ref<'teacher' | 'student' | null>(null)
 const wechatLoading = ref(false)
 const wechatLoginAvailable = appConfig.wechatWebLoginEnabled
+const demoPassword = 'Demo@2026'
 
 const passwordForm = reactive<LoginParams>({ username: '', password: '' })
 const wechatForm = reactive<WechatWebAuthorizeInput>({ gradeLevel: 3, semester: 1 })
@@ -39,15 +41,32 @@ const passwordRules: FormRules<LoginParams> = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
-async function handlePasswordLogin(context: SubmitContext) {
-  if (context.validateResult !== true) return
+async function completePasswordLogin(params: LoginParams) {
   passwordLoading.value = true
   try {
-    await userStore.login({ ...passwordForm, username: passwordForm.username.trim() })
+    await userStore.login(params)
     void MessagePlugin.success('登录成功')
     await router.replace(safeRedirect(route.query.redirect, '/dashboard'))
   } finally {
     passwordLoading.value = false
+  }
+}
+
+async function handlePasswordLogin(context: SubmitContext) {
+  if (context.validateResult !== true) return
+  await completePasswordLogin({ ...passwordForm, username: passwordForm.username.trim() })
+}
+
+async function loginAsDemo(role: 'teacher' | 'student') {
+  if (passwordLoading.value) return
+  const username = role === 'teacher' ? 'demo_teacher' : 'demo_student'
+  passwordForm.username = username
+  passwordForm.password = demoPassword
+  demoLoading.value = role
+  try {
+    await completePasswordLogin({ username, password: demoPassword })
+  } finally {
+    demoLoading.value = null
   }
 }
 
@@ -197,6 +216,32 @@ async function handleWechatLogin() {
         :rules="passwordRules"
         @submit="handlePasswordLogin"
       >
+        <div class="demo-accounts">
+          <div>
+            <strong>公开演示账号</strong>
+            <span>无需注册，选择身份即可进入完整示例数据。</span>
+          </div>
+          <div class="demo-account-actions">
+            <t-button
+              type="button"
+              variant="outline"
+              :loading="demoLoading === 'teacher'"
+              :disabled="passwordLoading && demoLoading !== 'teacher'"
+              @click="loginAsDemo('teacher')"
+            >
+              体验教师端
+            </t-button>
+            <t-button
+              type="button"
+              variant="outline"
+              :loading="demoLoading === 'student'"
+              :disabled="passwordLoading && demoLoading !== 'student'"
+              @click="loginAsDemo('student')"
+            >
+              体验学生端
+            </t-button>
+          </div>
+        </div>
         <t-form-item label="用户名 / 手机号 / 邮箱" name="username">
           <t-input
             v-model="passwordForm.username"
@@ -424,6 +469,39 @@ async function handleWechatLogin() {
 
 .password-form :deep(.t-form__item) {
   margin-bottom: 22px;
+}
+
+.demo-accounts {
+  display: grid;
+  margin-bottom: 18px;
+  padding: 13px 14px;
+  border: 1px solid #c9d9f4;
+  border-radius: 12px;
+  background: #f5f8ff;
+  gap: 11px;
+}
+
+.demo-accounts strong,
+.demo-accounts span {
+  display: block;
+}
+
+.demo-accounts strong {
+  color: #20304b;
+  font-size: 14px;
+}
+
+.demo-accounts span {
+  margin-top: 3px;
+  color: #6d7b91;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.demo-account-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .wechat-visual {

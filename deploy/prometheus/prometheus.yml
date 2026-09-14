@@ -9,12 +9,12 @@ scrape_configs:
       - targets:
           - localhost:9090
 
-  # 模块化单体当前直接运行在宿主机，Prometheus 从容器内抓取统一入口。
+  # Java 单体与 Prometheus 位于同一个平台网络，通过容器服务名抓取指标。
   - job_name: primary-math-platform
     metrics_path: /actuator/prometheus
     static_configs:
       - targets:
-          - host.docker.internal:10000
+          - monolith-app:10000
         labels:
           service: monolith-app
 

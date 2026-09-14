@@ -55,8 +55,8 @@ class Settings:
     model_timeout_seconds: int
     max_tool_rounds: int
     embedding_model: str = ""
-    embedding_dimensions: int = 1536
-    embedding_batch_size: int = 32
+    embedding_dimensions: int = 1024
+    embedding_batch_size: int = 20
     database_url: str = "postgresql://postgres:postgres@postgres:5432/monolith_db"
     database_pool_min_size: int = 2
     database_pool_max_size: int = 10
@@ -88,8 +88,8 @@ class Settings:
             model_timeout_seconds=_integer("AI_MODEL_TIMEOUT_SECONDS", 60),
             max_tool_rounds=_integer("AI_MAX_TOOL_ROUNDS", 4),
             embedding_model=os.getenv("AI_EMBEDDING_MODEL", ""),
-            embedding_dimensions=_integer("AI_EMBEDDING_DIMENSIONS", 1536),
-            embedding_batch_size=_integer("AI_EMBEDDING_BATCH_SIZE", 32),
+            embedding_dimensions=_integer("AI_EMBEDDING_DIMENSIONS", 1024),
+            embedding_batch_size=_integer("AI_EMBEDDING_BATCH_SIZE", 20),
             database_url=_database_url(),
             database_pool_min_size=_integer("AI_DATABASE_POOL_MIN_SIZE", 2),
             database_pool_max_size=_integer("AI_DATABASE_POOL_MAX_SIZE", 10),

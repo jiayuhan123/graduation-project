@@ -18,7 +18,7 @@ import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.common.core.result.Result;
 import xyz.jiayuhan.common.security.context.UserContext;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /** 当前用户个人操作审计查询接口；全局管理审计需在具体毕设业务中另设管理员权限点。 */
 @Tag(name = "操作审计")
@@ -52,9 +52,9 @@ public class AuditLogController {
             @RequestParam(required = false) String targetType,
             @RequestParam(required = false) String targetId,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime occurredFrom,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime occurredFrom,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime occurredTo) {
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime occurredTo) {
         Long requesterId = UserContext.requireUserId();
         authorizationService.requireAdmin(requesterId);
         return Result.success(auditLogService.page(

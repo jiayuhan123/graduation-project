@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /** 由跨服务领域事件生成的不可变操作审计记录。 */
@@ -27,8 +27,8 @@ public class AuditLog {
     private String targetType;
     private String targetId;
     private String detail;
-    private LocalDateTime occurredAt;
+    private OffsetDateTime occurredAt;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

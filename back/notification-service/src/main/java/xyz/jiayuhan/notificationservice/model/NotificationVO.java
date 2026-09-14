@@ -1,6 +1,6 @@
 package xyz.jiayuhan.notificationservice.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -20,7 +20,7 @@ public record NotificationVO(
         String title,
         String content,
         boolean read,
-        LocalDateTime readAt,
-        LocalDateTime createdAt
+        OffsetDateTime readAt,
+        OffsetDateTime createdAt
 ) {
 }

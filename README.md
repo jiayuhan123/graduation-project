@@ -117,6 +117,24 @@ cd ..\..\agent-service
 python -m pytest
 ```
 
+## 作品集演示数据
+
+核心结构和基础题库初始化完成后，可以单独装载作品集演示数据。该脚本使用固定 ID、可重复执行，不修改基础题库和非演示账号；不要将公开演示账号用于正式业务环境。
+
+```bash
+cd back/database
+psql -v ON_ERROR_STOP=1 -d monolith_db -f demo-data.sql
+psql -v ON_ERROR_STOP=1 -d monolith_db -f verify-demo-data.sql
+```
+
+演示入口：
+
+- 教师端：`demo_teacher` / `Demo@2026`
+- 学生端：`demo_student` / `Demo@2026`
+- 班级码：`DEMO2026`
+
+需要重新生成相对当前日期的作业和趋势数据时，直接再次执行 `demo-data.sql`。需要移除演示数据时，执行 `demo-data-reset.sql`；该脚本只清理 81–89 固定编号段内的演示记录。
+
 ## 文档
 
 - [系统功能总结（教师反馈收敛版）](./文档/系统功能总结.docx)

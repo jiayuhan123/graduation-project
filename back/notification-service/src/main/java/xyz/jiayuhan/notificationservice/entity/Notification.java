@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /** 用户站内通知实体。 */
@@ -28,13 +28,14 @@ public class Notification {
     private String content;
 
     /** 是否已读。 */
+    @TableField("is_read")
     private Boolean read;
 
-    private LocalDateTime readAt;
+    private OffsetDateTime readAt;
 
     /** 触发通知的领域事件 ID，用唯一约束保证消息重复投递时不重复建通知。 */
     private UUID sourceEventId;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

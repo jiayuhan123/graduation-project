@@ -1,6 +1,6 @@
 package xyz.jiayuhan.auditservice.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -22,6 +22,6 @@ public record AuditLogVO(
         String targetType,
         String targetId,
         String detail,
-        LocalDateTime occurredAt
+        OffsetDateTime occurredAt
 ) {
 }

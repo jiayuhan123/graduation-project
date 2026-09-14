@@ -1,0 +1,126 @@
+name: ${APP_COMPOSE_PROJECT_NAME:-primary-math-platform-app}
+
+x-app-logging: &app-logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  agent-service:
+    build:
+      context: ../../agent-service
+      dockerfile: Dockerfile
+    image: primary-math-platform-agent:local
+    container_name: primary-math-platform-agent-service
+    restart: unless-stopped
+    environment:
+      AI_AGENT_BRIDGE_TOKEN: "${AI_AGENT_BRIDGE_TOKEN:?请设置 AI_AGENT_BRIDGE_TOKEN}"
+      INTERNAL_API_TOKEN: "${INTERNAL_API_TOKEN:?请设置 INTERNAL_API_TOKEN}"
+      AI_MODEL_BASE_URL: "${AI_MODEL_BASE_URL:?请设置 AI_MODEL_BASE_URL}"
+      AI_MODEL_API_KEY: "${AI_MODEL_API_KEY:?请设置 AI_MODEL_API_KEY}"
+      AI_MODEL_NAME: "${AI_MODEL_NAME:-qwen3.7-plus}"
+      AI_EMBEDDING_MODEL: "${AI_EMBEDDING_MODEL:-qwen3.7-text-embedding}"
+      AI_EMBEDDING_DIMENSIONS: "${AI_EMBEDDING_DIMENSIONS:-1024}"
+      AI_EMBEDDING_BATCH_SIZE: "${AI_EMBEDDING_BATCH_SIZE:-20}"
+      AI_MODEL_TIMEOUT_SECONDS: "${AI_MODEL_TIMEOUT_SECONDS:-60}"
+      AI_MAX_TOOL_ROUNDS: "${AI_MAX_TOOL_ROUNDS:-4}"
+      AI_DB_HOST: postgres
+      AI_DB_PORT: "5432"
+      AI_DB_USERNAME: "${DB_USERNAME:?请设置 DB_USERNAME}"
+      AI_DB_PASSWORD: "${DB_PASSWORD:?请设置 DB_PASSWORD}"
+      AI_DB_NAME: "${MONOLITH_DB_NAME:-monolith_db}"
+      AI_DATABASE_POOL_MIN_SIZE: "${AI_DATABASE_POOL_MIN_SIZE:-1}"
+      AI_DATABASE_POOL_MAX_SIZE: "${AI_DATABASE_POOL_MAX_SIZE:-5}"
+      AI_REDIS_HOST: redis
+      AI_REDIS_PORT: "6379"
+      AI_REDIS_PASSWORD: "${REDIS_PASSWORD:?请设置 REDIS_PASSWORD}"
+      AI_REDIS_DATABASE: "${REDIS_DATABASE:-0}"
+      AI_CONVERSATION_MEMORY_TTL_SECONDS: "${AI_CONVERSATION_MEMORY_TTL_SECONDS:-604800}"
+      AI_CONVERSATION_MAX_MESSAGES: "${AI_CONVERSATION_MAX_MESSAGES:-20}"
+      AI_CONTEXT_HISTORY_CHARS: "${AI_CONTEXT_HISTORY_CHARS:-24000}"
+      AI_RAG_TOP_K: "${AI_RAG_TOP_K:-6}"
+      AI_RAG_CANDIDATE_K: "${AI_RAG_CANDIDATE_K:-24}"
+      AI_RAG_MIN_SCORE: "${AI_RAG_MIN_SCORE:-0.5}"
+      AI_MEMORY_TOP_K: "${AI_MEMORY_TOP_K:-4}"
+      AI_MEMORY_RETENTION_DAYS: "${AI_MEMORY_RETENTION_DAYS:-180}"
+      AI_TRACE_RETENTION_DAYS: "${AI_TRACE_RETENTION_DAYS:-90}"
+      AI_MAX_REQUESTS_PER_MINUTE: "${AI_MAX_REQUESTS_PER_MINUTE:-20}"
+      AI_MAX_CONCURRENT_RUNS: "${AI_MAX_CONCURRENT_RUNS:-12}"
+      AI_DOCS_ENABLED: "${AI_DOCS_ENABLED:-false}"
+      JAVA_AI_TOOL_BASE_URL: http://monolith-app:10000
+      TZ: "${TZ:-Asia/Shanghai}"
+    ports:
+      - "127.0.0.1:${AI_AGENT_PORT:-8100}:8100"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 15s
+    mem_limit: 512m
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    logging: *app-logging
+    networks:
+      - platform-net
+
+  monolith-app:
+    build:
+      context: ../../back
+      dockerfile: Dockerfile
+    image: primary-math-platform-monolith:local
+    container_name: primary-math-platform-monolith-app
+    restart: unless-stopped
+    depends_on:
+      agent-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: server
+      SERVER_PORT: "10000"
+      TZ: "${TZ:-Asia/Shanghai}"
+      DB_HOST: postgres
+      POSTGRES_PORT: "5432"
+      MONOLITH_DB_NAME: "${MONOLITH_DB_NAME:-monolith_db}"
+      DB_USERNAME: "${DB_USERNAME:?请设置 DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD:?请设置 DB_PASSWORD}"
+      DB_POOL_MAX_SIZE: "${DB_POOL_MAX_SIZE:-5}"
+      DB_POOL_MIN_IDLE: "${DB_POOL_MIN_IDLE:-1}"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:?请设置 REDIS_PASSWORD}"
+      REDIS_DATABASE: "${REDIS_DATABASE:-0}"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USERNAME: "${RABBITMQ_USERNAME:?请设置 RABBITMQ_USERNAME}"
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD:?请设置 RABBITMQ_PASSWORD}"
+      RABBITMQ_VHOST: "${RABBITMQ_VHOST:-/}"
+      INTERNAL_API_ENABLED: "true"
+      INTERNAL_API_TOKEN: "${INTERNAL_API_TOKEN:?请设置 INTERNAL_API_TOKEN}"
+      AI_ENABLED: "true"
+      AI_AGENT_BASE_URL: http://agent-service:8100
+      AI_AGENT_BRIDGE_TOKEN: "${AI_AGENT_BRIDGE_TOKEN:?请设置 AI_AGENT_BRIDGE_TOKEN}"
+      AI_TOOL_SIGNING_SECRET: "${AI_TOOL_SIGNING_SECRET:?请设置 AI_TOOL_SIGNING_SECRET}"
+      BOOTSTRAP_ADMIN_ENABLED: "false"
+      JAVA_OPTS: "${JAVA_OPTS:--Xms256m -Xmx640m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError}"
+    ports:
+      - "127.0.0.1:${SERVER_PORT:-10000}:10000"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/10000; printf 'GET /actuator/health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep -q '200' <&3"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    mem_limit: 768m
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m
+    logging: *app-logging
+    networks:
+      - platform-net
+
+networks:
+  platform-net:
+    external: true
+    name: "${INFRA_NETWORK_NAME:-primary-math-platform_local-net}"

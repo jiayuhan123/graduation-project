@@ -1,0 +1,23 @@
+:80 {
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    @api path /api/*
+    handle @api {
+        reverse_proxy monolith-app:10000 {
+            flush_interval -1
+        }
+    }
+
+    handle {
+        root * /data/site
+        try_files {path} /index.html
+        file_server
+    }
+}

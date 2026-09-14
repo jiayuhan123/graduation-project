@@ -5,7 +5,7 @@ import xyz.jiayuhan.common.core.model.PageResult;
 import xyz.jiayuhan.common.mq.event.AuditLogEvent;
 import xyz.jiayuhan.common.mq.event.UserRegisteredEvent;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /** 审计事件幂等入库与当前用户审计查询服务。 */
 public interface AuditLogService {
@@ -24,6 +24,6 @@ public interface AuditLogService {
             String action,
             String targetType,
             String targetId,
-            LocalDateTime occurredFrom,
-            LocalDateTime occurredTo);
+            OffsetDateTime occurredFrom,
+            OffsetDateTime occurredTo);
 }

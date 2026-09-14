@@ -35,6 +35,8 @@ python -m venv .venv
 - `AI_REDIS_URL` 或 `AI_REDIS_*`：短期记忆和限流 Redis；
 - `JAVA_AI_TOOL_BASE_URL`：Java 单体内部工具地址。
 
+阿里云百炼北京地域推荐配置：`AI_MODEL_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1`、`AI_MODEL_NAME=qwen3.7-plus`、`AI_EMBEDDING_MODEL=qwen3.7-text-embedding`、`AI_EMBEDDING_DIMENSIONS=1024`、`AI_EMBEDDING_BATCH_SIZE=20`。向量维度必须在首次数据库迁移前确定，上线后不可直接修改。
+
 首次启动会在 PostgreSQL advisory lock 下执行带校验和的版本化迁移。修改已执行迁移会让启动失败；后续结构变更必须新增 `Vxxx__*.sql`。
 容器构建使用 `requirements.lock` 约束完整依赖树，更新依赖后应重新执行测试、Ruff 和离线评测再更新锁文件。
 

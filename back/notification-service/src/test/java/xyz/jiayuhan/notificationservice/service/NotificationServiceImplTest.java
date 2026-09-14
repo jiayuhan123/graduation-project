@@ -1,5 +1,6 @@
 package xyz.jiayuhan.notificationservice.service;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,6 +12,7 @@ import xyz.jiayuhan.notificationservice.entity.Notification;
 import xyz.jiayuhan.notificationservice.mapper.NotificationMapper;
 
 import java.time.Instant;
+import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +30,13 @@ class NotificationServiceImplTest {
 
     @InjectMocks
     private NotificationServiceImpl notificationService;
+
+    @Test
+    void shouldMapReadPropertyToIsReadColumn() throws NoSuchFieldException {
+        Field field = Notification.class.getDeclaredField("read");
+
+        assertThat(field.getAnnotation(TableField.class).value()).isEqualTo("is_read");
+    }
 
     @Test
     void shouldCreateWelcomeNotificationForNewEvent() {
