@@ -9,7 +9,8 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import FastAPI, Header, HTTPException, Request, Response, status
-from fastapi.responses import StreamingResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, StreamingResponse
 from prometheus_client import CONTENT_TYPE_LATEST
 from redis.asyncio import Redis
 
@@ -104,6 +105,30 @@ app = FastAPI(
     redoc_url=None,
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_handler(
+    request: Request, exception: RequestValidationError
+) -> JSONResponse:
+    """记录可诊断的字段错误，但不把请求正文或内部令牌写入日志。"""
+    safe_errors = [
+        {
+            "type": error.get("type", "validation_error"),
+            "loc": [str(item) for item in error.get("loc", ())],
+            "msg": error.get("msg", "Invalid request"),
+        }
+        for error in exception.errors()
+    ]
+    logger.warning(
+        "request validation failed path=%s errors=%s",
+        request.url.path,
+        safe_errors,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": safe_errors},
+    )
 
 
 @app.get("/health")
