@@ -126,7 +126,7 @@ async def request_validation_handler(
         safe_errors,
     )
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={"detail": safe_errors},
     )
 
