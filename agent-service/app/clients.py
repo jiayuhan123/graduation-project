@@ -56,7 +56,12 @@ class ModelClient:
                 if not data or data == "[DONE]":
                     continue
                 payload = json.loads(data)
-                delta = payload.get("choices", [{}])[0].get("delta", {}).get("content")
+                # OpenAI-compatible providers may append a usage-only chunk whose
+                # choices array is empty. It is metadata, not a malformed response.
+                choices = payload.get("choices") or []
+                if not choices:
+                    continue
+                delta = choices[0].get("delta", {}).get("content")
                 if delta:
                     yield delta
 

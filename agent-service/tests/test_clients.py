@@ -5,8 +5,40 @@ import json
 import httpx
 import pytest
 
-from app.clients import EmbeddingClient
+from app.clients import EmbeddingClient, ModelClient
 from app.config import Settings
+
+
+@pytest.mark.asyncio
+async def test_model_stream_ignores_usage_chunk_with_empty_choices() -> None:
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            headers={"Content-Type": "text/event-stream"},
+            text=(
+                'data: {"choices":[{"delta":{"content":"分析完成"}}]}\n\n'
+                'data: {"choices":[],"usage":{"total_tokens":42}}\n\n'
+                "data: [DONE]\n\n"
+            ),
+        )
+
+    settings = Settings(
+        bridge_token="bridge",
+        java_tool_base_url="http://java",
+        java_internal_api_token="internal",
+        model_base_url="http://model/v1",
+        model_api_key="key",
+        model_name="chat-model",
+        model_timeout_seconds=5,
+        max_tool_rounds=4,
+    )
+    http = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    client = ModelClient(settings, http)
+
+    chunks = [chunk async for chunk in client.stream_answer([{"role": "user", "content": "x"}])]
+
+    assert chunks == ["分析完成"]
+    await client.close()
 
 
 @pytest.mark.asyncio
