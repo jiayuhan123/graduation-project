@@ -3,14 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from datetime import UTC, datetime, timedelta
 from importlib import resources
 from typing import Any
 from uuid import UUID, uuid4
 
 import asyncpg
-import numpy as np
-from pgvector.asyncpg import register_vector
 
 from app.config import Settings
 from app.models import FeedbackRequest, KnowledgeDocumentView, KnowledgeUpsertRequest
@@ -36,7 +33,7 @@ def _bounded_value(value: Any, limit: int) -> Any:
 
 
 def redact_sensitive_text(value: str) -> str:
-    """Best-effort removal of credentials accidentally pasted into prompts or results."""
+    """Best-effort removal of credentials accidentally pasted into traces or memory."""
 
     redacted = _SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", value)
     redacted = _CHINESE_SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", redacted)
@@ -64,7 +61,7 @@ def redact_trace_data(value: Any) -> Any:
 
 
 class Database:
-    """Agent-owned PostgreSQL storage with versioned, checksummed migrations."""
+    """Domain records and audits; vectors/checkpoints are owned by framework adapters."""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -101,7 +98,6 @@ class Database:
             await conn.set_type_codec(
                 "jsonb", schema="pg_catalog", encoder=_json, decoder=json.loads, format="text"
             )
-            await register_vector(conn)
 
         self._pool = await asyncpg.create_pool(
             self._settings.database_url,
@@ -142,35 +138,36 @@ class Database:
     async def ping(self) -> bool:
         try:
             return bool(await self.pool.fetchval("SELECT TRUE"))
-        except Exception:  # noqa: BLE001 - 健康探针只返回布尔状态。
+        except Exception:  # noqa: BLE001 - readiness deliberately returns one boolean.
             return False
 
-    async def upsert_knowledge(
-        self,
-        request: KnowledgeUpsertRequest,
-        checksum: str,
-        chunks: list[tuple[str, int, list[float], dict[str, Any]]],
-    ) -> KnowledgeDocumentView:
+    async def table_exists(self, table_name: str) -> bool:
+        return bool(await self.pool.fetchval("SELECT to_regclass($1) IS NOT NULL", table_name))
+
+    async def prepare_knowledge(
+        self, request: KnowledgeUpsertRequest, checksum: str
+    ) -> tuple[UUID, bool]:
+        """Reserve the source URI and return (document_id, already_indexed)."""
+
         document_id = uuid4()
-        now = datetime.now(UTC)
         async with self.pool.acquire() as connection, connection.transaction():
             await connection.execute(
                 "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", request.sourceUri
             )
             existing = await connection.fetchrow(
-                "SELECT id, checksum, status FROM ai_knowledge_document WHERE source_uri = $1 FOR UPDATE",
+                "SELECT id, checksum, status FROM ai_knowledge_document WHERE source_uri=$1 FOR UPDATE",
                 request.sourceUri,
             )
             if existing and existing["checksum"] == checksum and existing["status"] == "ACTIVE":
-                row = await self._knowledge_row(connection, existing["id"])
-                return self._knowledge_view(row)
+                return existing["id"], True
             if existing:
                 document_id = existing["id"]
                 await connection.execute(
                     """
                     UPDATE ai_knowledge_document
-                       SET title=$2, source_type=$3, checksum=$4, metadata=$5::jsonb,
-                           status='ACTIVE', updated_at=$6
+                       SET title=$2,source_type=$3,checksum=$4,metadata=$5::jsonb,
+                           raw_content=$6,status='INDEXING',chunk_count=0,
+                           embedding_model=$7,embedding_dimensions=$8,updated_at=NOW()
                      WHERE id=$1
                     """,
                     document_id,
@@ -178,17 +175,17 @@ class Database:
                     request.sourceType,
                     checksum,
                     request.metadata,
-                    now,
-                )
-                await connection.execute(
-                    "DELETE FROM ai_knowledge_chunk WHERE document_id=$1", document_id
+                    redact_sensitive_text(request.content),
+                    self._settings.embedding_model,
+                    self._settings.embedding_dimensions,
                 )
             else:
                 await connection.execute(
                     """
                     INSERT INTO ai_knowledge_document(
-                        id,title,source_uri,source_type,checksum,metadata,created_by,created_at,updated_at
-                    ) VALUES($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$8)
+                        id,title,source_uri,source_type,checksum,status,metadata,raw_content,
+                        chunk_count,embedding_model,embedding_dimensions,created_by
+                    ) VALUES($1,$2,$3,$4,$5,'INDEXING',$6::jsonb,$7,0,$8,$9,$10)
                     """,
                     document_id,
                     request.title,
@@ -196,69 +193,67 @@ class Database:
                     request.sourceType,
                     checksum,
                     request.metadata,
+                    redact_sensitive_text(request.content),
+                    self._settings.embedding_model,
+                    self._settings.embedding_dimensions,
                     request.actorId,
-                    now,
                 )
-            await connection.executemany(
-                """
-                INSERT INTO ai_knowledge_chunk(
-                    id,document_id,chunk_index,content,token_count,embedding,metadata
-                ) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)
-                """,
-                [
-                    (
-                        uuid4(),
-                        document_id,
-                        index,
-                        content,
-                        token_count,
-                        np.asarray(embedding, dtype=np.float32),
-                        metadata,
-                    )
-                    for index, (content, token_count, embedding, metadata) in enumerate(chunks)
-                ],
-            )
-            row = await self._knowledge_row(connection, document_id)
-            return self._knowledge_view(row)
+        return document_id, False
+
+    async def complete_knowledge(
+        self, document_id: UUID, chunk_count: int
+    ) -> KnowledgeDocumentView:
+        row = await self.pool.fetchrow(
+            """
+            UPDATE ai_knowledge_document
+               SET status='ACTIVE',chunk_count=$2,indexed_at=NOW(),updated_at=NOW()
+             WHERE id=$1
+         RETURNING *
+            """,
+            document_id,
+            chunk_count,
+        )
+        if row is None:
+            raise RuntimeError("Knowledge document disappeared during indexing")
+        return self._knowledge_view(row)
+
+    async def fail_knowledge(self, document_id: UUID) -> None:
+        await self.pool.execute(
+            "UPDATE ai_knowledge_document SET status='FAILED',updated_at=NOW() WHERE id=$1",
+            document_id,
+        )
+
+    async def get_knowledge(self, document_id: UUID) -> KnowledgeDocumentView:
+        row = await self.pool.fetchrow(
+            "SELECT * FROM ai_knowledge_document WHERE id=$1", document_id
+        )
+        if row is None:
+            raise RuntimeError("Knowledge document not found")
+        return self._knowledge_view(row)
 
     async def list_knowledge(self) -> list[KnowledgeDocumentView]:
         rows = await self.pool.fetch(
             """
-            SELECT d.*, COUNT(c.id)::int AS chunk_count
-              FROM ai_knowledge_document d
-              LEFT JOIN ai_knowledge_chunk c ON c.document_id=d.id
-             WHERE d.status='ACTIVE'
-             GROUP BY d.id
-             ORDER BY d.updated_at DESC
+            SELECT * FROM ai_knowledge_document
+             WHERE status <> 'DELETED'
+             ORDER BY updated_at DESC
             """
         )
         return [self._knowledge_view(row) for row in rows]
 
     async def delete_knowledge(self, document_id: UUID) -> bool:
         result = await self.pool.execute(
-            "UPDATE ai_knowledge_document SET status='DELETED', updated_at=NOW() WHERE id=$1",
+            """
+            UPDATE ai_knowledge_document
+               SET status='DELETED',raw_content='',chunk_count=0,updated_at=NOW()
+             WHERE id=$1 AND status <> 'DELETED'
+            """,
             document_id,
         )
         return result.endswith("1")
 
-    async def _knowledge_row(
-        self, connection: asyncpg.Connection, document_id: UUID
-    ) -> asyncpg.Record:
-        row = await connection.fetchrow(
-            """
-            SELECT d.*, COUNT(c.id)::int AS chunk_count
-              FROM ai_knowledge_document d
-              LEFT JOIN ai_knowledge_chunk c ON c.document_id=d.id
-             WHERE d.id=$1
-             GROUP BY d.id
-            """,
-            document_id,
-        )
-        if row is None:
-            raise RuntimeError("Knowledge document disappeared during transaction")
-        return row
-
-    def _knowledge_view(self, row: asyncpg.Record) -> KnowledgeDocumentView:
+    @staticmethod
+    def _knowledge_view(row: asyncpg.Record) -> KnowledgeDocumentView:
         return KnowledgeDocumentView(
             id=row["id"],
             title=row["title"],
@@ -270,139 +265,6 @@ class Database:
             createdAt=row["created_at"],
             updatedAt=row["updated_at"],
         )
-
-    async def search_knowledge(
-        self,
-        embedding: list[float],
-        query: str,
-        top_k: int,
-        candidate_k: int,
-        metadata_filter: dict[str, Any] | None,
-    ) -> list[dict[str, Any]]:
-        rows = await self.pool.fetch(
-            """
-            WITH params AS (
-                SELECT plainto_tsquery('simple', $2) AS query
-            ),
-            vector_hits AS (
-                SELECT c.id
-                  FROM ai_knowledge_chunk c
-                  JOIN ai_knowledge_document d ON d.id=c.document_id
-                 WHERE d.status='ACTIVE' AND ($3::jsonb IS NULL OR c.metadata @> $3::jsonb)
-                 ORDER BY c.embedding <=> $1
-                 LIMIT $4
-            ),
-            lexical_hits AS (
-                SELECT c.id
-                  FROM ai_knowledge_chunk c
-                  JOIN ai_knowledge_document d ON d.id=c.document_id
-                  CROSS JOIN params p
-                 WHERE d.status='ACTIVE'
-                   AND ($3::jsonb IS NULL OR c.metadata @> $3::jsonb)
-                   AND c.content_tsv @@ p.query
-                 ORDER BY ts_rank_cd(c.content_tsv, p.query) DESC
-                 LIMIT $4
-            ),
-            candidate_ids AS (
-                SELECT id FROM vector_hits
-                UNION
-                SELECT id FROM lexical_hits
-            ),
-            scored AS (
-                SELECT c.id, c.document_id, c.chunk_index, c.content, c.metadata,
-                       1 - (c.embedding <=> $1) AS semantic_score,
-                       GREATEST(
-                           LEAST(ts_rank_cd(c.content_tsv, p.query) * 5, 1),
-                           CASE WHEN LOWER(c.content) LIKE '%' || LOWER($2) || '%'
-                               THEN 1.0 ELSE 0.0 END
-                       ) AS lexical_score
-                  FROM candidate_ids candidate
-                  JOIN ai_knowledge_chunk c ON c.id=candidate.id
-                  CROSS JOIN params p
-            )
-            SELECT c.*, d.title, d.source_uri, d.source_type,
-                   (c.semantic_score * 0.80 + c.lexical_score * 0.20) AS score
-              FROM scored c
-              JOIN ai_knowledge_document d ON d.id=c.document_id
-             ORDER BY score DESC
-             LIMIT $5
-            """,
-            np.asarray(embedding, dtype=np.float32),
-            query.strip(),
-            metadata_filter,
-            candidate_k,
-            top_k,
-        )
-        return [dict(row) for row in rows]
-
-    async def recall_memories(
-        self, actor_id: int, active_role: str, embedding: list[float], top_k: int
-    ) -> list[dict[str, Any]]:
-        rows = await self.pool.fetch(
-            """
-            SELECT id, conversation_id, memory_type, content, importance, created_at,
-                   1 - (embedding <=> $3) AS score
-              FROM ai_memory
-             WHERE actor_id=$1 AND active_role=$2 AND expires_at > NOW()
-             ORDER BY embedding <=> $3
-             LIMIT $4
-            """,
-            actor_id,
-            active_role,
-            np.asarray(embedding, dtype=np.float32),
-            top_k,
-        )
-        return [dict(row) for row in rows if float(row["score"]) >= 0.45]
-
-    async def store_memory(
-        self,
-        actor_id: int,
-        conversation_id: UUID,
-        active_role: str,
-        content: str,
-        embedding: list[float],
-        retention_days: int,
-    ) -> None:
-        expires_at = datetime.now(UTC) + timedelta(days=retention_days)
-        async with self.pool.acquire() as connection, connection.transaction():
-            await connection.execute(
-                """
-                INSERT INTO ai_conversation(id,actor_id,active_role,last_active_at)
-                VALUES($1,$2,$3,NOW())
-                ON CONFLICT(id,actor_id,active_role) DO UPDATE SET last_active_at=NOW()
-                """,
-                conversation_id,
-                actor_id,
-                active_role,
-            )
-            await connection.execute(
-                """
-                INSERT INTO ai_memory(
-                    id,actor_id,conversation_id,active_role,memory_type,content,embedding,expires_at
-                ) VALUES($1,$2,$3,$4,'EPISODIC',$5,$6,$7)
-                """,
-                uuid4(),
-                actor_id,
-                conversation_id,
-                active_role,
-                content[:6000],
-                np.asarray(embedding, dtype=np.float32),
-                expires_at,
-            )
-
-    async def forget(self, actor_id: int, conversation_id: UUID) -> int:
-        async with self.pool.acquire() as connection, connection.transaction():
-            result = await connection.execute(
-                "DELETE FROM ai_memory WHERE actor_id=$1 AND conversation_id=$2",
-                actor_id,
-                conversation_id,
-            )
-            await connection.execute(
-                "DELETE FROM ai_conversation WHERE actor_id=$1 AND id=$2",
-                actor_id,
-                conversation_id,
-            )
-        return int(result.rsplit(" ", 1)[-1])
 
     async def start_run(
         self,
@@ -419,6 +281,7 @@ class Database:
             INSERT INTO ai_agent_run(
                 run_id,conversation_id,actor_id,active_role,status,input_text,model_name,prompt_version
             ) VALUES($1,$2,$3,$4,'RUNNING',$5,$6,$7)
+            ON CONFLICT(run_id) DO NOTHING
             """,
             run_id,
             conversation_id,
@@ -476,7 +339,7 @@ class Database:
             tool_count,
             rag_hit_count,
             type(exception).__name__ if exception else None,
-            (str(exception)[:1000] if exception else None),
+            str(exception)[:1000] if exception else None,
         )
 
     async def save_feedback(self, request: FeedbackRequest) -> bool:
@@ -517,10 +380,8 @@ class Database:
         )
         feedback = await self.pool.fetchrow(
             """
-            SELECT COUNT(*) AS total,
-                   COUNT(*) FILTER (WHERE rating=1) AS positive
-              FROM ai_feedback
-             WHERE created_at >= NOW()-INTERVAL '30 days'
+            SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE rating=1) AS positive
+              FROM ai_feedback WHERE created_at >= NOW()-INTERVAL '30 days'
             """
         )
         run_count = int(row["run_count"])
@@ -536,26 +397,9 @@ class Database:
             "positiveRate": float(feedback["positive"]) / feedback_total if feedback_total else 0.0,
         }
 
-    async def cleanup(self, memory_days: int, trace_days: int) -> dict[str, int]:
-        memory = await self.pool.execute("DELETE FROM ai_memory WHERE expires_at < NOW()")
+    async def cleanup(self, _memory_days: int, trace_days: int) -> dict[str, int]:
         runs = await self.pool.execute(
             "DELETE FROM ai_agent_run WHERE started_at < NOW()-($1::int * INTERVAL '1 day')",
             trace_days,
         )
-        conversations = await self.pool.execute(
-            """
-            DELETE FROM ai_conversation
-             WHERE last_active_at < NOW()-($1::int * INTERVAL '1 day')
-               AND NOT EXISTS (
-                   SELECT 1 FROM ai_memory m
-                    WHERE m.actor_id=ai_conversation.actor_id
-                      AND m.conversation_id=ai_conversation.id
-               )
-            """,
-            memory_days,
-        )
-        return {
-            "memories": int(memory.rsplit(" ", 1)[-1]),
-            "runs": int(runs.rsplit(" ", 1)[-1]),
-            "conversations": int(conversations.rsplit(" ", 1)[-1]),
-        }
+        return {"runs": int(runs.rsplit(" ", 1)[-1])}

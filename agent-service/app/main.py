@@ -12,13 +12,15 @@ from fastapi import FastAPI, Header, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from prometheus_client import CONTENT_TYPE_LATEST
+from psycopg.rows import dict_row
+from psycopg_pool import AsyncConnectionPool
 from redis.asyncio import Redis
 
-from app.agent import TeachingAgent, sse
-from app.clients import EmbeddingClient, JavaToolClient, ModelClient
+from app.agent import AgentFactory, TeachingAgent, sse
+from app.clients import JavaToolClient, create_chat_model, create_embeddings
 from app.config import Settings
 from app.limiter import RunLimiter
-from app.memory import RedisConversationMemory
+from app.memory import AgentMemory
 from app.models import (
     FeedbackRequest,
     ForgetMemoryRequest,
@@ -27,7 +29,7 @@ from app.models import (
     RunRequest,
 )
 from app.observability import AgentMetrics
-from app.rag import KnowledgeService, SemanticMemory
+from app.rag import KnowledgeService
 from app.storage import Database
 
 settings = Settings.from_environment()
@@ -52,20 +54,54 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         socket_connect_timeout=5,
         socket_timeout=5,
     )
-    model = ModelClient(settings)
-    embeddings = EmbeddingClient(settings)
+    model = create_chat_model(settings)
+    embeddings = create_embeddings(settings)
     java_tools = JavaToolClient(settings)
+    graph_pool = AsyncConnectionPool(
+        settings.psycopg_database_url,
+        min_size=settings.database_pool_min_size,
+        max_size=settings.database_pool_max_size,
+        kwargs={
+            "autocommit": True,
+            "prepare_threshold": 0,
+            "row_factory": dict_row,
+        },
+        open=False,
+        name="agent-langgraph",
+    )
     cleanup_task: asyncio.Task[None] | None = None
+    knowledge: KnowledgeService | None = None
+    graph_store: Any | None = None
     try:
         await database.open()
         await redis.ping()
-        memory = RedisConversationMemory(
-            redis,
-            settings.conversation_max_messages,
-            settings.conversation_memory_ttl_seconds,
+        await graph_pool.open()
+        await graph_pool.wait()
+        from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+        from langgraph.store.postgres.aio import AsyncPostgresStore
+
+        checkpointer = AsyncPostgresSaver(graph_pool)
+        graph_store = AsyncPostgresStore(
+            graph_pool,
+            index={
+                "dims": settings.embedding_dimensions,
+                "embed": embeddings,
+                "fields": ["content"],
+                "distance_type": "cosine",
+            },
+            ttl={
+                "refresh_on_read": True,
+                "omit_expired": True,
+                "default_ttl": float(settings.memory_retention_days * 24 * 60),
+                "sweep_interval_minutes": 60,
+            },
         )
-        knowledge = KnowledgeService(settings, database, embeddings)
-        semantic_memory = SemanticMemory(settings, database, embeddings)
+        await checkpointer.setup()
+        await graph_store.setup()
+        await graph_store.start_ttl_sweeper()
+        knowledge = await KnowledgeService.create(settings, database, embeddings, model)
+        memory = AgentMemory(settings, graph_store, checkpointer)
+        factory = AgentFactory(settings, model, checkpointer, graph_store)
         app.state.database = database
         app.state.redis = redis
         app.state.memory = memory
@@ -75,11 +111,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         )
         app.state.agent = TeachingAgent(
             settings,
-            model,
+            factory,
             java_tools,
             memory,
             knowledge,
-            semantic_memory,
             database,
             metrics,
         )
@@ -90,9 +125,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             cleanup_task.cancel()
             with suppress(asyncio.CancelledError):
                 await cleanup_task
+        if graph_store is not None:
+            await graph_store.stop_ttl_sweeper(timeout=5)
+        if knowledge is not None:
+            await knowledge.close()
         await java_tools.close()
-        await embeddings.close()
-        await model.close()
+        await graph_pool.close()
         await redis.aclose()
         await database.close()
 
@@ -242,7 +280,7 @@ async def delete_knowledge(
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, bool]:
     verify_bridge_token(bridge_token)
-    deleted = await request.app.state.database.delete_knowledge(document_id)
+    deleted = await request.app.state.knowledge.delete(document_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     return {"deleted": True}
@@ -269,8 +307,7 @@ async def forget_memory(
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, int | bool]:
     verify_bridge_token(bridge_token)
-    await request.app.state.memory.forget(body.actorId, body.conversationId)
-    deleted = await request.app.state.database.forget(body.actorId, body.conversationId)
+    deleted = await request.app.state.memory.forget(body.actorId, body.conversationId)
     return {"forgotten": True, "deletedMemories": deleted}
 
 

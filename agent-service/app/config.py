@@ -61,12 +61,13 @@ class Settings:
     database_pool_min_size: int = 2
     database_pool_max_size: int = 10
     redis_url: str = "redis://redis:6379/0"
-    conversation_memory_ttl_seconds: int = 604800
     conversation_max_messages: int = 20
-    context_history_chars: int = 24000
+    rag_chunk_size: int = 1200
+    rag_chunk_overlap: int = 160
     rag_top_k: int = 6
     rag_candidate_k: int = 24
-    rag_min_score: float = 0.5
+    rag_mmr_lambda: float = 0.7
+    rag_max_rewrites: int = 1
     memory_top_k: int = 4
     memory_retention_days: int = 180
     trace_retention_days: int = 90
@@ -94,12 +95,13 @@ class Settings:
             database_pool_min_size=_integer("AI_DATABASE_POOL_MIN_SIZE", 2),
             database_pool_max_size=_integer("AI_DATABASE_POOL_MAX_SIZE", 10),
             redis_url=_redis_url(),
-            conversation_memory_ttl_seconds=_integer("AI_CONVERSATION_MEMORY_TTL_SECONDS", 604800),
             conversation_max_messages=_integer("AI_CONVERSATION_MAX_MESSAGES", 20),
-            context_history_chars=_integer("AI_CONTEXT_HISTORY_CHARS", 24000),
+            rag_chunk_size=_integer("AI_RAG_CHUNK_SIZE", 1200),
+            rag_chunk_overlap=_integer("AI_RAG_CHUNK_OVERLAP", 160),
             rag_top_k=_integer("AI_RAG_TOP_K", 6),
             rag_candidate_k=_integer("AI_RAG_CANDIDATE_K", 24),
-            rag_min_score=_float("AI_RAG_MIN_SCORE", 0.5),
+            rag_mmr_lambda=_float("AI_RAG_MMR_LAMBDA", 0.7),
+            rag_max_rewrites=_integer("AI_RAG_MAX_REWRITES", 1),
             memory_top_k=_integer("AI_MEMORY_TOP_K", 4),
             memory_retention_days=_integer("AI_MEMORY_RETENTION_DAYS", 180),
             trace_retention_days=_integer("AI_TRACE_RETENTION_DAYS", 90),
@@ -107,6 +109,16 @@ class Settings:
             max_concurrent_runs=_integer("AI_MAX_CONCURRENT_RUNS", 32),
             docs_enabled=_boolean("AI_DOCS_ENABLED", False),
         )
+
+    @property
+    def sqlalchemy_database_url(self) -> str:
+        if self.database_url.startswith("postgresql+asyncpg://"):
+            return self.database_url
+        return self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    @property
+    def psycopg_database_url(self) -> str:
+        return self.database_url.replace("postgresql+asyncpg://", "postgresql://", 1)
 
     @property
     def model_configured(self) -> bool:
@@ -131,18 +143,22 @@ class Settings:
             raise ValueError("AI_MODEL_TIMEOUT_SECONDS must be between 1 and 300")
         if self.max_tool_rounds < 1 or self.max_tool_rounds > 8:
             raise ValueError("AI_MAX_TOOL_ROUNDS must be between 1 and 8")
-        if self.conversation_memory_ttl_seconds < 60:
-            raise ValueError("AI_CONVERSATION_MEMORY_TTL_SECONDS must be at least 60")
         if self.conversation_max_messages < 2 or self.conversation_max_messages > 100:
             raise ValueError("AI_CONVERSATION_MAX_MESSAGES must be between 2 and 100")
+        if self.rag_chunk_size < 200 or self.rag_chunk_size > 8000:
+            raise ValueError("AI_RAG_CHUNK_SIZE must be between 200 and 8000")
+        if self.rag_chunk_overlap < 0 or self.rag_chunk_overlap >= self.rag_chunk_size:
+            raise ValueError("AI_RAG_CHUNK_OVERLAP must be smaller than chunk size")
         if self.rag_top_k < 1 or self.rag_top_k > 20:
             raise ValueError("AI_RAG_TOP_K must be between 1 and 20")
         if self.rag_candidate_k < self.rag_top_k or self.rag_candidate_k > 200:
             raise ValueError("AI_RAG_CANDIDATE_K must be >= top-k and <= 200")
         if self.embedding_batch_size < 1 or self.embedding_batch_size > 256:
             raise ValueError("AI_EMBEDDING_BATCH_SIZE must be between 1 and 256")
-        if self.rag_min_score < 0 or self.rag_min_score > 1:
-            raise ValueError("AI_RAG_MIN_SCORE must be between 0 and 1")
+        if self.rag_mmr_lambda < 0 or self.rag_mmr_lambda > 1:
+            raise ValueError("AI_RAG_MMR_LAMBDA must be between 0 and 1")
+        if self.rag_max_rewrites < 0 or self.rag_max_rewrites > 3:
+            raise ValueError("AI_RAG_MAX_REWRITES must be between 0 and 3")
         if self.max_concurrent_runs < 1:
             raise ValueError("AI_MAX_CONCURRENT_RUNS must be positive")
         if self.memory_top_k < 1 or self.memory_top_k > 10:
@@ -153,5 +169,3 @@ class Settings:
             raise ValueError("AI_TRACE_RETENTION_DAYS must be between 1 and 3650")
         if self.max_requests_per_minute < 1:
             raise ValueError("AI_MAX_REQUESTS_PER_MINUTE must be positive")
-        if self.context_history_chars < 4000 or self.context_history_chars > 200000:
-            raise ValueError("AI_CONTEXT_HISTORY_CHARS must be between 4000 and 200000")

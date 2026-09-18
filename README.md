@@ -91,7 +91,7 @@
 - `back` 是默认且唯一维护的模块化单体后端；`monolith-app` 是唯一启动入口，统一提供 `10000` 端口。
 - 用户、内容、学习、教学、游戏、文件、通知、审计和 AI 接入仍按 Maven 模块隔离，但 Java 模块运行在同一个 JVM、共享服务器 `monolith_db`。
 - 模块间同步调用使用进程内适配器，事件链路与事务发件箱继续通过 RabbitMQ 保证可靠性；当前运行不依赖 Gateway、Nacos 或服务发现。
-- `agent-service` 是独立 FastAPI 进程，只通过签名工具契约调用 Java，不直连业务表。
+- `agent-service` 是独立 FastAPI 进程，使用 LangChain/LangGraph 编排工具、Checkpoint 与 Agentic RAG，只通过动态授权的工具契约调用 Java，不直连业务表。
 - 微服务实现已从当前分支移除；如答辩后需要重新拆分，以 Git 历史中的 `dev` 分支和保留的 API 契约为基础进行。
 
 ### 前端

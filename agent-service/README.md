@@ -1,62 +1,74 @@
 # 教学 Agent FastAPI 服务
 
-这是教学 Agent 的模型编排与 AI 数据面。Java `ai-service` 仍是唯一可信业务入口，负责登录身份、业务权限、工具签名和人工确认；FastAPI 负责多轮规划、RAG、记忆、运行轨迹、评测与流式输出。
+FastAPI 只负责 HTTP/SSE 边界；Agent 编排、工具循环、Checkpoint 与 Agentic RAG 使用 LangChain/LangGraph。Java `monolith-app` 仍是业务数据与权限的唯一可信入口，负责动态工具授权、工具签名以及作业草稿的人工确认。
 
-## 已实现的生产闭环
+## 结构
 
-- 多轮 Tool Calling：模型在最多 `AI_MAX_TOOL_ROUNDS` 轮内执行“规划—工具—观察—再规划”。
-- 真实业务工具：班级学情、审核题库检索、带人工确认的作业草稿。
-- RAG：文档切片、批量 Embedding、PostgreSQL/pgvector HNSW 检索、词面加权、最低相关度过滤和来源引用。
-- 双层记忆：Redis 保存有 TTL 的短期上下文；PostgreSQL 保存按用户隔离、可语义召回且自动过期的长期情景记忆。
-- 安全：服务间令牌、Java 侧动态工具白名单、HMAC 运行令牌、写操作二次确认、防重放、提示注入隔离、学生身份最小化和凭据文本脱敏。
-- 治理：运行与工具轨迹、显式好评/差评、30 天质量指标、会话记忆删除、知识库软删除。
-- 可靠性：模型与 Embedding 瞬时故障重试、Redis 用户限流、进程并发上限、依赖就绪探针和定期数据清理。
-- 可观测性：`/metrics` 暴露运行、时延、工具、RAG、反馈和并发指标；Prometheus 已配置抓取。
-- Grafana：仓库内置“教学 Agent 运行总览”，展示成功率、P95 时延、工具失败、RAG 命中和反馈趋势。
-- 离线评测：`evals/teaching-agent.jsonl` 检查必需工具、禁止工具和答案约束，适合在模型升级前执行回归。
+```text
+app/
+├── main.py          # FastAPI 路由、依赖生命周期、就绪检查
+├── agent.py         # LangChain create_agent 与 SSE 事件适配
+├── tools.py         # @tool、参数模型、动态授权与工具审计
+├── rag.py           # PGVectorStore 与 retrieve/grade/rewrite 子图
+├── memory.py        # LangGraph PostgreSQL Checkpoint/Store
+├── storage.py       # 业务元数据、运行轨迹和版本化迁移
+├── clients.py       # ChatOpenAI、OpenAIEmbeddings、Java 工具客户端
+└── migrations/      # Agent 自有数据库迁移
+```
 
-系统不会在线修改提示词或自动“学习”用户反馈。生产系统采用可审计的离线评测与人工发布流程，避免反馈投毒导致行为漂移。
+主链路如下：
+
+```text
+Java 身份与动态授权 → FastAPI → LangGraph Agent → LangChain Tools → Java 业务接口
+                                      ├─ PostgreSQL Checkpoint
+                                      ├─ PostgreSQL 长期语义记忆
+                                      └─ Agentic RAG → PGVectorStore/pgvector
+```
+
+RAG 使用中文递归分块和 MMR：先召回与问题相似的候选，再降低候选之间的重复度。候选会经过模型相关性评估；没有有效资料时，子图最多改写问题一次并重新检索。返回结果保留 `[资料n]`、文档 ID、来源 URI 和片段 ID。
+
+Redis 不再保存对话内容，只用于用户限流和并发控制。多轮短期上下文由 LangGraph Checkpoint 保存，长期记忆由 LangGraph Store 进行向量召回。
 
 ## 本地启动
+
+需要 Python 3.12、带 pgvector 的 PostgreSQL、Redis，以及 OpenAI-compatible 的对话和 Embedding 接口。
 
 ```powershell
 cd agent-service
 python -m venv .venv
-.\.venv\Scripts\python -m pip install -e ".[dev]"
-.\.venv\Scripts\python -m uvicorn app.main:app --reload --port 8100
+.\.venv\Scripts\python -m pip install --constraint requirements.lock -e ".[dev]"
+$env:AI_RELOAD="true"
+.\.venv\Scripts\python -m app.server
 ```
 
-核心配置：
+关键配置：
 
-- `AI_AGENT_BRIDGE_TOKEN`、`INTERNAL_API_TOKEN`：Java/Python 双向服务凭证；
-- `AI_MODEL_BASE_URL`、`AI_MODEL_API_KEY`、`AI_MODEL_NAME`：OpenAI-compatible Chat Completions 接口；
-- `AI_EMBEDDING_MODEL`、`AI_EMBEDDING_DIMENSIONS`：同一服务的 Embeddings 接口及固定向量维度；
-- `AI_DATABASE_URL` 或 `AI_DB_*`：安装 pgvector 的 PostgreSQL 连接；
-- `AI_REDIS_URL` 或 `AI_REDIS_*`：短期记忆和限流 Redis；
-- `JAVA_AI_TOOL_BASE_URL`：Java 单体内部工具地址。
+- `AI_AGENT_BRIDGE_TOKEN`、`INTERNAL_API_TOKEN`：Java/Python 服务凭证；
+- `AI_MODEL_BASE_URL`、`AI_MODEL_API_KEY`、`AI_MODEL_NAME`：模型配置；
+- `AI_EMBEDDING_MODEL`、`AI_EMBEDDING_DIMENSIONS`：Embedding 配置；
+- `AI_DATABASE_URL` 或 `AI_DB_*`：PostgreSQL/pgvector；
+- `AI_REDIS_URL` 或 `AI_REDIS_*`：Redis；
+- `JAVA_AI_TOOL_BASE_URL`：Java 内部工具地址；
+- `AI_RAG_CHUNK_SIZE`、`AI_RAG_CHUNK_OVERLAP`：中文分块；
+- `AI_RAG_TOP_K`、`AI_RAG_CANDIDATE_K`、`AI_RAG_MMR_LAMBDA`：MMR 检索；
+- `AI_RAG_MAX_REWRITES`：无相关资料时的最大问题改写次数。
 
-阿里云百炼北京地域推荐配置：`AI_MODEL_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1`、`AI_MODEL_NAME=qwen3.7-plus`、`AI_EMBEDDING_MODEL=qwen3.7-text-embedding`、`AI_EMBEDDING_DIMENSIONS=1024`、`AI_EMBEDDING_BATCH_SIZE=20`。向量维度必须在首次数据库迁移前确定，上线后不可直接修改。
+首次运行新版迁移会按项目决定直接删除旧的手写 RAG/记忆表和其中数据，再由 LangChain/LangGraph 创建新表；不会迁移或备份旧 AI 数据。业务表与 Agent 运行审计表不受影响。
 
-首次启动会在 PostgreSQL advisory lock 下执行带校验和的版本化迁移。修改已执行迁移会让启动失败；后续结构变更必须新增 `Vxxx__*.sql`。
-容器构建使用 `requirements.lock` 约束完整依赖树，更新依赖后应重新执行测试、Ruff 和离线评测再更新锁文件。
+## 验证
 
-## 健康、指标与评测
-
-```bash
-curl -fsS http://127.0.0.1:8100/health
-curl -fsS http://127.0.0.1:8100/ready
-curl -fsS http://127.0.0.1:8100/metrics
-python -m app.evaluation evals/teaching-agent.jsonl --threshold 0.8
+```powershell
+.\.venv\Scripts\python -m ruff check app tests
+.\.venv\Scripts\python -m ruff format --check app tests
+.\.venv\Scripts\python -m pytest -q
+curl.exe -fsS http://127.0.0.1:8100/health
+curl.exe -fsS http://127.0.0.1:8100/ready
 ```
 
-`/health` 仅表示进程存活；`/ready` 会检查 PostgreSQL、Redis、对话模型和 Embedding 模型配置。知识库导入、反馈、遗忘和质量接口只允许 Java 携带桥接令牌调用，浏览器不能直连。
+离线 Agent 回归仍可运行：
 
-## 数据保留
+```powershell
+.\.venv\Scripts\python -m app.evaluation evals/teaching-agent.jsonl --threshold 0.8
+```
 
-- Redis 短期上下文默认保留 7 天且最多 20 条消息；
-- 长期语义记忆默认保留 180 天；
-- 运行、工具和反馈轨迹默认保留 90 天；
-- 用户可在对话页清除当前会话的短期与长期记忆；
-- 定时清理任务每 6 小时处理过期数据。
-
-部署前应根据隐私政策调整保留期，知识库不得导入学生隐私、盗版教材或未授权内容。
+`/health` 只表示进程存活；`/ready` 会检查 PostgreSQL、Redis、模型、Embedding 与服务凭证。知识库、反馈、遗忘和质量接口只能由 Java 携带桥接令牌调用。

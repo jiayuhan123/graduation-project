@@ -1,52 +1,75 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterator
+from typing import Any
 from uuid import uuid4
 
 import pytest
+from langchain_core.messages import AIMessage, AIMessageChunk
 
 from app.agent import TeachingAgent
 from app.config import Settings
-from app.memory import ConversationMemory
 from app.models import Actor, RunRequest
+from app.observability import AgentMetrics
 
 
-class FakeModelClient:
-    def __init__(self) -> None:
-        self.plans = 0
-
-    async def plan(self, messages: list[dict], tools: list[dict]) -> dict:
-        self.plans += 1
-        if self.plans == 1:
-            return {
-                "content": None,
-                "tool_calls": [
-                    {
-                        "id": "call-1",
-                        "type": "function",
-                        "function": {
-                            "name": "get_class_dashboard",
-                            "arguments": '{"classId":12,"days":7}',
-                        },
-                    }
-                ],
-            }
-        return {"content": "ready"}
-
-    async def stream_answer(self, messages: list[dict]) -> AsyncIterator[str]:
-        yield "班级正确率"
-        yield "为 80%。"
+class FakeGraph:
+    async def astream(self, _input: Any, **kwargs: Any) -> Any:
+        context = kwargs["context"]
+        context.used_tools.append("get_class_dashboard")
+        yield {
+            "type": "custom",
+            "data": {"event": "tool_start", "toolName": "get_class_dashboard"},
+        }
+        yield {
+            "type": "custom",
+            "data": {
+                "event": "tool_result",
+                "toolName": "get_class_dashboard",
+                "status": "SUCCEEDED",
+                "result": {"accuracyRate": 0.8},
+            },
+        }
+        yield {"type": "messages", "data": (AIMessageChunk(content="班级正确率"), {})}
+        yield {"type": "messages", "data": (AIMessageChunk(content="为 80%。"), {})}
+        yield {
+            "type": "values",
+            "data": {"messages": [AIMessage(content="班级正确率为 80%。")]},
+        }
 
 
-class FakeToolClient:
-    async def invoke(self, run: RunRequest, tool_name: str, arguments: dict) -> dict:
-        assert tool_name in run.actor.allowedTools
-        return {"classId": 12, "metrics": {"accuracyRate": 0.8}}
+class FakeFactory:
+    def for_tools(self, allowed_tools: list[str]) -> FakeGraph:
+        assert allowed_tools == ["get_class_dashboard"]
+        return FakeGraph()
+
+
+class FakeMemory:
+    remembered = False
+
+    async def recall(self, *_args: Any) -> list[dict[str, Any]]:
+        return []
+
+    async def remember(self, *_args: Any) -> None:
+        self.remembered = True
+
+    @staticmethod
+    def thread_id(actor_id: int, conversation_id: Any, active_role: str) -> str:
+        return f"{actor_id}:{conversation_id}:{active_role}"
+
+
+class FakeDatabase:
+    finished: tuple[Any, ...] | None = None
+
+    async def start_run(self, *_args: Any) -> None:
+        return None
+
+    async def finish_run(self, *args: Any) -> None:
+        self.finished = args
 
 
 @pytest.mark.asyncio
-async def test_agent_executes_authorized_tool_and_streams_answer() -> None:
+async def test_agent_adapts_langgraph_stream_to_existing_sse_contract() -> None:
     settings = Settings(
         bridge_token="bridge",
         java_tool_base_url="http://java",
@@ -70,18 +93,26 @@ async def test_agent_executes_authorized_tool_and_streams_answer() -> None:
         ),
         toolToken="signed-token",
     )
+    memory = FakeMemory()
+    database = FakeDatabase()
     agent = TeachingAgent(
         settings,
-        FakeModelClient(),  # type: ignore[arg-type]
-        FakeToolClient(),  # type: ignore[arg-type]
-        ConversationMemory(),
+        FakeFactory(),  # type: ignore[arg-type]
+        object(),  # type: ignore[arg-type]
+        memory,  # type: ignore[arg-type]
+        object(),  # type: ignore[arg-type]
+        database,  # type: ignore[arg-type]
+        AgentMetrics(),
     )
 
     events = [event async for event in agent.run(request)]
 
     names = [event.splitlines()[0] for event in events]
+    assert names[0] == "event: metadata"
     assert "event: tool_start" in names
     assert "event: tool_result" in names
     assert names.count("event: delta") == 2
     done = json.loads(events[-1].split("data: ", 1)[1])
     assert done["toolCalls"] == ["get_class_dashboard"]
+    assert memory.remembered
+    assert database.finished is not None

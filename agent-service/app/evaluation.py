@@ -8,11 +8,14 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from app.agent import TeachingAgent
-from app.clients import ModelClient
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
+
+from app.agent import AgentFactory, TeachingAgent
+from app.clients import create_chat_model
 from app.config import Settings
-from app.memory import ConversationMemory
 from app.models import Actor, RunRequest
+from app.observability import AgentMetrics
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +36,7 @@ class FixtureToolClient:
         self._fixtures = fixtures
 
     async def invoke(
-        self, run: RunRequest, tool_name: str, arguments: dict[str, Any]
+        self, run: RunRequest, tool_name: str, _arguments: dict[str, Any]
     ) -> dict[str, Any]:
         if tool_name not in run.actor.allowedTools:
             raise RuntimeError(f"unauthorized tool in evaluation: {tool_name}")
@@ -41,13 +44,34 @@ class FixtureToolClient:
 
 
 class FixtureKnowledgeService:
-    def __init__(self, fixture: dict[str, Any]) -> None:
-        self._fixture = fixture
+    def __init__(self, fixture: dict[str, Any] | None) -> None:
+        self._fixture = fixture or {"hitCount": 0, "sources": []}
 
-    async def retrieve(
-        self, query: str, top_k: int | None, metadata_filter: dict[str, Any] | None
-    ) -> dict[str, Any]:
+    async def retrieve(self, query: str, *_args: Any) -> dict[str, Any]:
         return {"query": query, **self._fixture}
+
+
+class EvaluationMemory:
+    async def recall(self, *_args: Any) -> list[dict[str, Any]]:
+        return []
+
+    async def remember(self, *_args: Any) -> None:
+        return None
+
+    @staticmethod
+    def thread_id(actor_id: int, conversation_id: Any, active_role: str) -> str:
+        return f"eval:{actor_id}:{conversation_id}:{active_role}"
+
+
+class EvaluationDatabase:
+    async def start_run(self, *_args: Any) -> None:
+        return None
+
+    async def record_tool(self, *_args: Any) -> None:
+        return None
+
+    async def finish_run(self, *_args: Any) -> None:
+        return None
 
 
 def load_cases(path: Path) -> list[EvaluationCase]:
@@ -103,13 +127,16 @@ async def evaluate_case(settings: Settings, case: EvaluationCase) -> dict[str, A
         ),
         toolToken="evaluation-token",
     )
-    model = ModelClient(settings)
+    model = create_chat_model(settings)
+    factory = AgentFactory(settings, model, InMemorySaver(), InMemoryStore())  # type: ignore[arg-type]
     agent = TeachingAgent(
         settings,
-        model,
+        factory,
         FixtureToolClient(case.tool_fixtures),  # type: ignore[arg-type]
-        ConversationMemory(),
-        FixtureKnowledgeService(case.rag_fixture) if case.rag_fixture else None,  # type: ignore[arg-type]
+        EvaluationMemory(),  # type: ignore[arg-type]
+        FixtureKnowledgeService(case.rag_fixture),  # type: ignore[arg-type]
+        EvaluationDatabase(),  # type: ignore[arg-type]
+        AgentMetrics(),
     )
     calls: set[str] = set()
     answer_parts: list[str] = []
@@ -123,7 +150,7 @@ async def evaluate_case(settings: Settings, case: EvaluationCase) -> dict[str, A
             elif event_name == "delta":
                 answer_parts.append(data["content"])
     finally:
-        await model.close()
+        await model.root_async_client.close()
     answer = "".join(answer_parts)
     passed, failures = score_case(case, calls, answer)
     return {
@@ -140,9 +167,7 @@ async def run(path: Path, threshold: float) -> int:
     if not settings.model_configured:
         raise RuntimeError("运行评测前必须配置 AI_MODEL_API_KEY 和 AI_MODEL_NAME")
     cases = load_cases(path)
-    results: list[dict[str, Any]] = []
-    for case in cases:
-        results.append(await evaluate_case(settings, case))
+    results = [await evaluate_case(settings, case) for case in cases]
     passed = sum(1 for item in results if item["passed"])
     pass_rate = passed / len(results) if results else 0.0
     print(json.dumps({"passRate": pass_rate, "results": results}, ensure_ascii=False, indent=2))

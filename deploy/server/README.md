@@ -41,7 +41,7 @@ psql -v ON_ERROR_STOP=1 -d monolith_db -f database/seed-data.sql
 
 当前服务器数据库已在 2026-09-11 完成八库数据迁入，47 张表共 788 行；不要在已有数据的服务器上重复执行迁移或初始化脚本。
 
-PostgreSQL 容器使用与 PostgreSQL 18 兼容的固定版 pgvector 镜像。已有数据库升级时只重建容器，不得删除 `./data/postgres`；FastAPI 首次就绪前会幂等创建 `vector` 扩展和 `ai_*` 表，并使用迁移校验和阻止历史脚本漂移。
+PostgreSQL 容器使用与 PostgreSQL 18 兼容的固定版 pgvector 镜像。FastAPI 首次启动新版迁移时会直接清除旧的手写 RAG/记忆数据，再由 LangChain PGVectorStore 和 LangGraph Checkpoint/Store 创建新表；业务表和 Agent 运行审计不受影响。迁移使用校验和阻止历史脚本漂移。
 
 教学 Agent 启用前还必须配置 `AI_MODEL_NAME`、`AI_EMBEDDING_MODEL`、模型 API Key、桥接令牌和至少 32 字符的工具签名密钥：
 
