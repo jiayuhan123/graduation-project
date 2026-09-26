@@ -1,3 +1,10 @@
+"""项目自有 PostgreSQL 数据、迁移和审计访问层。
+
+本模块使用 asyncpg 管理知识文档主记录、Agent 运行、工具调用和反馈，并在数据落库前执行
+基础脱敏。向量 chunk、LangGraph checkpoint 和长期 Store 由各自官方适配器管理，本类只
+管理项目能够稳定定义和查询的领域表，避免绕过框架直接操作其内部结构。
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -22,10 +29,14 @@ _OPENAI_STYLE_KEY = re.compile(r"\bsk-[A-Za-z0-9_-]{12,}\b")
 
 
 def _json(value: Any) -> str:
+    """把 Python 值序列化为紧凑 JSON，保留中文并兼容 UUID 等对象。"""
+
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"), default=str)
 
 
 def _bounded_value(value: Any, limit: int) -> Any:
+    """限制审计 JSON 体积；超限时只保存明确标记的预览。"""
+
     encoded = _json(value)
     if len(encoded) <= limit:
         return value
@@ -33,7 +44,7 @@ def _bounded_value(value: Any, limit: int) -> Any:
 
 
 def redact_sensitive_text(value: str) -> str:
-    """Best-effort removal of credentials accidentally pasted into traces or memory."""
+    """尽力移除被用户误贴进轨迹、回答或记忆的常见凭证。"""
 
     redacted = _SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", value)
     redacted = _CHINESE_SECRET_ASSIGNMENT.sub(r"\1\2[REDACTED]", redacted)
@@ -42,6 +53,8 @@ def redact_sensitive_text(value: str) -> str:
 
 
 def redact_trace_data(value: Any) -> Any:
+    """递归脱敏工具参数/结果中的凭证键、学生 ID、显示名和文本。"""
+
     if isinstance(value, dict):
         redacted: dict[str, Any] = {}
         for key, item in value.items():
@@ -61,7 +74,7 @@ def redact_trace_data(value: Any) -> Any:
 
 
 class Database:
-    """Domain records and audits; vectors/checkpoints are owned by framework adapters."""
+    """管理领域记录与审计；向量和 checkpoint 由框架适配器负责。"""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -69,13 +82,18 @@ class Database:
 
     @property
     def pool(self) -> asyncpg.Pool:
+        """返回已初始化连接池；在 lifespan 启动完成前调用属于编程错误。"""
+
         if self._pool is None:
             raise RuntimeError("Agent database is not initialized")
         return self._pool
 
     async def open(self) -> None:
+        """串行执行版本化迁移，然后创建供请求共享的 asyncpg 连接池。"""
+
         connection = await asyncpg.connect(self._settings.database_url)
         try:
+            # 固定 advisory lock 让多个副本启动时只有一个实例执行项目迁移。
             await connection.execute("SELECT pg_advisory_lock($1)", 7_104_202_601)
             await connection.execute(
                 """
@@ -92,6 +110,8 @@ class Database:
             await connection.close()
 
         async def initialize_connection(conn: asyncpg.Connection) -> None:
+            """让 asyncpg 自动在 Python 对象与 PostgreSQL JSON/JSONB 间转换。"""
+
             await conn.set_type_codec(
                 "json", schema="pg_catalog", encoder=_json, decoder=json.loads, format="text"
             )
@@ -108,9 +128,12 @@ class Database:
         )
 
     async def _migrate(self, connection: asyncpg.Connection) -> None:
+        """按文件名顺序执行未应用迁移，并拒绝被修改的历史迁移。"""
+
         migration_root = resources.files("app.migrations")
         migrations = sorted(item for item in migration_root.iterdir() if item.name.endswith(".sql"))
         for migration in migrations:
+            # 旧版迁移使用维度占位符；checksum 对替换后的真实 SQL 计算。
             sql = migration.read_text(encoding="utf-8").replace(
                 "{{EMBEDDING_DIMENSIONS}}", str(self._settings.embedding_dimensions)
             )
@@ -122,6 +145,7 @@ class Database:
                 raise RuntimeError(f"Migration checksum changed: {migration.name}")
             if existing:
                 continue
+            # SQL 与迁移历史必须在同一事务提交，避免只执行一半却被标记成功。
             async with connection.transaction():
                 await connection.execute(sql)
                 await connection.execute(
@@ -131,26 +155,33 @@ class Database:
                 )
 
     async def close(self) -> None:
+        """关闭请求连接池；方法可重复调用。"""
+
         if self._pool is not None:
             await self._pool.close()
             self._pool = None
 
     async def ping(self) -> bool:
+        """执行最轻量查询并把任何异常折叠成 readiness 所需布尔值。"""
+
         try:
             return bool(await self.pool.fetchval("SELECT TRUE"))
         except Exception:  # noqa: BLE001 - readiness deliberately returns one boolean.
             return False
 
     async def table_exists(self, table_name: str) -> bool:
+        """通过 PostgreSQL catalog 判断关系表是否存在。"""
+
         return bool(await self.pool.fetchval("SELECT to_regclass($1) IS NOT NULL", table_name))
 
     async def prepare_knowledge(
         self, request: KnowledgeUpsertRequest, checksum: str
     ) -> tuple[UUID, bool]:
-        """Reserve the source URI and return (document_id, already_indexed)."""
+        """锁定来源 URI，准备入库并返回 `(文档ID, 是否已完成相同内容)`。"""
 
         document_id = uuid4()
         async with self.pool.acquire() as connection, connection.transaction():
+            # 对 URI 哈希加事务级锁，避免并发请求为同一来源重复做昂贵 Embedding。
             await connection.execute(
                 "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", request.sourceUri
             )
@@ -158,6 +189,7 @@ class Database:
                 "SELECT id, checksum, status FROM ai_knowledge_document WHERE source_uri=$1 FOR UPDATE",
                 request.sourceUri,
             )
+            # 内容未变化且旧索引可用时直接复用，实现幂等入库。
             if existing and existing["checksum"] == checksum and existing["status"] == "ACTIVE":
                 return existing["id"], True
             if existing:
@@ -203,6 +235,8 @@ class Database:
     async def complete_knowledge(
         self, document_id: UUID, chunk_count: int
     ) -> KnowledgeDocumentView:
+        """向量写入成功后把主记录切换为 ACTIVE 并返回对外视图。"""
+
         row = await self.pool.fetchrow(
             """
             UPDATE ai_knowledge_document
@@ -218,12 +252,16 @@ class Database:
         return self._knowledge_view(row)
 
     async def fail_knowledge(self, document_id: UUID) -> None:
+        """向量入库失败后保留主记录并标记 FAILED，方便诊断或重试。"""
+
         await self.pool.execute(
             "UPDATE ai_knowledge_document SET status='FAILED',updated_at=NOW() WHERE id=$1",
             document_id,
         )
 
     async def get_knowledge(self, document_id: UUID) -> KnowledgeDocumentView:
+        """按 ID 读取一条知识文档摘要。"""
+
         row = await self.pool.fetchrow(
             "SELECT * FROM ai_knowledge_document WHERE id=$1", document_id
         )
@@ -232,6 +270,8 @@ class Database:
         return self._knowledge_view(row)
 
     async def list_knowledge(self) -> list[KnowledgeDocumentView]:
+        """按最近更新时间倒序列出所有未软删除的知识文档。"""
+
         rows = await self.pool.fetch(
             """
             SELECT * FROM ai_knowledge_document
@@ -242,6 +282,8 @@ class Database:
         return [self._knowledge_view(row) for row in rows]
 
     async def delete_knowledge(self, document_id: UUID) -> bool:
+        """软删除文档主记录并清空原文，返回本次是否实际删除。"""
+
         result = await self.pool.execute(
             """
             UPDATE ai_knowledge_document
@@ -254,6 +296,8 @@ class Database:
 
     @staticmethod
     def _knowledge_view(row: asyncpg.Record) -> KnowledgeDocumentView:
+        """把数据库 snake_case 行映射为 API camelCase Pydantic 视图。"""
+
         return KnowledgeDocumentView(
             id=row["id"],
             title=row["title"],
@@ -276,6 +320,8 @@ class Database:
         model_name: str,
         prompt_version: str,
     ) -> None:
+        """幂等记录一次 Agent 运行开始，并在入库前脱敏用户输入。"""
+
         await self.pool.execute(
             """
             INSERT INTO ai_agent_run(
@@ -301,6 +347,8 @@ class Database:
         status: str,
         duration_ms: int,
     ) -> None:
+        """保存一次工具调用的脱敏参数、结果、状态与耗时。"""
+
         await self.pool.execute(
             """
             INSERT INTO ai_tool_call(id,run_id,tool_name,arguments,result,status,duration_ms)
@@ -325,6 +373,8 @@ class Database:
         rag_hit_count: int,
         exception: BaseException | None = None,
     ) -> None:
+        """结束运行并写入最终状态、输出、统计以及可选异常摘要。"""
+
         await self.pool.execute(
             """
             UPDATE ai_agent_run
@@ -343,6 +393,8 @@ class Database:
         )
 
     async def save_feedback(self, request: FeedbackRequest) -> bool:
+        """仅允许运行所有者新增或覆盖反馈；run 不匹配时返回 False。"""
+
         owner = await self.pool.fetchval(
             "SELECT actor_id FROM ai_agent_run WHERE run_id=$1", request.runId
         )
@@ -364,6 +416,8 @@ class Database:
         return True
 
     async def quality_summary(self) -> dict[str, Any]:
+        """用 PostgreSQL 条件聚合生成最近 30 天质量概览。"""
+
         row = await self.pool.fetchrow(
             """
             SELECT COUNT(*) FILTER (WHERE started_at >= NOW()-INTERVAL '30 days') AS run_count,
@@ -384,6 +438,7 @@ class Database:
               FROM ai_feedback WHERE created_at >= NOW()-INTERVAL '30 days'
             """
         )
+        # 分母为 0 时显式返回 0，避免除零并让接口字段保持稳定。
         run_count = int(row["run_count"])
         feedback_total = int(feedback["total"])
         return {
@@ -398,6 +453,12 @@ class Database:
         }
 
     async def cleanup(self, _memory_days: int, trace_days: int) -> dict[str, int]:
+        """删除超过审计保留期的运行；工具调用和反馈通过外键级联删除。
+
+        长期记忆由 LangGraph Store TTL sweeper 清理，因此 `_memory_days` 只保留接口语义，
+        当前方法不直接操作 Store 的框架表。
+        """
+
         runs = await self.pool.execute(
             "DELETE FROM ai_agent_run WHERE started_at < NOW()-($1::int * INTERVAL '1 day')",
             trace_days,

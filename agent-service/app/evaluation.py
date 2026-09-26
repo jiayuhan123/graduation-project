@@ -1,3 +1,10 @@
+"""教学 Agent 的模型行为评测命令行入口。
+
+与只验证确定性代码的单元测试不同，本模块会调用真实对话模型，但用 fixture 隔离 Java、
+RAG 和数据库。每条用例检查模型是否调用必需工具、避开禁止工具并满足关键文本约束，最终
+以通过率决定进程退出码，便于本地或 CI 回归。
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -20,6 +27,8 @@ from app.observability import AgentMetrics
 
 @dataclass(frozen=True, slots=True)
 class EvaluationCase:
+    """从 JSONL 读取的一条评测规则与外部工具 fixture。"""
+
     case_id: str
     message: str
     allowed_tools: list[str]
@@ -32,18 +41,24 @@ class EvaluationCase:
 
 
 class FixtureToolClient:
+    """评测专用 Java 工具替身，不访问真实业务服务。"""
+
     def __init__(self, fixtures: dict[str, dict[str, Any]]) -> None:
         self._fixtures = fixtures
 
     async def invoke(
         self, run: RunRequest, tool_name: str, _arguments: dict[str, Any]
     ) -> dict[str, Any]:
+        """按工具名返回固定数据，并保留 allowedTools 安全断言。"""
+
         if tool_name not in run.actor.allowedTools:
             raise RuntimeError(f"unauthorized tool in evaluation: {tool_name}")
         return self._fixtures.get(tool_name, {"evaluationFixture": True})
 
 
 class FixtureKnowledgeService:
+    """评测专用知识服务替身，返回样例中声明的固定资料。"""
+
     def __init__(self, fixture: dict[str, Any] | None) -> None:
         self._fixture = fixture or {"hitCount": 0, "sources": []}
 
@@ -52,6 +67,8 @@ class FixtureKnowledgeService:
 
 
 class EvaluationMemory:
+    """不读写真实记忆的最小接口实现。"""
+
     async def recall(self, *_args: Any) -> list[dict[str, Any]]:
         return []
 
@@ -64,6 +81,8 @@ class EvaluationMemory:
 
 
 class EvaluationDatabase:
+    """屏蔽真实运行和工具审计写入的最小接口实现。"""
+
     async def start_run(self, *_args: Any) -> None:
         return None
 
@@ -75,6 +94,8 @@ class EvaluationDatabase:
 
 
 def load_cases(path: Path) -> list[EvaluationCase]:
+    """读取 JSONL 数据集；每个非空行独立解析为一条用例。"""
+
     cases: list[EvaluationCase] = []
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
@@ -97,6 +118,8 @@ def load_cases(path: Path) -> list[EvaluationCase]:
 
 
 def score_case(case: EvaluationCase, tool_calls: set[str], answer: str) -> tuple[bool, list[str]]:
+    """对工具集合和回答文本执行确定性断言，返回是否通过及失败原因。"""
+
     failures: list[str] = []
     missing = case.required_tools.difference(tool_calls)
     forbidden = case.forbidden_tools.intersection(tool_calls)
@@ -114,6 +137,8 @@ def score_case(case: EvaluationCase, tool_calls: set[str], answer: str) -> tuple
 
 
 async def evaluate_case(settings: Settings, case: EvaluationCase) -> dict[str, Any]:
+    """使用真实模型和内存版 LangGraph 存储运行一条隔离评测。"""
+
     request = RunRequest(
         runId=uuid4(),
         conversationId=uuid4(),
@@ -141,6 +166,7 @@ async def evaluate_case(settings: Settings, case: EvaluationCase) -> dict[str, A
     calls: set[str] = set()
     answer_parts: list[str] = []
     try:
+        # 复用生产 TeachingAgent，确保评测覆盖的正是线上系统提示词和流式适配逻辑。
         async for event in agent.run(request):
             lines = event.splitlines()
             event_name = lines[0].removeprefix("event: ")
@@ -163,6 +189,8 @@ async def evaluate_case(settings: Settings, case: EvaluationCase) -> dict[str, A
 
 
 async def run(path: Path, threshold: float) -> int:
+    """串行执行评测集并根据通过率返回适合命令行/CI 的退出码。"""
+
     settings = Settings.from_environment()
     if not settings.model_configured:
         raise RuntimeError("运行评测前必须配置 AI_MODEL_API_KEY 和 AI_MODEL_NAME")
@@ -175,6 +203,8 @@ async def run(path: Path, threshold: float) -> int:
 
 
 def main() -> None:
+    """解析命令行参数并启动异步评测。"""
+
     parser = argparse.ArgumentParser(description="Run deterministic teaching Agent evaluations")
     parser.add_argument("dataset", type=Path)
     parser.add_argument("--threshold", type=float, default=0.8)

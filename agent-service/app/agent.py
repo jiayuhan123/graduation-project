@@ -1,3 +1,10 @@
+"""教学 Agent 的构建、一次运行协调与 SSE 流适配。
+
+`AgentFactory` 使用 LangChain `create_agent` 为不同动态权限集合编译并缓存 LangGraph Agent；
+`TeachingAgent` 负责运行审计、长期记忆、checkpoint 线程、图事件消费和最终结果收尾。这里
+不直接实现业务工具，工具执行细节集中在 `tools.py`。
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -31,6 +38,7 @@ from app.tools import AgentContext, tools_for
 
 PROMPT_VERSION = "teaching-agent-langgraph-v1"
 logger = logging.getLogger(__name__)
+# 系统提示词负责教学角色和模型行为约束；真正权限还会由 Python 工具层与 Java 双重执行。
 SYSTEM_PROMPT = """你是小学数学个性化练习平台的教学决策 Agent。
 你的服务对象是教师或管理员，必须以工具返回的真实业务数据和知识库来源为依据。
 
@@ -48,12 +56,14 @@ SYSTEM_PROMPT = """你是小学数学个性化练习平台的教学决策 Agent�
 
 
 def sse(event: str, data: dict[str, Any]) -> str:
+    """把事件名和 JSON 数据编码成一个完整 Server-Sent Events 帧。"""
+
     encoded = json.dumps(data, ensure_ascii=False, separators=(",", ":"), default=str)
     return f"event: {event}\ndata: {encoded}\n\n"
 
 
 class AgentFactory:
-    """Compile one LangGraph agent per least-privilege tool set and reuse it safely."""
+    """按最小权限工具集合编译并安全复用 LangGraph Agent。"""
 
     def __init__(
         self,
@@ -69,7 +79,10 @@ class AgentFactory:
         self._agents: dict[tuple[str, ...], Any] = {}
 
     def for_tools(self, allowed_tools: list[str]) -> Any:
+        """返回与本次动态工具白名单完全对应的已编译 Agent。"""
+
         selected = tools_for(allowed_tools, include_local=True)
+        # 工具名元组既保留顺序又可哈希，用作不同权限图的缓存键。
         key = tuple(tool.name for tool in selected)
         if key not in self._agents:
             self._agents[key] = create_agent(
@@ -80,11 +93,13 @@ class AgentFactory:
                 checkpointer=self._checkpointer,
                 store=self._store,
                 middleware=[
+                    # 上下文过长时先总结旧消息，再保留配置数量的近期原始消息。
                     SummarizationMiddleware(
                         model=self._model,
                         trigger=("messages", max(12, self._settings.conversation_max_messages * 2)),
                         keep=("messages", self._settings.conversation_max_messages),
                     ),
+                    # 模型调用和工具调用分别设上限，防止错误规划造成循环或费用失控。
                     ModelCallLimitMiddleware(
                         run_limit=self._settings.max_tool_rounds + 2,
                         exit_behavior="error",
@@ -101,6 +116,8 @@ class AgentFactory:
 
 
 class TeachingAgent:
+    """协调单次 Agent 运行的持久化、记忆、流式输出和失败收尾。"""
+
     def __init__(
         self,
         settings: Settings,
@@ -120,6 +137,12 @@ class TeachingAgent:
         self._metrics = metrics
 
     async def run(self, request: RunRequest) -> AsyncIterator[str]:
+        """运行一轮 Agent，并按执行进度异步产出 SSE 字符串。
+
+        生成器只有被 `StreamingResponse` 消费时才真正执行。SSE 建立后的异常无法再改变 HTTP
+        状态码，因此调用方会把异常转成 `error` 事件，同时本方法负责写 FAILED/CANCELLED。
+        """
+
         started = time.monotonic()
         answer = ""
         context = AgentContext(
@@ -129,6 +152,7 @@ class TeachingAgent:
             database=self._database,
             metrics=self._metrics,
         )
+        # 先写 RUNNING，确保后续模型或工具失败仍然留下可追查的运行主记录。
         await self._database.start_run(
             request.runId,
             request.conversationId,
@@ -151,6 +175,7 @@ class TeachingAgent:
                     "recalledMemories": len(recalled),
                 },
             )
+            # 每次请求只把 Java 已授权的工具交给模型；相同集合会复用已编译图。
             graph = self._factory.for_tools(request.actor.allowedTools)
             final_state: dict[str, Any] = {}
             streamed_parts: list[str] = []
@@ -162,8 +187,10 @@ class TeachingAgent:
                         request.actor.activeRole,
                     )
                 },
+                # 图递归上限是最后一道死循环保护，独立于中间件的模型/工具调用上限。
                 "recursion_limit": self._settings.max_tool_rounds * 4 + 12,
             }
+            # custom=工具事件，messages=模型增量，values=最终可恢复的完整图状态。
             async for event in graph.astream(
                 {"messages": [HumanMessage(content=self._input_message(request, recalled))]},
                 config=config,
@@ -174,6 +201,7 @@ class TeachingAgent:
                 event_type = event.get("type")
                 data = event.get("data")
                 if event_type == "custom" and isinstance(data, dict):
+                    # tools.py 通过 stream_writer 产生的内部事件在这里稳定化为外部 SSE 协议。
                     event_name = data.get("event")
                     if event_name == "tool_start":
                         yield sse(
@@ -193,6 +221,7 @@ class TeachingAgent:
                             },
                         )
                 elif event_type == "messages" and isinstance(data, tuple):
+                    # 只转发 AIMessageChunk 文本，工具调用元数据不会被误当成回答正文。
                     message = data[0]
                     if isinstance(message, AIMessageChunk):
                         delta = self._message_text(message)
@@ -200,13 +229,16 @@ class TeachingAgent:
                             streamed_parts.append(delta)
                             yield sse("delta", {"content": delta})
                 elif event_type == "values" and isinstance(data, dict):
+                    # 持续保留最新快照，流结束后从中提取权威最终回答。
                     final_state = data
 
+            # 某些兼容模型不产生增量 chunk，因此保留从最终 state 回退输出完整文本的路径。
             answer = self._final_answer(final_state) or "".join(streamed_parts).strip()
             if not streamed_parts and answer:
                 yield sse("delta", {"content": answer})
             if answer:
                 try:
+                    # 长期记忆是增强能力：写入失败只告警，不推翻已经成功生成的用户答案。
                     await self._memory.remember(
                         request.runId,
                         request.actor.userId,
@@ -242,6 +274,7 @@ class TeachingAgent:
                 },
             )
         except asyncio.CancelledError as exception:
+            # 客户端断开或服务关闭导致的取消与普通业务失败分开统计。
             await self._finish_failure(request, started, context, "CANCELLED", answer, exception)
             raise
         except Exception as exception:
@@ -256,6 +289,8 @@ class TeachingAgent:
             self._metrics.inflight.dec()
 
     async def _recall(self, request: RunRequest) -> list[dict[str, Any]]:
+        """召回长期记忆；记忆库故障时降级为空列表而不中断主图。"""
+
         try:
             return await self._memory.recall(
                 request.actor.userId, request.actor.activeRole, request.message
@@ -270,6 +305,8 @@ class TeachingAgent:
 
     @staticmethod
     def _input_message(request: RunRequest, memories: list[dict[str, Any]]) -> str:
+        """构造送入图的 HumanMessage，并把历史记忆明确标记为不可信上下文。"""
+
         memory_text = "\n".join(
             f"[历史记忆{index}] {str(item.get('content', ''))[:1600]}"
             for index, item in enumerate(memories, 1)
@@ -287,6 +324,8 @@ class TeachingAgent:
 
     @classmethod
     def _final_answer(cls, state: dict[str, Any]) -> str:
+        """从后向前查找最后一条不包含工具调用的 AI 文本消息。"""
+
         for message in reversed(state.get("messages", [])):
             if isinstance(message, AIMessage) and not message.tool_calls:
                 text = cls._message_text(message).strip()
@@ -296,6 +335,8 @@ class TeachingAgent:
 
     @staticmethod
     def _message_text(message: AIMessage | AIMessageChunk) -> str:
+        """兼容纯字符串和内容块两种模型消息格式，提取可展示文本。"""
+
         if isinstance(message.content, str):
             return message.content
         parts: list[str] = []
@@ -315,6 +356,8 @@ class TeachingAgent:
         answer: str,
         exception: BaseException,
     ) -> None:
+        """统一持久化失败/取消状态并更新对应 Prometheus 指标。"""
+
         duration_ms = int((time.monotonic() - started) * 1000)
         await self._database.finish_run(
             request.runId,

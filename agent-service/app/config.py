@@ -1,3 +1,10 @@
+"""集中读取、转换并校验 Agent 服务的环境变量。
+
+模块不主动连接任何外部服务，只把字符串环境变量整理成只读 `Settings`。数据库、Redis、
+模型和 RAG 的所有可调参数都从这里进入应用，便于本地 `.env`、Docker Compose 和生产
+环境使用同一份代码。
+"""
+
 from __future__ import annotations
 
 import os
@@ -6,24 +13,33 @@ from urllib.parse import quote
 
 
 def _integer(name: str, default: int) -> int:
+    """读取整数环境变量；变量不存在或为空时使用默认值。"""
+
     value = os.getenv(name)
     return int(value) if value else default
 
 
 def _float(name: str, default: float) -> float:
+    """读取浮点环境变量；变量不存在或为空时使用默认值。"""
+
     value = os.getenv(name)
     return float(value) if value else default
 
 
 def _boolean(name: str, default: bool) -> bool:
+    """把常见真值字符串转换成 bool，避免直接用非空字符串判断。"""
+
     value = os.getenv(name)
     return value.lower() in {"1", "true", "yes", "on"} if value else default
 
 
 def _database_url() -> str:
+    """生成 asyncpg/psycopg 都可继续转换使用的 PostgreSQL URL。"""
+
     explicit = os.getenv("AI_DATABASE_URL")
     if explicit:
         return explicit
+    # 用户名、密码和数据库名可能含 URL 保留字符，拼接前必须进行百分号编码。
     username = quote(os.getenv("AI_DB_USERNAME", os.getenv("DB_USERNAME", "postgres")), safe="")
     password = quote(os.getenv("AI_DB_PASSWORD", os.getenv("DB_PASSWORD", "postgres")), safe="")
     host = os.getenv("AI_DB_HOST", os.getenv("DB_HOST", "postgres"))
@@ -33,6 +49,8 @@ def _database_url() -> str:
 
 
 def _redis_url() -> str:
+    """生成 Redis URL，并兼容 AI 专用变量和项目通用变量。"""
+
     explicit = os.getenv("AI_REDIS_URL")
     if explicit:
         return explicit
@@ -46,6 +64,12 @@ def _redis_url() -> str:
 
 @dataclass(frozen=True, slots=True)
 class Settings:
+    """应用启动后不可变的配置快照。
+
+    `frozen=True` 防止运行过程中意外修改配置；`slots=True` 限制可用属性并减少对象开销。
+    字段默认值主要服务本地开发，生产环境应由 Compose/环境变量显式覆盖敏感配置。
+    """
+
     bridge_token: str
     java_tool_base_url: str
     java_internal_api_token: str
@@ -77,6 +101,8 @@ class Settings:
 
     @classmethod
     def from_environment(cls) -> Settings:
+        """在进程启动时读取一次环境变量并构造配置对象。"""
+
         return cls(
             bridge_token=os.getenv("AI_AGENT_BRIDGE_TOKEN", ""),
             java_tool_base_url=os.getenv(
@@ -112,27 +138,40 @@ class Settings:
 
     @property
     def sqlalchemy_database_url(self) -> str:
+        """返回 LangChain `PGEngine` 所需的 SQLAlchemy asyncpg URL。"""
+
         if self.database_url.startswith("postgresql+asyncpg://"):
             return self.database_url
         return self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     @property
     def psycopg_database_url(self) -> str:
+        """返回 LangGraph PostgreSQL Checkpoint/Store 所需的 psycopg URL。"""
+
         return self.database_url.replace("postgresql+asyncpg://", "postgresql://", 1)
 
     @property
     def model_configured(self) -> bool:
+        """只判断模型必要配置是否存在，不发起真实模型探测。"""
+
         return bool(self.model_api_key and self.model_name)
 
     @property
     def embedding_configured(self) -> bool:
+        """只判断 Embedding 必要配置是否存在。"""
+
         return bool(self.model_api_key and self.embedding_model)
 
     @property
     def credentials_configured(self) -> bool:
+        """检查两个服务间凭证是否达到最低长度要求。"""
+
         return len(self.bridge_token) >= 24 and len(self.java_internal_api_token) >= 24
 
     def validate(self) -> None:
+        """校验配置之间的范围和大小关系，尽量在启动阶段快速失败。"""
+
+        # 向量维度一旦用于建表就必须与 Embedding 输出一致，不能在同一张表上随意切换。
         if self.embedding_dimensions < 64 or self.embedding_dimensions > 2000:
             raise ValueError("AI_EMBEDDING_DIMENSIONS must be between 64 and 2000")
         if self.database_pool_min_size < 1:

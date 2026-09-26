@@ -23,11 +23,11 @@ back/
 
 各业务模块仍是独立 Maven JAR，但不再各自启动。`monolith-app` 是唯一的 `@SpringBootApplication`，统一装配全部 Controller、Service、Mapper、Redis、RabbitMQ listener 和定时任务。
 
-微服务时期的 Feign 契约与 DTO 暂时保留，运行时由本地适配器直接调用用户、内容、教学模块，不经过 Nacos、负载均衡或 HTTP。外部 `/api/**` 路径保持不变，开发前端统一访问服务器单体地址 `http://122.51.234.113:10000`。
+微服务时期的 Feign 契约与 DTO 暂时保留，运行时由本地适配器直接调用用户、内容、教学模块，不经过 Nacos、负载均衡或 HTTP。外部 `/api/**` 路径保持不变，本机开发前端统一访问本机单体地址 `http://127.0.0.1:10000`。
 
 ## 开发启动
 
-开发阶段统一使用服务器 PostgreSQL、Redis 和 RabbitMQ，不启动本地基础设施。运行 Java 进程的机器需要 JDK 21。
+开发阶段在本机运行 Java、Python Agent 和前端，统一使用远端 PostgreSQL、Redis、RabbitMQ 与 OSS，不启动本地基础设施。运行 Java 进程的机器需要 JDK 21。
 
 1. 创建本地配置：
 
@@ -51,10 +51,15 @@ back/
 
 常用入口：
 
-- 业务 API：`http://122.51.234.113:10000/api/**`
-- Swagger UI：`http://122.51.234.113:10000/swagger-ui.html`
-- 健康检查：`http://122.51.234.113:10000/actuator/health`
+- 业务 API：`http://127.0.0.1:10000/api/**`
+- Swagger UI：`http://127.0.0.1:10000/swagger-ui.html`
+- 健康检查：`http://127.0.0.1:10000/actuator/health`
 - RabbitMQ 管理台：`http://122.51.234.113:15672`
+
+拍照批改 OCR 运行在 Java 单体内，不经过 Python Agent。开发环境在根目录 `.env` 中设置
+`AI_OCR_ENABLED=true` 和 `AI_OCR_MODEL_NAME=qwen-vl-ocr-latest` 即可启用；默认复用
+`AI_MODEL_API_KEY`，也可以用 `AI_OCR_API_KEY` 单独隔离 OCR 额度。工作器会领取待识别任务、
+读取私有原图并回写结构化题目，失败任务沿用现有 OCR 工作台重试流程。
 
 服务器上的 `monolith_db` 已完成初始化。需要在新的服务器环境重建时，可创建 `${MONOLITH_DB_NAME}` 数据库后执行：
 

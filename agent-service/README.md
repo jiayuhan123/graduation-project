@@ -41,6 +41,8 @@ $env:AI_RELOAD="true"
 .\.venv\Scripts\python -m app.server
 ```
 
+`app.server` 会自动读取仓库根目录 `.env`；当前进程中已设置的环境变量优先，便于临时覆盖配置。Windows 下请使用该入口，以保留 psycopg 所需的 Selector 事件循环策略。
+
 关键配置：
 
 - `AI_AGENT_BRIDGE_TOKEN`、`INTERNAL_API_TOKEN`：Java/Python 服务凭证；

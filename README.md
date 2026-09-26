@@ -64,16 +64,18 @@
 
 ## OCR 拍照批改
 
-系统已完成 OCR 业务闭环和外部识别工作器接入契约：
+系统已完成 OCR 业务闭环，并在 Java 模块化单体中接入 Qwen-VL-OCR 工作器；原有内部接口仍保留，便于未来拆分独立工作器：
 
 1. 学生通过小程序上传私有图片并创建拍照批改任务。
-2. OCR 工作器使用内部服务令牌轮询 `GET /internal/learning/photo-marking/pending`。
-3. 工作器调用 `POST /internal/learning/photo-marking/{taskId}/start` 领取任务，再通过 `GET /internal/files/{fileId}?ownerId={studentId}` 校验所有权并读取私有原图。
-4. 工作器完成切题、文字识别和固定题库匹配后，向 `POST /internal/learning/photo-marking/{taskId}/recognition` 回传结构化结果；无法处理时回调 `/failure`。
+2. 启用 `AI_OCR_ENABLED` 后，Java 工作器定时领取 `UPLOADED` 任务并通过文件服务校验所有权、读取私有原图。
+3. 工作器使用 `AI_OCR_MODEL_NAME=qwen-vl-ocr-latest` 调用阿里云百炼，提取题干、学生答案、题目区域和识别可信度；提示词明确禁止模型代替学生解题。
+4. 识别结果交回学习域事务服务完成固定题库匹配和落库；处理失败会写入安全失败摘要，可在 OCR 工作台重新入队。
 5. 可信度不低于 0.85 且成功匹配固定题目的结果自动判题；其余题目进入学生/教师/管理员复核。
 6. 确认后的答案统一更新答题记录、错题、掌握度和巩固推荐，并保留人工复核审计快照。
 
-仓库不绑定某一家 OCR 厂商；部署时需单独配置实现上述内部契约的 OCR 工作器和供应商凭据。未配置工作器时，任务会安全停留在“等待识别”，不会生成伪造结果。
+OCR 默认关闭，未配置百炼凭据时任务会安全停留在“等待识别”，不会生成伪造结果。启用后默认复用
+`AI_MODEL_API_KEY`，也可另配 `AI_OCR_API_KEY` 隔离额度；若未来更换厂商，只需替换组合层 OCR 客户端，
+学习域内部契约无需改变。
 
 ## 业务边界
 

@@ -8,6 +8,12 @@ import { auditRoutes } from '@/router/modules/audit'
 
 export const routes: RouteRecordRaw[] = [
   {
+    path: '/',
+    name: 'home',
+    component: () => import('@/views/home/HomeView.vue'),
+    meta: { title: '首页', requiresAuth: false, hidden: true },
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/login/LoginView.vue'),
@@ -28,7 +34,6 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
-    redirect: '/dashboard',
     meta: { title: '首页', requiresAuth: true },
     children: [
       {

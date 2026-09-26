@@ -24,7 +24,7 @@
 
 - Node.js `^20.19.0 || >=22.12.0`
 - npm（使用仓库中的 `package-lock.json`）
-- 开发环境统一访问服务器模块化单体 `http://122.51.234.113:10000`
+- 开发环境通过 Vite 代理访问本机模块化单体 `http://127.0.0.1:10000`；数据库、Redis、RabbitMQ 与 OSS 仍由根目录 `.env` 指向远端共享环境
 
 ## 启动
 
@@ -36,7 +36,7 @@ npm run dev
 
 `.env.local` 不提交到 Git。所有 `VITE_` 变量都会进入浏览器构建产物，禁止写入密码、Token、微信 AppSecret 或 AccessKey。
 
-开发环境通过 Vite 把 `/api` 代理到服务器模块化单体。生产环境建议让 Web 静态资源和 `/api` 使用同一站点，这样微信扫码登录的 HttpOnly state Cookie 可以稳定工作。
+开发环境通过 Vite 把 `/api` 代理到本机模块化单体。生产环境建议让 Web 静态资源和 `/api` 使用同一站点，这样微信扫码登录的 HttpOnly state Cookie 可以稳定工作。
 
 ## 微信扫码登录前置条件
 

@@ -90,6 +90,22 @@ app:
     action-token-ttl: ${AI_ACTION_TOKEN_TTL:15m}
     stream-timeout: ${AI_STREAM_TIMEOUT:120s}
     connect-timeout: ${AI_CONNECT_TIMEOUT:5s}
+  ocr:
+    enabled: ${AI_OCR_ENABLED:false}
+    endpoint: ${AI_OCR_ENDPOINT:https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions}
+    # 默认复用教学 Agent 的百炼 Key；需要隔离额度时可单独设置 AI_OCR_API_KEY。
+    api-key: ${AI_OCR_API_KEY:${AI_MODEL_API_KEY:}}
+    model-name: ${AI_OCR_MODEL_NAME:qwen-vl-ocr-latest}
+    connect-timeout: ${AI_OCR_CONNECT_TIMEOUT:5s}
+    read-timeout: ${AI_OCR_READ_TIMEOUT:90s}
+    fixed-delay-ms: ${AI_OCR_FIXED_DELAY_MS:5000}
+    batch-size: ${AI_OCR_BATCH_SIZE:2}
+    max-items: ${AI_OCR_MAX_ITEMS:100}
+    max-output-tokens: ${AI_OCR_MAX_OUTPUT_TOKENS:4096}
+    min-pixels: ${AI_OCR_MIN_PIXELS:3072}
+    max-pixels: ${AI_OCR_MAX_PIXELS:8388608}
+    # Base64 Data URL 还会膨胀约三分之一，因此低于上传接口的 20MB 上限。
+    max-image-bytes: ${AI_OCR_MAX_IMAGE_BYTES:14000000}
   mq:
     confirm-timeout: ${MQ_CONFIRM_TIMEOUT:5s}
     outbox:

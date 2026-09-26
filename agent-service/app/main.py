@@ -1,3 +1,10 @@
+"""FastAPI 应用入口、生命周期装配和 HTTP/SSE 路由。
+
+本模块是服务的 composition root：启动时创建数据库、Redis、模型、LangGraph、RAG 和
+TeachingAgent，并放入 `app.state` 供路由复用；关闭时按相反顺序释放资源。具体推理、工具
+和持久化逻辑分别留在对应模块，路由层只处理协议、安全入口与错误映射。
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -32,6 +39,7 @@ from app.observability import AgentMetrics
 from app.rag import KnowledgeService
 from app.storage import Database
 
+# 模块被 Uvicorn 导入时读取并校验一次配置；修改环境变量后需要重启进程。
 settings = Settings.from_environment()
 settings.validate()
 metrics = AgentMetrics()
@@ -39,6 +47,11 @@ logger = logging.getLogger(__name__)
 
 
 async def cleanup_loop(database: Database) -> None:
+    """每六小时清理一次超过保留期的运行审计。
+
+    长期语义记忆的 TTL 由 LangGraph Store 自己的 sweeper 负责，这个任务只清理项目表。
+    """
+
     while True:
         await asyncio.sleep(6 * 60 * 60)
         await database.cleanup(settings.memory_retention_days, settings.trace_retention_days)
@@ -46,6 +59,9 @@ async def cleanup_loop(database: Database) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """在整个 FastAPI 进程生命周期内创建并管理共享依赖。"""
+
+    # 这里只构造客户端对象；真正连接会在后面的 open/ping/setup 中建立。
     database = Database(settings)
     redis = Redis.from_url(
         settings.redis_url,
@@ -57,6 +73,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     model = create_chat_model(settings)
     embeddings = create_embeddings(settings)
     java_tools = JavaToolClient(settings)
+    # LangGraph 官方 PostgreSQL 适配器要求 psycopg pool；领域审计则使用 Database 的 asyncpg pool。
     graph_pool = AsyncConnectionPool(
         settings.psycopg_database_url,
         min_size=settings.database_pool_min_size,
@@ -73,6 +90,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     knowledge: KnowledgeService | None = None
     graph_store: Any | None = None
     try:
+        # 项目迁移必须先完成，之后 LangGraph/PGVector 才能在稳定 schema 上初始化自己的表。
         await database.open()
         await redis.ping()
         await graph_pool.open()
@@ -80,6 +98,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
         from langgraph.store.postgres.aio import AsyncPostgresStore
 
+        # Checkpointer 保存对话线程的图状态；Store 保存带向量索引和 TTL 的长期语义记忆。
         checkpointer = AsyncPostgresSaver(graph_pool)
         graph_store = AsyncPostgresStore(
             graph_pool,
@@ -96,12 +115,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 "sweep_interval_minutes": 60,
             },
         )
+        # setup() 幂等创建/升级框架表；不能用项目 SQL 猜测并手工维护这些内部表。
         await checkpointer.setup()
         await graph_store.setup()
         await graph_store.start_ttl_sweeper()
+        # RAG 服务会确保 chunk 向量表和 HNSW 索引存在，并编译检索子图。
         knowledge = await KnowledgeService.create(settings, database, embeddings, model)
         memory = AgentMemory(settings, graph_store, checkpointer)
         factory = AgentFactory(settings, model, checkpointer, graph_store)
+        # app.state 保存应用级单例，所有请求共享连接池、模型适配器和已编译 Agent 图。
         app.state.database = database
         app.state.redis = redis
         app.state.memory = memory
@@ -119,8 +141,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             metrics,
         )
         cleanup_task = asyncio.create_task(cleanup_loop(database), name="agent-data-cleanup")
+        # yield 之前是 startup；运行到这里 Uvicorn 才开始正常接收请求。
         yield
     finally:
+        # shutdown 必须容忍部分初始化失败，所以可选资源都先判断再关闭。
         if cleanup_task:
             cleanup_task.cancel()
             with suppress(asyncio.CancelledError):
@@ -171,17 +195,22 @@ async def request_validation_handler(
 
 @app.get("/health")
 async def health() -> dict[str, str]:
+    """Liveness：只证明 FastAPI 进程和事件循环仍能响应。"""
+
     return {"status": "UP"}
 
 
 @app.get("/ready")
 async def ready(request: Request) -> dict[str, Any]:
+    """Readiness：检查数据库、Redis 和关键配置是否具备接收请求的条件。"""
+
     database_ok = await request.app.state.database.ping()
     try:
         redis_ok = bool(await request.app.state.redis.ping())
     except Exception as exception:  # noqa: BLE001 - readiness 汇总所有依赖故障。
         logger.warning("redis readiness check failed error_type=%s", type(exception).__name__)
         redis_ok = False
+    # 模型、Embedding 和凭证这里只检查“已配置”，不会产生有成本的真实外部探测。
     ready_now = (
         database_ok
         and redis_ok
@@ -205,15 +234,20 @@ async def ready(request: Request) -> dict[str, Any]:
 
 @app.get("/metrics", include_in_schema=False)
 async def prometheus_metrics() -> Response:
+    """返回 Prometheus 文本指标；不放入对外 OpenAPI 文档。"""
+
     return Response(content=metrics.render(), media_type=CONTENT_TYPE_LATEST)
 
 
 def verify_bridge_token(supplied: str | None) -> None:
+    """验证 Java 调用 Python 使用的固定桥接令牌。"""
+
     if not settings.bridge_token:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="AI_AGENT_BRIDGE_TOKEN is not configured",
         )
+    # compare_digest 使用常量时间比较，避免普通字符串比较暴露前缀匹配时序。
     if supplied is None or not secrets.compare_digest(settings.bridge_token, supplied):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
@@ -224,6 +258,8 @@ async def stream_run(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> StreamingResponse:
+    """校验并启动一次 Agent，以 SSE 持续返回元数据、工具和回答事件。"""
+
     verify_bridge_token(bridge_token)
     try:
         await request.app.state.limiter.check_rate(request_body.actor.userId)
@@ -231,11 +267,14 @@ async def stream_run(
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=str(exception))
 
     async def events() -> AsyncIterator[str]:
+        """在并发槽位内消费 Agent 异步生成器，并兜底流建立后的异常。"""
+
         try:
             async with request.app.state.limiter:
                 async for event in request.app.state.agent.run(request_body):
                     yield event
         except Exception as exception:  # noqa: BLE001 - SSE 建立后必须转成事件。
+            # 响应头已经发出，无法再改成 HTTP 500，只能发送协议内 error 事件。
             logger.warning(
                 "agent stream failed run_id=%s error_type=%s",
                 request_body.runId,
@@ -260,6 +299,8 @@ async def upsert_knowledge(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> KnowledgeDocumentView:
+    """新增知识或按 sourceUri 替换内容，并等待向量索引完成后返回。"""
+
     verify_bridge_token(bridge_token)
     return await request.app.state.knowledge.ingest(body)
 
@@ -269,6 +310,8 @@ async def list_knowledge(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> list[KnowledgeDocumentView]:
+    """列出全部未软删除的知识文档摘要。"""
+
     verify_bridge_token(bridge_token)
     return await request.app.state.database.list_knowledge()
 
@@ -279,6 +322,8 @@ async def delete_knowledge(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, bool]:
+    """软删除知识主记录并删除所属向量 chunk。"""
+
     verify_bridge_token(bridge_token)
     deleted = await request.app.state.knowledge.delete(document_id)
     if not deleted:
@@ -292,6 +337,8 @@ async def save_feedback(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, bool]:
+    """保存运行所有者的正负反馈，并更新实时指标。"""
+
     verify_bridge_token(bridge_token)
     saved = await request.app.state.database.save_feedback(body)
     if not saved:
@@ -306,6 +353,8 @@ async def forget_memory(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, int | bool]:
+    """删除指定用户会话的长期记忆和所有角色 checkpoint。"""
+
     verify_bridge_token(bridge_token)
     deleted = await request.app.state.memory.forget(body.actorId, body.conversationId)
     return {"forgotten": True, "deletedMemories": deleted}
@@ -316,5 +365,7 @@ async def quality_summary(
     request: Request,
     bridge_token: str | None = Header(default=None, alias="X-AI-Bridge-Token"),
 ) -> dict[str, Any]:
+    """返回最近 30 天 Agent 运行和反馈质量统计。"""
+
     verify_bridge_token(bridge_token)
     return await request.app.state.database.quality_summary()

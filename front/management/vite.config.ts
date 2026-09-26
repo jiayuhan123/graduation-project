@@ -13,9 +13,9 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 5173,
       proxy: {
-        // 开发环境代理：/api 请求直接转发到服务器模块化单体
+        // 开发环境代理：/api 请求转发到本机模块化单体。
         '/api': {
-          target: env.DEV_API_PROXY_TARGET || 'http://122.51.234.113:10000',
+          target: env.DEV_API_PROXY_TARGET || 'http://127.0.0.1:10000',
           changeOrigin: true,
         },
       },

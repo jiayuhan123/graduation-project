@@ -1,3 +1,10 @@
+"""知识入库、pgvector 检索和 Agentic RAG 子图。
+
+入库侧负责中文递归切分、稳定 checksum、Embedding 和向量表更新；检索侧使用 LangGraph
+组织“召回 -> 相关性判断 -> 必要时改写查询”的闭环。业务文档元数据由 `Database` 管理，
+chunk 与向量由 LangChain `PGVectorStore` 管理。
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -24,6 +31,8 @@ _METADATA_COLUMNS = ["document_id", "chunk_index", "title", "source_uri", "sourc
 
 
 class RelevanceDecision(BaseModel):
+    """相关性评分模型的结构化输出，只允许返回候选编号。"""
+
     relevant_indices: list[int] = Field(
         default_factory=list,
         description="与问题直接相关、能支撑回答的候选资料编号，从 1 开始",
@@ -31,10 +40,14 @@ class RelevanceDecision(BaseModel):
 
 
 class RewrittenQuery(BaseModel):
+    """查询改写模型的结构化输出。"""
+
     query: str = Field(min_length=2, max_length=500, description="更适合知识库检索的问题")
 
 
 class RagState(TypedDict, total=False):
+    """RAG 子图节点共享的状态；节点只返回自己更新的字段。"""
+
     query: str
     search_query: str
     top_k: int
@@ -45,6 +58,12 @@ class RagState(TypedDict, total=False):
 
 
 def build_chinese_splitter(chunk_size: int, chunk_overlap: int) -> RecursiveCharacterTextSplitter:
+    """创建优先尊重段落和中文标点的递归文本切分器。
+
+    长度按 Python 字符数而非 token 数计算；`keep_separator=True` 保留标点，减少句意在
+    chunk 边界处被破坏。只有上级分隔符无法满足大小时才继续尝试更细分隔符。
+    """
+
     return RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -55,7 +74,7 @@ def build_chinese_splitter(chunk_size: int, chunk_overlap: int) -> RecursiveChar
 
 
 class KnowledgeService:
-    """LangChain PGVectorStore plus an explicit LangGraph Agentic-RAG subgraph."""
+    """组合 LangChain PGVectorStore 与显式 LangGraph Agentic-RAG 子图。"""
 
     def __init__(
         self,
@@ -84,7 +103,10 @@ class KnowledgeService:
         embeddings: Embeddings,
         model: BaseChatModel,
     ) -> KnowledgeService:
+        """初始化向量表/索引、连接 PGVectorStore 并编译 RAG 子图。"""
+
         engine = PGEngine.from_connection_string(url=settings.sqlalchemy_database_url)
+        # V002 会删除旧手写 chunk 表；首次新版启动由官方适配器按当前字段创建。
         if not await database.table_exists(_TABLE):
             await engine.ainit_vectorstore_table(
                 table_name=_TABLE,
@@ -114,18 +136,25 @@ class KnowledgeService:
             fetch_k=settings.rag_candidate_k,
             lambda_mult=settings.rag_mmr_lambda,
         )
+        # HNSW 为近似最近邻检索索引，避免数据量增长后每次扫描全部向量。
         if not await vector_store.ais_valid_index(_INDEX):
             await vector_store.aapply_vector_index(HNSWIndex(name=_INDEX))
         return cls(settings, database, embeddings, model, engine, vector_store)
 
     async def close(self) -> None:
+        """释放 LangChain PGEngine 持有的 SQLAlchemy 连接资源。"""
+
         await self._engine.close()
 
     async def ingest(self, request: KnowledgeUpsertRequest) -> KnowledgeDocumentView:
+        """按来源幂等地切分、向量化并新增或替换一篇知识文档。"""
+
+        # 先统一换行，确保 Windows/Linux 上相同正文得到相同 checksum 和 chunk。
         normalized = request.content.replace("\r\n", "\n").replace("\r", "\n").strip()
         chunks = [chunk.strip() for chunk in self._splitter.split_text(normalized) if chunk.strip()]
         if not chunks:
             raise ValueError("文档切分后没有可入库的有效内容")
+        # canonical JSON 固定字段顺序和空白，使 checksum 只由实际内容决定。
         canonical = json.dumps(
             {
                 "title": request.title,
@@ -153,8 +182,10 @@ class KnowledgeService:
             Document(page_content=content, metadata={**metadata, "chunk_index": index})
             for index, content in enumerate(chunks)
         ]
+        # UUID5 是确定性的：同一文档同一序号重复入库会得到相同 chunk ID。
         ids = [str(uuid5(NAMESPACE_URL, f"{document_id}:{index}")) for index in range(len(chunks))]
         try:
+            # 先删除该文档的旧版本 chunk，再写入完整新版本，避免新旧片段混合检索。
             await self._vector_store.adelete(filter={"document_id": str(document_id)})
             await self._vector_store.aadd_documents(documents, ids=ids)
             return await self._database.complete_knowledge(document_id, len(chunks))
@@ -163,6 +194,8 @@ class KnowledgeService:
             raise
 
     async def delete(self, document_id: UUID) -> bool:
+        """软删除文档元数据，并在确实删除时物理删除所属向量 chunk。"""
+
         deleted = await self._database.delete_knowledge(document_id)
         if deleted:
             await self._vector_store.adelete(filter={"document_id": str(document_id)})
@@ -174,6 +207,8 @@ class KnowledgeService:
         top_k: int | None = None,
         metadata_filter: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        """运行 RAG 子图并把内部 Document/距离转换成可引用的 JSON 结果。"""
+
         clean_query = query.strip()
         if len(clean_query) < 2:
             raise ValueError("检索问题至少需要 2 个字符")
@@ -199,6 +234,7 @@ class KnowledgeService:
                     "sourceUri": metadata.get("source_uri", ""),
                     "sourceType": metadata.get("source_type", "TEXT"),
                     "content": document.page_content,
+                    # PGVector 返回距离；对外转换为越大越相似的 0~1 展示分数。
                     "score": round(min(1.0, max(0.0, 1.0 - float(distance))), 4),
                     "metadata": {
                         key: value
@@ -215,6 +251,8 @@ class KnowledgeService:
         }
 
     def _build_graph(self) -> Any:
+        """编译 `retrieve -> grade -> rewrite?` 的无 checkpoint 短生命周期子图。"""
+
         builder = StateGraph(RagState)
         builder.add_node("retrieve", self._retrieve_node)
         builder.add_node("grade", self._grade_node)
@@ -230,6 +268,8 @@ class KnowledgeService:
         return builder.compile()
 
     async def _retrieve_node(self, state: RagState) -> dict[str, Any]:
+        """对当前检索词生成向量，并用 MMR 选择相关且不过度重复的候选。"""
+
         embedding = await self._embeddings.aembed_query(state["search_query"])
         docs = await self._vector_store.amax_marginal_relevance_search_with_score_by_vector(
             embedding,
@@ -241,6 +281,8 @@ class KnowledgeService:
         return {"scored_docs": docs}
 
     async def _grade_node(self, state: RagState) -> dict[str, Any]:
+        """让模型用结构化输出过滤不能直接支撑原问题的候选资料。"""
+
         scored_docs = state.get("scored_docs", [])
         if not scored_docs:
             return {"relevant_docs": []}
@@ -248,6 +290,7 @@ class KnowledgeService:
             f"[{index}] {document.page_content[:1200]}"
             for index, (document, _distance) in enumerate(scored_docs, 1)
         )
+        # 明确把资料内容视作不可信数据，避免知识库中的提示注入改变评分规则。
         decision = await self._grader.ainvoke(
             [
                 (
@@ -268,6 +311,8 @@ class KnowledgeService:
         }
 
     def _route_after_grade(self, state: RagState) -> str:
+        """有相关资料或达到改写上限时结束，否则进入 query rewrite。"""
+
         if state.get("relevant_docs"):
             return "done"
         if state.get("rewrite_count", 0) >= self._settings.rag_max_rewrites:
@@ -275,6 +320,8 @@ class KnowledgeService:
         return "rewrite"
 
     async def _rewrite_node(self, state: RagState) -> dict[str, Any]:
+        """在不改变原意的前提下生成更适合中文数学知识库检索的查询。"""
+
         rewritten = await self._rewriter.ainvoke(
             [
                 (
@@ -294,6 +341,8 @@ class KnowledgeService:
 
     @staticmethod
     def _normalize_filter(metadata_filter: dict[str, Any] | None) -> dict[str, Any] | None:
+        """把 API camelCase 别名映射为列名，并丢弃未允许的过滤字段。"""
+
         if not metadata_filter:
             return None
         aliases = {

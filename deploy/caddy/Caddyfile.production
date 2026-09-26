@@ -1,4 +1,4 @@
-:80 {
+jiayuhan.site {
     encode zstd gzip
 
     header {

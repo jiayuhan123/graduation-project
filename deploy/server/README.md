@@ -43,7 +43,10 @@ psql -v ON_ERROR_STOP=1 -d monolith_db -f database/seed-data.sql
 
 PostgreSQL 容器使用与 PostgreSQL 18 兼容的固定版 pgvector 镜像。FastAPI 首次启动新版迁移时会直接清除旧的手写 RAG/记忆数据，再由 LangChain PGVectorStore 和 LangGraph Checkpoint/Store 创建新表；业务表和 Agent 运行审计不受影响。迁移使用校验和阻止历史脚本漂移。
 
-教学 Agent 启用前还必须配置 `AI_MODEL_NAME`、`AI_EMBEDDING_MODEL`、模型 API Key、桥接令牌和至少 32 字符的工具签名密钥：
+教学 Agent 启用前还必须配置 `AI_MODEL_NAME=qwen3.7-flash`、
+`AI_EMBEDDING_MODEL=qwen3.7-text-embedding-flash`、模型 API Key、桥接令牌和至少 32 字符的工具签名密钥。
+Java 单体的拍照批改使用 `AI_OCR_MODEL_NAME=qwen-vl-ocr-latest`；部署脚本默认让它复用同一个百炼 Key，
+也可以通过 `AI_OCR_API_KEY` 单独隔离额度：
 
 ```bash
 docker compose --env-file .env -f docker-compose.yaml -f docker-compose.server.yaml up -d postgres redis agent-service

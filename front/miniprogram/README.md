@@ -55,7 +55,7 @@ front/miniprogram/
 1. 在本目录执行 `npm install`。
 2. 使用微信开发者工具导入 `front/miniprogram`，在“设置 → 安全设置”中开启服务端口，然后执行“工具 → 构建 npm”，生成 TDesign 小程序组件。
 3. 开发者工具会根据 `project.config.json` 编译 TypeScript；当前 AppID 已配置为 `wxa69fc7e3c9ecd0d4`。
-4. 开发接口统一使用服务器模块化单体 `http://122.51.234.113:10000`，配置位于 `miniprogram/config/environment.ts`。开发者工具调试时需关闭合法域名校验。
+4. 开发接口使用本机模块化单体 `http://127.0.0.1:10000`，配置位于 `miniprogram/config/environment.ts`；数据库与中间件仍使用根目录 `.env` 指向的远端共享环境。开发者工具调试时需关闭合法域名校验。
 5. 体验版和正式版必须改为已在微信公众平台登记的 HTTPS 域名，不能使用 HTTP IP 地址。
 6. 后端微信登录还需配置与 AppID 对应的 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`，并启用微信登录配置。只测试账号密码登录时可以先不配置。
 7. 开发者工具会生成 `project.private.config.json`，该文件只保存本机设置，不提交到 Git。
