@@ -4,6 +4,8 @@
 > 面向读者：学过 Java、Spring Boot、MySQL，正在系统学习 Python、FastAPI、LangChain、LangGraph、RAG
 > 阅读原则：先理解数据库和数据边界，再看启动过程，最后沿一次真实请求阅读 Python 代码
 
+本文只解释当前代码实际运行时的最终结构和流程，不讲数据库结构的历史演进。`migrations` 中的 SQL 是服务启动时维护当前数据库结构的内部脚本；学习项目时直接以本章列出的当前表、当前字段和当前代码行为为准。
+
 ## 1. 先用一句话认识这个项目
 
 这个 `agent-service` 是一个基于 FastAPI 的 Python AI 编排服务：它把大模型、LangChain 工具、LangGraph 状态图、PostgreSQL/pgvector 知识库、长短期记忆和 SSE 流式输出组合起来，但不直接信任模型去读取或修改核心业务数据；身份、权限、班级数据和最终业务写入仍由 Java `monolith-app` 掌握。
@@ -76,7 +78,6 @@ flowchart LR
 | `TIMESTAMPTZ` | 创建时间、完成时间、过期时间 | 带时区语义的时间点；显示时可转换到本地时区 |
 | `VECTOR(1024)` | 文档和记忆的 Embedding | MySQL 普通版本没有同等原生向量类型；这里由 `pgvector` 扩展提供 |
 | HNSW 索引 | 近似最近邻向量检索 | 类似为“语义距离查询”建立专用高性能索引 |
-| `TSVECTOR` + GIN | V001 旧版全文检索设计 | PostgreSQL 原生全文检索；新版向量表不再使用旧字段 |
 | `FILTER (WHERE ...)` | 一次聚合多个质量指标 | 比多条 `SUM(CASE WHEN ...)` 更直观 |
 | `ON CONFLICT` | 幂等插入、反馈 upsert | 对应 MySQL 的 `ON DUPLICATE KEY UPDATE` |
 | `RETURNING *` | 更新文档后立即得到新行 | MySQL 传统写法通常还要再查一次 |
@@ -93,28 +94,26 @@ flowchart LR
 | 分组 | 表 | 谁创建 | 用途 |
 |---|---|---|---|
 | 项目迁移与业务元数据 | `ai_schema_migration`、`ai_knowledge_document` | `storage.py` + SQL 迁移 | 迁移版本、知识文档主记录 |
-| 运行审计 | `ai_agent_run`、`ai_tool_call`、`ai_feedback` | V001 迁移 | 每次运行、每次工具调用和用户反馈 |
+| 运行审计 | `ai_agent_run`、`ai_tool_call`、`ai_feedback` | 项目 SQL 迁移 | 每次运行、每次工具调用和用户反馈 |
 | RAG 向量表 | `ai_knowledge_chunk` | `langchain-postgres` | 文档分块、Embedding、检索元数据 |
 | LangGraph 短期状态 | `checkpoint_migrations`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes` | `AsyncPostgresSaver.setup()` | 工作流快照、消息状态和中间写入 |
 | LangGraph 长期记忆 | `store_migrations`、`vector_migrations`、`store`、`store_vectors` | `AsyncPostgresStore.setup()` | JSON 记忆、TTL、语义向量 |
 
-旧表 `ai_conversation` 和 `ai_memory` 已在 V002 中删除。当前的多轮状态和语义记忆由 LangGraph 官方表接管。
-
-### 3.3 `ai_schema_migration`：Python 自己的迁移历史
+### 3.3 `ai_schema_migration`：Python 自己的结构变更记录
 
 | 字段 | 类型 | 作用 |
 |---|---|---|
-| `version` | `VARCHAR(100)`，主键 | SQL 文件名，例如 `V001__agent_production_core.sql` |
+| `version` | `VARCHAR(100)`，主键 | 已执行 SQL 脚本的唯一标识 |
 | `checksum` | `CHAR(64)` | 替换变量后的 SQL SHA-256，用于检测已执行迁移被篡改 |
 | `applied_at` | `TIMESTAMPTZ` | 应用迁移的时间 |
 
-`Database.open()` 启动时先取得固定 advisory lock，再创建这张表，然后按文件名排序执行 `app/migrations/*.sql`。如果同名迁移已经执行但 checksum 变化，服务直接报错，避免“悄悄修改历史迁移”造成环境不一致。
+`Database.open()` 启动时先取得固定 advisory lock，再创建这张表，然后按文件名排序执行 `app/migrations/*.sql`。如果某个已执行脚本的 checksum 发生变化，服务直接报错，避免不同环境得到不一致的表结构。
 
 这和 Flyway 的思想相似，但实现是项目自己的轻量版本。
 
 ### 3.4 `ai_knowledge_document`：知识文档主表
 
-V001 创建基础字段，V002 在清空旧知识数据后添加新版字段。当前最终结构的含义如下：
+当前运行代码使用的字段结构如下：
 
 | 字段 | 类型 | 作用与特点 |
 |---|---|---|
@@ -128,7 +127,7 @@ V001 创建基础字段，V002 在清空旧知识数据后添加新版字段。�
 | `created_by` | `BIGINT` | 发起入库的 Java 用户 ID |
 | `created_at` | `TIMESTAMPTZ` | 首次创建时间 |
 | `updated_at` | `TIMESTAMPTZ` | 最近更新状态或内容时间 |
-| `raw_content` | `TEXT` | 脱敏后的原始正文，V002 新增 |
+| `raw_content` | `TEXT` | 脱敏后的原始正文 |
 | `chunk_count` | `INTEGER` | 成功切分并写入的片段数 |
 | `embedding_model` | `VARCHAR(200)` | 入库时使用的 Embedding 模型 |
 | `embedding_dimensions` | `INTEGER` | 入库时向量维度，默认配置为 1024 |
@@ -159,7 +158,7 @@ V001 创建基础字段，V002 在清空旧知识数据后添加新版字段。�
 
 ### 3.5 `ai_knowledge_chunk`：知识向量表
 
-V001 曾经手写过一版包含外键、`token_count` 和全文检索列的表；V002 会删除它。当前表由 `KnowledgeService.create()` 调用 `langchain-postgres` 创建，最终结构以运行时定义为准：
+当前表由 `KnowledgeService.create()` 调用 `langchain-postgres` 创建，字段结构以当前运行时代码为准：
 
 | 字段 | 类型 | 作用 |
 |---|---|---|
@@ -175,7 +174,7 @@ V001 曾经手写过一版包含外键、`token_count` 和全文检索列的表�
 
 这里有两个容易误解的地方：
 
-1. 当前 `document_id` 是 `TEXT`，不是 V001 旧表中的 `UUID` 外键；它与主表的关联由应用维护，没有数据库外键。
+1. `document_id` 是文档 UUID 的字符串形式，字段类型为 `TEXT`；它与主表的关联由应用维护，没有数据库外键。
 2. 标题和来源字段故意冗余到 chunk 表，这样向量检索返回一行时，不需要再 join 主表才能生成引用。
 
 索引 `idx_ai_knowledge_chunk_embedding` 是 HNSW 向量索引。HNSW 是近似最近邻结构：牺牲极少量精确性，换取大规模向量检索速度。代码使用余弦语义进行检索，并在候选中做 MMR 去重。
@@ -192,7 +191,7 @@ V001 曾经手写过一版包含外键、`token_count` 和全文检索列的表�
 | `input_text` | `TEXT` | 脱敏后的用户输入 |
 | `output_text` | `TEXT` | 脱敏后的最终回答 |
 | `model_name` | `VARCHAR(200)` | 本次模型名 |
-| `prompt_version` | `VARCHAR(64)` | 当前固定为 `teaching-agent-langgraph-v1` |
+| `prompt_version` | `VARCHAR(64)` | 本次运行使用的系统提示词标识，便于审计和效果对比 |
 | `tool_call_count` | `INTEGER` | 本次工具调用次数 |
 | `rag_hit_count` | `INTEGER` | RAG 最终有效资料数 |
 | `error_type` | `VARCHAR(200)` | 失败异常类名 |
@@ -301,8 +300,7 @@ agent-service/
 ├── app/                                  # 当前、唯一可信的 Python 服务源码
 │   ├── migrations/                       # 项目自有 PostgreSQL 迁移
 │   │   ├── __init__.py
-│   │   ├── V001__agent_production_core.sql
-│   │   └── V002__langchain_langgraph.sql
+│   │   └── *.sql                          # 启动时维护当前表结构的内部脚本
 │   ├── __init__.py
 │   ├── agent.py                           # Agent 构建、运行和 SSE 适配
 │   ├── clients.py                         # 模型、Embedding、Java HTTP 客户端
@@ -343,7 +341,7 @@ agent-service/
 
 ### 4.1 必须强调：`app` 才是源码，`build/lib/app` 不是
 
-当前 `build/lib/app` 与 `app` 的内容已经明显不同，而且缺少 `server.py`、V002 等当前代码。它是某次旧打包留下的快照，不会被 Git 跟踪，也不会被 Dockerfile复制。阅读、修改、调试都应以 `agent-service/app` 为准。
+当前 `build/lib/app` 与 `app` 的内容已经明显不同，而且缺少 `server.py` 等当前代码。它是某次打包留下的过期快照，不会被 Git 跟踪，也不会被 Dockerfile复制。阅读、修改、调试都应以 `agent-service/app` 为准。
 
 各类生成目录可以这样理解：
 
@@ -406,7 +404,7 @@ Uvicorn 开始服务前进入 `lifespan(app)`，依次执行：
 4. 创建 `OpenAIEmbeddings` 向量模型适配器。
 5. 创建回调 Java 的 `JavaToolClient`。
 6. 创建供 LangGraph 使用的 psycopg 异步连接池。
-7. `database.open()`：执行 V001/V002 项目迁移，再创建 `asyncpg` 连接池。
+7. `database.open()`：把项目自有数据库结构更新到当前状态，再创建 `asyncpg` 连接池。
 8. `redis.ping()`：Redis 不可用时启动失败。
 9. 打开 LangGraph psycopg 连接池。
 10. `checkpointer.setup()`：创建或升级 checkpoint 表。
@@ -860,31 +858,20 @@ async with limiter:
 
 整体作用：把迁移目录标记为包，使 `importlib.resources.files("app.migrations")` 在本地和安装后的 wheel 中都能读取 SQL 文件。
 
-### 7.16 `V001__agent_production_core.sql`
+### 7.16 `app/migrations/*.sql`
 
-整体作用：创建 pgvector 扩展、最初知识表、旧记忆表、运行审计、工具审计和反馈表。
+整体作用：让 `Database.open()` 在服务启动时把项目自有 PostgreSQL 结构准备到当前代码所需状态。
 
-需要用“历史迁移”视角阅读：
+学习业务时直接记住当前职责即可：
 
-- `ai_knowledge_document`、`ai_agent_run`、`ai_tool_call`、`ai_feedback` 延续到当前版本。
-- V001 中的 `ai_knowledge_chunk` 会被 V002 删除并由 LangChain 重建。
-- V001 中的 `ai_conversation`、`ai_memory` 会被 V002 删除，不是当前运行模型。
+- 启用 `pgvector` 扩展。
+- 准备知识文档主表。
+- 准备 Agent 运行、工具调用和用户反馈审计表。
+- 让知识文档字段满足当前 RAG 入库流程。
+- LangChain 在启动时创建当前 `ai_knowledge_chunk` 向量表。
+- LangGraph 在启动时创建当前 checkpoint 和 Store 表。
 
-迁移文件一旦在环境执行，不应该直接修改；新变化应增加 V003，否则 checksum 会阻止启动。
-
-### 7.17 `V002__langchain_langgraph.sql`
-
-整体作用：从旧手写 RAG/记忆结构切换到 LangChain/LangGraph 官方结构。
-
-它会：
-
-1. 删除旧 `ai_memory`。
-2. 删除旧 `ai_conversation`。
-3. 删除旧 `ai_knowledge_chunk`。
-4. 清空 `ai_knowledge_document`。
-5. 为知识文档增加原文、chunk 数、Embedding 模型/维度和索引时间。
-
-这是破坏性迁移，明确放弃旧 AI 知识和记忆数据。它适合当时“干净替换”的项目决策，但在已有重要生产知识数据后不能再次照此模式新增迁移。
+当前最终表结构已经在第 3 章逐表说明。SQL 脚本属于数据库初始化机制，不是两套同时运行的业务模型。
 
 ## 8. Agent 工具的真实业务链路
 
@@ -951,16 +938,6 @@ Java 适配层会把真实学生 ID 清空，把姓名改为“需关注学生-1
 | `AI_HOST` | `0.0.0.0` | 仅 `app.server` 读取 |
 | `AI_AGENT_PORT` | 8100 | 本地服务端口 |
 | `AI_RELOAD` | false | 本地代码热重载 |
-
-### 9.2 `.env.example` 中当前未被 Python 使用的旧配置
-
-下列变量仍出现在仓库根 `.env.example`，但当前 `Settings` 没有读取：
-
-- `AI_CONVERSATION_MEMORY_TTL_SECONDS`
-- `AI_CONTEXT_HISTORY_CHARS`
-- `AI_RAG_MIN_SCORE`
-
-它们看起来来自旧版实现。调整这些值不会改变当前 Python 行为。当前检索依赖模型 grade，而不是固定 `AI_RAG_MIN_SCORE` 阈值。
 
 ## 10. 本地安装、启动和验证
 
@@ -1092,8 +1069,6 @@ Python 项目的统一配置文件，类似 Maven `pom.xml` 的一部分职责�
 - 配置 Ruff 行宽与 Python 目标版本。
 - 确保迁移 SQL 被打进 Python 包。
 
-注意：项目包版本为 `0.1.0`，FastAPI 对外显示版本为 `0.2.0`，目前两个版本号未统一。
-
 ### `requirements.lock`
 
 记录当前实际解析后的精确依赖版本。`pyproject.toml` 表示允许范围，lock 文件表示本项目验证时具体使用哪一版。升级依赖时应重新验证 LangChain、LangGraph、Pydantic 和 FastAPI 的兼容性。
@@ -1188,7 +1163,6 @@ Settings
 - `/health` 成功不等于依赖就绪，应再看 `/ready`。
 - `/ready` 成功也不代表模型和 Java 一定可调用，因为它没有做真实外部探测。
 - `build/lib/app` 是过期构建产物，不是第二套源码。
-- V001 中的旧 `ai_memory`、`ai_conversation`、旧 chunk 表已被 V002 删除。
 - Redis 不保存聊天消息。
 - `create_assignment_draft` 不等于最终创建/发布作业。
 - 长期语义记忆按用户和角色跨会话召回，这是当前设计，不是串话 bug。
@@ -1198,28 +1172,26 @@ Settings
 
 这些不是启动阻塞项，而是理解系统成熟度时应知道的现实边界：
 
-- 统一 `pyproject.toml` 与 FastAPI 对外版本号。
-- 清理 `.env.example` 中已经不使用的旧配置，补齐 chunk/overlap/rewrite 配置示例。
 - 为 `/ready` 增加可选的模型、Embedding 和 Java 轻量探测，或把“配置就绪”和“依赖可达”拆成不同状态。
 - 如果部署多个 Python worker/副本，需要使用分布式并发控制，而不只是进程内 semaphore。
 - `ai_knowledge_chunk.document_id` 没有数据库外键，依赖应用删除；应持续做孤儿 chunk 检查或接受框架表边界。
 - Feedback comment 当前没有调用和运行文本同等级的主动脱敏，可按隐私要求增强。
 - 集成测试应覆盖真实 pgvector 表、LangGraph setup、Redis、Java 签名工具链和 SSE 中断恢复。
-- V002 是明确的破坏性替换；今后生产迁移应采用备份、兼容读写和可回滚步骤。
+- 今后生产数据库结构发生变化时，应采用备份、兼容读写和可回滚的迁移步骤。
 
 ## 16. 推荐的源码学习顺序
 
 不要按文件名字母顺序读。建议按运行因果关系读：
 
-1. `app/migrations/V001...sql` 和 `V002...sql`：先知道数据落在哪里。
+1. 先读本文第 3 章：知道当前数据落在哪些表、每个字段做什么。
 2. `app/config.py`：知道服务依赖什么配置。
 3. `app/models.py`：知道 Java 与 Python 交换什么数据。
 4. `app/server.py`：知道本地从哪里启动。
 5. `app/main.py`：知道依赖怎样创建、有哪些路由。
-6. `app/storage.py`：知道迁移、审计和知识元数据怎样保存。
+6. `app/storage.py`：知道当前审计和知识元数据怎样保存。
 7. `app/clients.py`：知道模型和 Java 怎样连接。
 8. `app/tools.py`：知道模型能做什么、不能做什么。
-9. `app/rag.py`：理解知识入库和检索子图。
+9. `app/rag.py`：理解当前知识入库和检索子图。
 10. `app/memory.py`：区分 checkpoint 与长期语义记忆。
 11. `app/agent.py`：最后把模型、工具、记忆、SSE 串起来。
 12. `tests/` 和 `evals/`：用断言反向确认你是否真正理解行为。

@@ -121,6 +121,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await graph_store.start_ttl_sweeper()
         # RAG 服务会确保 chunk 向量表和 HNSW 索引存在，并编译检索子图。
         knowledge = await KnowledgeService.create(settings, database, embeddings, model)
+        # ai_knowledge_chunk 由上一步动态创建；此时统一写入六张 AI 表的表/字段注释。
+        await database.apply_schema_comments()
         memory = AgentMemory(settings, graph_store, checkpointer)
         factory = AgentFactory(settings, model, checkpointer, graph_store)
         # app.state 保存应用级单例，所有请求共享连接池、模型适配器和已编译 Agent 图。

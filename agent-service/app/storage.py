@@ -131,7 +131,13 @@ class Database:
         """按文件名顺序执行未应用迁移，并拒绝被修改的历史迁移。"""
 
         migration_root = resources.files("app.migrations")
-        migrations = sorted(item for item in migration_root.iterdir() if item.name.endswith(".sql"))
+        # 只有 V 开头的 SQL 才属于一次性版本迁移；schema_comments.sql 会在所有动态表
+        # （尤其是 LangChain 创建的 ai_knowledge_chunk）就绪后单独、幂等地应用。
+        migrations = sorted(
+            item
+            for item in migration_root.iterdir()
+            if item.name.startswith("V") and item.name.endswith(".sql")
+        )
         for migration in migrations:
             # 旧版迁移使用维度占位符；checksum 对替换后的真实 SQL 计算。
             sql = migration.read_text(encoding="utf-8").replace(
@@ -153,6 +159,21 @@ class Database:
                     migration.name,
                     checksum,
                 )
+
+    async def apply_schema_comments(self) -> None:
+        """为当前 AI 领域表及其字段写入 PostgreSQL 元数据注释。
+
+        该步骤必须在 `KnowledgeService.create()` 之后执行，因为 `ai_knowledge_chunk` 由
+        LangChain 在运行时确保存在。`COMMENT ON` 可重复执行，服务重启时会把注释恢复为
+        当前代码定义的内容，不影响表数据、约束和索引。
+        """
+
+        comment_sql = (
+            resources.files("app.migrations")
+            .joinpath("schema_comments.sql")
+            .read_text(encoding="utf-8")
+        )
+        await self.pool.execute(comment_sql)
 
     async def close(self) -> None:
         """关闭请求连接池；方法可重复调用。"""
